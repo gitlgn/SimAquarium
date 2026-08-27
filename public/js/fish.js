@@ -146,13 +146,15 @@ var fishFrameR		= new Array();
 for( i = 0; i < 29; i++ ) {
 	fishFrameL[i] = new Array();
 	fishFrameR[i] = new Array();
-	
+
 	fishFrameL[i][0] = new Image();
 	fishFrameR[i][0] = new Image();
-	
-	fishFrameL[i][0].src = "gfx/aquarium/fishes/fish" + i + "L.png";
-	fishFrameR[i][0].src = "gfx/aquarium/fishes/fish" + i + "R.png";;
 
+	// Species 0 ("Test fish") is a debug entry that ships no artwork —
+	// fall back to species 1's sprite so it still has a valid image.
+	var spriteNum = ( i === 0 ) ? 1 : i;
+	fishFrameL[i][0].src = "gfx/aquarium/fishes/fish" + spriteNum + "L.png";
+	fishFrameR[i][0].src = "gfx/aquarium/fishes/fish" + spriteNum + "R.png";
 }
 
 
