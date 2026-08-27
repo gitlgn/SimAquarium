@@ -40,8 +40,8 @@ npm run dev      # http://localhost:5173
 Other scripts:
 
 ```bash
-npm run build    # production build into dist/
-npm run preview  # serve the production build locally
+npm run build      # production build into dist/
+npm run preview    # serve the production build locally
 npm run lint       # ESLint
 npm run typecheck  # tsc --checkJs (no emit)
 npm run test       # Vitest
