@@ -20,8 +20,11 @@
 	<link rel="stylesheet" href="/css/viewLighting.css" type="text/css">
 	<link rel="stylesheet" href="/css/viewAccessories.css" type="text/css">
 	<link rel="stylesheet" href="/css/viewStatistics.css" type="text/css">
+	<!-- Scale-to-fit wrapper for the fixed 457x300 widget layout (loaded last to win the cascade). -->
+	<link rel="stylesheet" href="/css/stage.css" type="text/css">
 
 	<!-- Phase 1: classic scripts, loaded in original order. Phase 2 converts these to ES modules. -->
+	<script defer src="/stage.js"></script>
 	<script defer src="/storageAPI.js"></script>
 	<script defer src="/sandbox.js"></script>
 	<script defer src="/js/main.js"></script>
@@ -37,6 +40,9 @@
 	<script defer src="/js/uio.js"></script>
 </head>
 <body>
+
+<div id="viewport">
+<div id="stage">
 
 	<div id="pageFront">
 
@@ -369,5 +375,8 @@
 	<div class="buttonWidget" id="buttonWidget0"></div>
 	<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
 	<div class="buttonWidget" id="buttonWidget2" title="Save &amp; Exit"></div>
+
+</div><!-- #stage -->
+</div><!-- #viewport -->
 </body>
 </html>

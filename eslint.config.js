@@ -40,9 +40,15 @@ export default [
 		},
 	},
 
-	// Legacy game code — classic scripts sharing one global scope.
+	// Classic browser scripts (the modernization wrapper + the legacy game code,
+	// which shares one global scope).
 	{
-		files: ['public/js/**/*.js', 'public/storageAPI.js', 'public/sandbox.js'],
+		files: [
+			'public/js/**/*.js',
+			'public/storageAPI.js',
+			'public/sandbox.js',
+			'public/stage.js',
+		],
 		languageOptions: {
 			ecmaVersion: 5,
 			sourceType: 'script',

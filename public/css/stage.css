@@ -1,0 +1,62 @@
+/*
+ * stage.css — scale-to-fit wrapper for the original fixed 457x300 "widget" layout.
+ *
+ * The 2014 UI positions everything with `position: absolute` + pixel `top/left/
+ * right/bottom`, but never established a positioning context — so right-anchored
+ * elements (money, tools, speed bar, widget buttons) resolved against the
+ * viewport and drifted away from the background frame as the window resized.
+ *
+ * Fix: wrap the whole thing in #stage (position: relative, exact 457x300) so all
+ * those absolute children anchor to the frame again, then uniformly scale #stage
+ * to fill the window. Zero changes to game markup or logic.
+ *
+ * A truly fluid/responsive layout (bigger tank, reflowing panels for portrait
+ * phones) is a separate rebuild — see MODERNIZATION.md Phase 4.
+ */
+
+:root {
+	--stage-scale: 1;
+	--stage-bg: #0e4e7a;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--stage-bg);
+	overflow: hidden;
+}
+
+#viewport {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#stage {
+	position: relative;
+	width: 457px;
+	height: 300px;
+	flex: none;
+	transform: scale(var(--stage-scale));
+	transform-origin: center center;
+	/* keep the pixel art crisp when scaled up */
+	image-rendering: pixelated;
+}
+
+/* Give the two widget faces a positioning context inside #stage and stack them. */
+#pageFront,
+#pageBack {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#tank {
+	image-rendering: pixelated;
+}
