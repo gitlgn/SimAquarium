@@ -8,6 +8,7 @@ import { fishShop } from './fishshop.js';
 import { storage } from './storage.js';
 import { loop } from './loop.js';
 import { computeBreedingRate, computeFishNumComfort } from './species.js';
+import { $ } from './dom.js';
 
 class Config {
 	#relaxEnable() {
@@ -15,10 +16,9 @@ class Config {
 		loop.big = window.setInterval(() => {
 			aquarium.updateRelaxMode();
 		}, 2000);
-		document.getElementById('statusEvent').style.backgroundPosition = '38px';
-		document.getElementById('statusEventIcon').style.background =
-			'url(gfx/interface/alertLightIcon5.png)';
-		document.getElementById('statusEventIcon').style.display = 'block';
+		$('statusEvent').style.backgroundPosition = '38px';
+		$('statusEventIcon').style.background = 'url(gfx/interface/alertLightIcon5.png)';
+		$('statusEventIcon').style.display = 'block';
 	}
 
 	#relaxDisable() {
@@ -26,13 +26,13 @@ class Config {
 		loop.big = window.setInterval(() => {
 			aquarium.update();
 		}, 2000);
-		document.getElementById('statusEvent').style.backgroundPosition = '0';
-		document.getElementById('statusEventIcon').style.display = 'none';
+		$('statusEvent').style.backgroundPosition = '0';
+		$('statusEventIcon').style.display = 'none';
 	}
 
 	/** @returns {HTMLInputElement} */
 	#relaxCheckbox() {
-		return /** @type {HTMLInputElement} */ (document.getElementById('confRelaxMode'));
+		return $('confRelaxMode') as HTMLInputElement;
 	}
 
 	relaxChange() {

@@ -3,41 +3,33 @@ import globals from 'globals';
 import prettier from 'eslint-config-prettier';
 
 /**
- * Flat config. Tiers:
- *  - src/**        : the game as ES modules + classes. Strict syntax rules
- *                    (no-var, prefer-const, eqeqeq) + correctness rules.
- *  - test/**       : Vitest specs (jsdom env).
+ * Flat config.
+ *
+ * `src/**` and `test/**` are TypeScript. ESLint's built-in parser can't read
+ * `.ts`, and `typescript-eslint` does not yet support the TS 7 compiler API
+ * (typescript-eslint#10940), so those are covered by `tsc --strict`
+ * (+ `noUnusedLocals`) and Prettier instead — see `npm run check`.
+ *
+ * What ESLint still lints:
  *  - *.config.js   : Node tooling config.
- *  - public/*.js   : classic browser scripts — only `stage.js` remains.
+ *  - public/*.js   : the one classic browser script (`stage.js`).
  */
 export default [
-	{ ignores: ['dist/**', 'node_modules/**', 'dev-dist/**', 'android/**', 'ios/**'] },
+	{
+		ignores: [
+			'dist/**',
+			'dev-dist/**',
+			'node_modules/**',
+			'android/**',
+			'ios/**',
+			'src/**',
+			'test/**',
+		],
+	},
 
 	js.configs.recommended,
 	prettier,
 
-	// ES-module sources (Phase 2b). The module *structure* is modern; syntax
-	// modernization (var -> const/let, == -> ===, TypeScript) is Phase 3, so
-	// those rules stay off here for now to keep that diff separate.
-	{
-		files: ['src/**/*.{js,mjs}'],
-		languageOptions: {
-			ecmaVersion: 2023,
-			sourceType: 'module',
-			globals: { ...globals.browser },
-		},
-		rules: {
-			'no-undef': 'error',
-			'no-implied-eval': 'error',
-			'no-redeclare': 'error',
-			'no-unused-vars': 'warn',
-			'no-var': 'error',
-			'prefer-const': 'error',
-			eqeqeq: ['error', 'always'],
-		},
-	},
-
-	// Tooling / config files that run in Node.
 	{
 		files: ['*.config.js', 'scripts/**/*.js'],
 		languageOptions: {
@@ -47,21 +39,6 @@ export default [
 		},
 	},
 
-	// Vitest specs run in a jsdom environment.
-	{
-		files: ['test/**/*.js'],
-		languageOptions: {
-			ecmaVersion: 2023,
-			sourceType: 'module',
-			globals: { ...globals.browser },
-		},
-		rules: {
-			'no-undef': 'error',
-			eqeqeq: ['error', 'always'],
-		},
-	},
-
-	// Classic browser scripts served from /public (currently just stage.js).
 	{
 		files: ['public/**/*.js'],
 		languageOptions: {

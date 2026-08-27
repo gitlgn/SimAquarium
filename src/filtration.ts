@@ -3,6 +3,7 @@
  **
  */
 
+import { $ } from './dom.js';
 import {
 	FI_NAME,
 	FI_PRICE,
@@ -19,11 +20,11 @@ const PATH_FILTERS = 'gfx/filters/';
 const PATH_BGS = 'gfx/view4/';
 
 class Filtration {
-	#filter = [];
+	#filter: any[][] = [];
 
 	constructor() {
 		const add = (name, fileName, price, comfort, pollution, energyCost) => {
-			const row = [];
+			const row: any[] = [];
 			row[FI_NAME] = name;
 			row[FI_PRICE] = price;
 			row[FI_COMFORT] = comfort;
@@ -49,11 +50,11 @@ class Filtration {
 }
 
 class BackgroundWall {
-	#background = [];
+	#background: any[][] = [];
 
 	constructor() {
 		const add = (name, fileName, price) => {
-			const row = [];
+			const row: any[] = [];
 			row[BG_NAME] = name;
 			row[BG_PRICE] = price;
 			row[BG_IMAGE] = PATH_BGS + fileName;
@@ -107,12 +108,12 @@ class BackgroundWall {
 			bgSlotBuy.setAttribute('class', 'button buy on');
 			bgSlotBuy.setAttribute('id', 'buttonBackgroundBuy' + i);
 
-			document.getElementById('tabBackgroundShop').appendChild(bgSlot);
+			$('tabBackgroundShop').appendChild(bgSlot);
 			bgSlot.appendChild(bgSlotTitle);
 			bgSlot.appendChild(bgSlotMoney);
 			bgSlot.appendChild(bgSlotBuy);
 		}
-		document.getElementById('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
+		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
 	}
 }
 

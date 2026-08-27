@@ -115,14 +115,26 @@ Vite from a single `<script type="module" src="/src/main.js">`.
   module-eval (it hit `fishSpecies`'s TDZ through the `species ↔ aquarium`
   cycle when `species.js` was imported first) — it seeds from `main.js` boot().
 
-## Phase 3d — full TypeScript (deferred)
+## ✅ Phase 3d — TypeScript (done)
 
-- Add a `dom.js` helper (`$(id)` that asserts non-null), then flip
-  `strictNullChecks` on file-by-file.
-- Rename `src/*.js` → `.ts`, drop the JSDoc `@type` casts for real annotations,
-  switch ESLint to `typescript-eslint`.
+- **3d-1** `src/dom.ts`: `$(id)` (throws on a missing id) + `ctx2d(canvas)`.
+  ~130 `document.getElementById(…)` → `$(…)`. `storage.getItem` returns
+  `string` (`''` for missing — callers already treat missing == empty);
+  `loop.small/big` typed `number` (0 = no timer). `tsconfig` → `strict: true`
+  (0 errors).
+- **3d-2** `src/*.js` + `test/*.js` → `.ts`, `jsconfig.json` → `tsconfig.json`.
+  JSDoc `@type` casts → native TS (`#fish: Fish[]`, `expr as HTMLInputElement`,
+  …). Import specifiers keep `.js` (bundler resolution maps to `.ts`).
+  `noImplicitAny` stays **off**: the scenery/light/filter/shop rows are `T[]`
+  indexed by column constants and tuple-typing them isn't worth it yet.
+- **ESLint gap:** `typescript-eslint` doesn't support the TS 7 compiler API
+  yet ([typescript-eslint#10940]). `src/**` / `test/**` are covered by
+  `tsc --strict` + Prettier for now; ESLint lints `*.config.js` +
+  `public/*.js` only. Re-add `typescript-eslint` when TS 7 is supported, and
+  turn `noImplicitAny` on with tuple types for the shop rows.
+- Bundle 49.4 → 46.8 kB. `npm run check` = typecheck + lint + test.
 
-## Phase 4 — responsive / mobile layout
+[typescript-eslint#10940]: https://github.com/typescript-eslint/typescript-eslint/issues/10940
 
 ## Phase 4 — responsive / mobile layout
 

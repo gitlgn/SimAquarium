@@ -7,6 +7,7 @@ import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
 import { fishSpecies } from './species.js';
 import { VIEW_STATISTICS } from './constants.js';
+import { $ } from './dom.js';
 
 const FISH_LIST_ROWS = 64;
 
@@ -19,7 +20,7 @@ function makeDiv(className, id) {
 
 class Stats {
 	createFishListTable() {
-		const container = document.getElementById('fishTableContainer');
+		const container = $('fishTableContainer');
 
 		for (let i = 0; i < FISH_LIST_ROWS; i++) {
 			const row = makeDiv('fishTableRow', 'fishTableRow' + i);
@@ -47,62 +48,53 @@ class Stats {
 	updateFishListTable() {
 		const fishNum = aquarium.getFishNum();
 
-		document.getElementById('fishTableContainer').style.overflow =
-			fishNum < 10 ? 'hidden' : 'auto';
+		$('fishTableContainer').style.overflow = fishNum < 10 ? 'hidden' : 'auto';
 
 		if (fishNum === 0) {
-			document.getElementById('fishTableIcons').style.display = 'none';
-			document.getElementById('fishTableInfo').style.display = 'block';
+			$('fishTableIcons').style.display = 'none';
+			$('fishTableInfo').style.display = 'block';
 		} else {
-			document.getElementById('fishTableIcons').style.display = 'block';
-			document.getElementById('fishTableInfo').style.display = 'none';
+			$('fishTableIcons').style.display = 'block';
+			$('fishTableInfo').style.display = 'none';
 		}
 
 		for (let i = 0; i < fishNum; i++) {
-			document.getElementById('fishTableRow' + i).style.display = 'block';
-			document.getElementById('fishTableSpeciesName' + i).innerHTML =
-				aquarium.returnSpecName(i);
-			document.getElementById('fishTableHealthBoxBar' + i).style.width =
+			$('fishTableRow' + i).style.display = 'block';
+			$('fishTableSpeciesName' + i).innerHTML = aquarium.returnSpecName(i);
+			$('fishTableHealthBoxBar' + i).style.width =
 				(aquarium.returnFishCondition(i) /
 					fishSpecies[aquarium.returnSpecNum(i)].maxCondition) *
 					25 +
 				'px';
-			document.getElementById('fishTableHungerBoxBar' + i).style.width =
-				aquarium.returnFishHunger(i) / 4 + 'px';
-			document.getElementById('fishTableSickBox' + i).innerHTML =
-				aquarium.returnFishDisease(i) > 0 ? 'SICK' : '';
+			$('fishTableHungerBoxBar' + i).style.width = aquarium.returnFishHunger(i) / 4 + 'px';
+			$('fishTableSickBox' + i).innerHTML = aquarium.returnFishDisease(i) > 0 ? 'SICK' : '';
 			const sizePercent = Math.round(aquarium.returnFishSize(i) * 100);
-			document.getElementById('fishTableSizeBox' + i).innerHTML = sizePercent + '%';
-			document.getElementById('fishTablePrice' + i).innerHTML = String(
+			$('fishTableSizeBox' + i).innerHTML = sizePercent + '%';
+			$('fishTablePrice' + i).innerHTML = String(
 				fishSpecies[aquarium.returnSpecNum(i)].price / 2
 			);
 		}
 
 		for (let i = fishNum; i < FISH_LIST_ROWS; i++) {
-			document.getElementById('fishTableRow' + i).style.display = 'none';
+			$('fishTableRow' + i).style.display = 'none';
 		}
 	}
 
 	refreshStatsPage() {
 		if (uio.getView() !== VIEW_STATISTICS) return;
 
-		if (document.getElementById('tabFishList').style.display === 'block') {
+		if ($('tabFishList').style.display === 'block') {
 			this.updateFishListTable();
 		} else {
-			document.getElementById('statFishNumber').innerHTML = String(aquarium.getFishNum());
-			document.getElementById('statFishBirths').innerHTML = String(aquarium.getFishBirths());
-			document.getElementById('statFishDeaths').innerHTML = String(aquarium.getFishDeaths());
-			document.getElementById('statPollution').innerHTML =
-				Math.trunc(aquarium.getPollution() * 3.15) + '%';
-			document.getElementById('statFood').innerHTML = Math.trunc(aquarium.getFood()) + '%';
-			document.getElementById('statMedicine').innerHTML =
-				Math.trunc(aquarium.getMedicine()) + '%';
-			document.getElementById('statGrowH').innerHTML =
-				Math.trunc(aquarium.getGrowHormone()) + '%';
-			document.getElementById('statBreedH').innerHTML =
-				Math.trunc(aquarium.getBreedHormone()) + '%';
-			document.getElementById('statDistraction').innerHTML =
-				Math.trunc(aquarium.getDistraction()) + '%';
+			$('statFishNumber').innerHTML = String(aquarium.getFishNum());
+			$('statFishBirths').innerHTML = String(aquarium.getFishBirths());
+			$('statFishDeaths').innerHTML = String(aquarium.getFishDeaths());
+			$('statPollution').innerHTML = Math.trunc(aquarium.getPollution() * 3.15) + '%';
+			$('statFood').innerHTML = Math.trunc(aquarium.getFood()) + '%';
+			$('statMedicine').innerHTML = Math.trunc(aquarium.getMedicine()) + '%';
+			$('statGrowH').innerHTML = Math.trunc(aquarium.getGrowHormone()) + '%';
+			$('statBreedH').innerHTML = Math.trunc(aquarium.getBreedHormone()) + '%';
+			$('statDistraction').innerHTML = Math.trunc(aquarium.getDistraction()) + '%';
 		}
 	}
 }
