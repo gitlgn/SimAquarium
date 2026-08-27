@@ -36,17 +36,72 @@ import {
 	BG_IMAGE,
 } from './constants.js';
 
-function aquariumConstructor() {
-	// Set in one method, consumed in update(); genuinely shared across the instance.
-	let breedFish = -1;
-	let killFish = -1;
+class Aquarium {
+	#money = 0;
 
-	this.resetAquarium = function () {
+	#usedScenery = 0; // which scenery is shown
+	#sceneries = [true]; // which sceneries the user owns (index 0 always available)
+
+	#usedLight = 0;
+	#lights = [true];
+
+	#usedFilter = 0;
+	#filters = [true];
+
+	#usedBackground = 0;
+
+	#fish = []; // the list of all fish
+	#fishNum = 0;
+	#fishNumBySpecies = Array(29).fill(0);
+
+	#pollution = 0;
+	#pollutionChanged = false;
+
+	#medicine = 0;
+	#food = 0;
+	#growHormone = 0;
+	#breedHormone = 0;
+	#distraction = 0;
+
+	#fishBirths = 0;
+	#fishDeaths = 0;
+
+	// Set in one method, consumed in update().
+	#breedFish = -1;
+	#killFish = -1;
+
+	#comfortAquarium;
+
+	// Canvas + offscreen layers
+	#canvasTankCtx;
+	#imageGlassFront = new Image();
+	#imageWater = new Image();
+	#imageGlassBack = new Image();
+	#layerFront = document.createElement('canvas');
+	#layerBack = document.createElement('canvas');
+	#layerFrontCtx;
+	#layerBackCtx;
+
+	constructor() {
+		this.#imageGlassFront.src = 'gfx/aquarium/tank/glassFront.png';
+		this.#imageWater.src = 'gfx/aquarium/tank/water.png';
+		this.#imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
+
+		this.#layerFront.setAttribute('width', 360);
+		this.#layerFront.setAttribute('height', 240);
+		this.#layerFrontCtx = this.#layerFront.getContext('2d');
+
+		this.#layerBack.setAttribute('width', 360);
+		this.#layerBack.setAttribute('height', 240);
+		this.#layerBackCtx = this.#layerBack.getContext('2d');
+	}
+
+	resetAquarium() {
 		this.resetMoney();
 
-		usedScenery = 0;
-		sceneries.length = 0;
-		sceneries[0] = true;
+		this.#usedScenery = 0;
+		this.#sceneries.length = 0;
+		this.#sceneries[0] = true;
 		document.getElementById('buttonSceneryBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 9; i++) {
 			document
@@ -54,17 +109,17 @@ function aquariumConstructor() {
 				.setAttribute('class', 'button sell off');
 		}
 
-		usedLight = 0;
-		lights.length = 0;
-		lights[0] = true;
+		this.#usedLight = 0;
+		this.#lights.length = 0;
+		this.#lights[0] = true;
 		document.getElementById('buttonLightBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 9; i++) {
 			document.getElementById('buttonLightSell' + i).setAttribute('class', 'button sell off');
 		}
 
-		usedFilter = 0;
-		filters.length = 0;
-		filters[0] = true;
+		this.#usedFilter = 0;
+		this.#filters.length = 0;
+		this.#filters[0] = true;
 		document.getElementById('buttonFilterBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 6; i++) {
 			document
@@ -72,94 +127,94 @@ function aquariumConstructor() {
 				.setAttribute('class', 'button sell off');
 		}
 
-		usedBackground = 0;
+		this.#usedBackground = 0;
 		document.getElementById('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
 		document.getElementById('view0').style.background =
 			'url(' + background.getBackgroundData(0, BG_IMAGE) + ')';
 
-		fish.length = 0;
+		this.#fish.length = 0;
 		for (let i = 0; i < 29; i++) {
-			fishNumBySpecies[i] = 0;
+			this.#fishNumBySpecies[i] = 0;
 		}
 
-		fishNum = 0;
+		this.#fishNum = 0;
 
-		pollution = 0;
-		pollutionChanged = false;
+		this.#pollution = 0;
+		this.#pollutionChanged = false;
 		this.updatePollutionBar();
 
-		medicine = 0;
-		food = 0;
+		this.#medicine = 0;
+		this.#food = 0;
 
-		growHormone = 0;
-		breedHormone = 0;
-		distraction = 0;
+		this.#growHormone = 0;
+		this.#breedHormone = 0;
+		this.#distraction = 0;
 
-		killFish = -1;
-		breedFish = -1;
+		this.#killFish = -1;
+		this.#breedFish = -1;
 
-		fishBirths = 0;
-		fishDeaths = 0;
+		this.#fishBirths = 0;
+		this.#fishDeaths = 0;
 
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
-		updateBuyButtons();
-	};
+		this.#updateBuyButtons();
+	}
 
-	this.saveAquarium = function () {
-		config.setItem('money', money);
+	saveAquarium() {
+		config.setItem('money', this.#money);
 
-		config.setItem('usedScenery', usedScenery);
-		config.setItem('usedLight', usedLight);
+		config.setItem('usedScenery', this.#usedScenery);
+		config.setItem('usedLight', this.#usedLight);
 		for (let i = 0; i < 9; i++) {
-			config.setItem('sceneries' + i, sceneries[i] === true ? '1' : '0');
-			config.setItem('lights' + i, lights[i] === true ? '1' : '0');
+			config.setItem('sceneries' + i, this.#sceneries[i] === true ? '1' : '0');
+			config.setItem('lights' + i, this.#lights[i] === true ? '1' : '0');
 		}
-		config.setItem('usedFilter', usedFilter);
+		config.setItem('usedFilter', this.#usedFilter);
 		for (let i = 0; i < 6; i++) {
-			config.setItem('filters' + i, filters[i] === true ? '1' : '0');
+			config.setItem('filters' + i, this.#filters[i] === true ? '1' : '0');
 		}
-		config.setItem('usedBackground', usedBackground);
+		config.setItem('usedBackground', this.#usedBackground);
 
 		// save the fish
-		config.setItem('fishNum', fishNum);
+		config.setItem('fishNum', this.#fishNum);
 		for (let i = 0; i < 29; i++) {
-			config.setItem('fishNumBySpecies' + i, fishNumBySpecies[i]);
+			config.setItem('fishNumBySpecies' + i, this.#fishNumBySpecies[i]);
 		}
-		for (let i = 0; i < fishNum; i++) {
-			config.setItem('fish' + i, fish[i].serialize());
+		for (let i = 0; i < this.#fishNum; i++) {
+			config.setItem('fish' + i, this.#fish[i].serialize());
 		}
 
-		config.setItem('pollution', pollution);
-		pollutionChanged = false;
+		config.setItem('pollution', this.#pollution);
+		this.#pollutionChanged = false;
 		this.updatePollutionBar();
 
-		config.setItem('medicine', medicine);
-		config.setItem('food', food);
+		config.setItem('medicine', this.#medicine);
+		config.setItem('food', this.#food);
 
-		config.setItem('growHormone', growHormone);
-		config.setItem('breedHormone', breedHormone);
-		config.setItem('distraction', distraction);
+		config.setItem('growHormone', this.#growHormone);
+		config.setItem('breedHormone', this.#breedHormone);
+		config.setItem('distraction', this.#distraction);
 
-		config.setItem('killFish', killFish);
-		config.setItem('breedFish', breedFish);
+		config.setItem('killFish', this.#killFish);
+		config.setItem('breedFish', this.#breedFish);
 
-		config.setItem('fishBirths', fishBirths);
-		config.setItem('fishDeaths', fishDeaths);
-	};
+		config.setItem('fishBirths', this.#fishBirths);
+		config.setItem('fishDeaths', this.#fishDeaths);
+	}
 
-	this.loadAquarium = function () {
-		money = parseFloat(config.getItem('money'));
-		document.getElementById('statusMoney').innerHTML = parseInt(money);
+	loadAquarium() {
+		this.#money = parseFloat(config.getItem('money'));
+		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
 
-		usedScenery = parseInt(config.getItem('usedScenery'), 10);
-		usedLight = parseInt(config.getItem('usedLight'), 10);
+		this.#usedScenery = parseInt(config.getItem('usedScenery'), 10);
+		this.#usedLight = parseInt(config.getItem('usedLight'), 10);
 		for (let i = 0; i < 9; i++) {
 			const scStored = config.getItem('sceneries' + i);
 			if (scStored === '1') {
-				sceneries[i] = true;
-				if (i !== usedScenery) {
+				this.#sceneries[i] = true;
+				if (i !== this.#usedScenery) {
 					document
 						.getElementById('buttonSceneryBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -174,13 +229,13 @@ function aquariumConstructor() {
 						.setAttribute('class', 'button sell on');
 				}
 			} else {
-				sceneries[i] = false;
+				this.#sceneries[i] = false;
 			}
 
 			const liStored = config.getItem('lights' + i);
 			if (liStored === '1') {
-				lights[i] = true;
-				if (i !== usedLight) {
+				this.#lights[i] = true;
+				if (i !== this.#usedLight) {
 					document
 						.getElementById('buttonLightBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -195,15 +250,15 @@ function aquariumConstructor() {
 						.setAttribute('class', 'button sell on');
 				}
 			} else {
-				lights[i] = false;
+				this.#lights[i] = false;
 			}
 		}
-		usedFilter = parseInt(config.getItem('usedFilter'), 10);
+		this.#usedFilter = parseInt(config.getItem('usedFilter'), 10);
 		for (let i = 0; i < 6; i++) {
 			const fiStored = config.getItem('filters' + i);
 			if (fiStored === '1') {
-				filters[i] = true;
-				if (i !== usedFilter) {
+				this.#filters[i] = true;
+				if (i !== this.#usedFilter) {
 					document
 						.getElementById('buttonFilterBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -218,100 +273,95 @@ function aquariumConstructor() {
 						.setAttribute('class', 'button sell on');
 				}
 			} else {
-				filters[i] = false;
+				this.#filters[i] = false;
 			}
 		}
-		usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
+		this.#usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
 		document
-			.getElementById('buttonBackgroundBuy' + usedBackground)
+			.getElementById('buttonBackgroundBuy' + this.#usedBackground)
 			.setAttribute('class', 'button buy off');
 		document.getElementById('view0').style.background =
-			'url(' + background.getBackgroundData(usedBackground, BG_IMAGE) + ')';
+			'url(' + background.getBackgroundData(this.#usedBackground, BG_IMAGE) + ')';
 
 		// load fish data
 
 		const storedFishNum = parseInt(config.getItem('fishNum'), 10);
 		for (let i = 0; i < 29; i++) {
-			fishNumBySpecies[i] = parseInt(config.getItem('fishNumBySpecies' + i), 10);
+			this.#fishNumBySpecies[i] = parseInt(config.getItem('fishNumBySpecies' + i), 10);
 		}
-		fishNum = 0;
+		this.#fishNum = 0;
 		for (let i = 0; i < storedFishNum; i++) {
 			const unSerialize = config.getItem('fish' + i).split('|');
 			const spec = parseInt(unSerialize[0], 10);
 
-			fish[i] = new Fish(spec, 0.9999);
-			fishNum++;
+			this.#fish[i] = new Fish(spec, 0.9999);
+			this.#fishNum++;
 
-			fish[i].changeData(
+			this.#fish[i].changeData(
 				parseFloat(unSerialize[1]),
 				parseFloat(unSerialize[2]),
 				parseFloat(unSerialize[3]),
 				parseFloat(unSerialize[4])
 			);
 		}
-		aquarium.updateComfortSpecies();
+		this.updateComfortSpecies();
 
-		pollution = parseFloat(config.getItem('pollution'));
-		pollutionChanged = false;
+		this.#pollution = parseFloat(config.getItem('pollution'));
+		this.#pollutionChanged = false;
 		this.updatePollutionBar();
 
-		medicine = parseFloat(config.getItem('medicine'));
-		food = parseFloat(config.getItem('food'));
+		this.#medicine = parseFloat(config.getItem('medicine'));
+		this.#food = parseFloat(config.getItem('food'));
 
-		growHormone = parseFloat(config.getItem('growHormone'));
-		breedHormone = parseFloat(config.getItem('breedHormone'));
-		distraction = parseFloat(config.getItem('distraction'));
+		this.#growHormone = parseFloat(config.getItem('growHormone'));
+		this.#breedHormone = parseFloat(config.getItem('breedHormone'));
+		this.#distraction = parseFloat(config.getItem('distraction'));
 
-		killFish = parseInt(config.getItem('killFish'), 10);
-		breedFish = parseInt(config.getItem('breedFish'), 10);
+		this.#killFish = parseInt(config.getItem('killFish'), 10);
+		this.#breedFish = parseInt(config.getItem('breedFish'), 10);
 
-		fishBirths = parseInt(config.getItem('fishBirths'), 10);
-		fishDeaths = parseInt(config.getItem('fishDeaths'), 10);
+		this.#fishBirths = parseInt(config.getItem('fishBirths'), 10);
+		this.#fishDeaths = parseInt(config.getItem('fishDeaths'), 10);
 
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
-		updateBuyButtons();
-	};
-
-	/*** AQUARIUM CANVAS & CONTEXT ***/
-	let canvasTank;
-	let canvasTankCtx;
+		this.#updateBuyButtons();
+	}
 
 	/*** AQUARIUM MONEY ***/
-	let money = 0;
 
-	this.getMoney = function () {
-		return money;
-	};
-	this.resetMoney = function () {
-		money = 100;
-		document.getElementById('statusMoney').innerHTML = parseInt(money);
-	};
+	getMoney() {
+		return this.#money;
+	}
+	resetMoney() {
+		this.#money = 100;
+		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
+	}
 
-	const changeMoney = (diff) => {
-		if (money + diff < 0) return false;
-		money = money + diff;
-		document.getElementById('statusMoney').innerHTML = parseInt(money);
+	/** Returns false (and does nothing) when the change would overdraw. */
+	changeMoney(diff) {
+		if (this.#money + diff < 0) return false;
+		this.#money = this.#money + diff;
+		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
 		return true;
-	};
-	this.changeMoney = changeMoney; // used by fishShop.buyFish
+	}
+
+	addMoney(mNum) {
+		this.changeMoney(mNum);
+	}
 
 	/*** AQUARIUM SCENERIES ***/
 
-	let usedScenery = 0; // which scenery is used in the aquarium
-	const sceneries = []; // which sceneries the user owns
-	this.getSceneries = function (sNum) {
-		return sceneries[sNum];
-	};
+	getSceneries(sNum) {
+		return this.#sceneries[sNum];
+	}
 
-	sceneries[0] = true; // the first scenery is always available
-
-	this.buyScenery = function (scNum) {
-		if (sceneries[scNum]) {
+	buyScenery(scNum) {
+		if (this.#sceneries[scNum]) {
 			this.chooseScenery(scNum);
 		} else {
-			if (changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
+			if (this.changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
 				document
 					.getElementById('buttonSceneryBuy' + scNum)
 					.setAttribute('class', 'button choose on');
@@ -319,59 +369,55 @@ function aquariumConstructor() {
 					document
 						.getElementById('buttonScenerySell' + scNum)
 						.setAttribute('class', 'button sell on');
-				sceneries[scNum] = true;
+				this.#sceneries[scNum] = true;
 				this.chooseScenery(scNum);
-				updateBuyButtons();
+				this.#updateBuyButtons();
 			}
 		}
-	};
-	this.chooseScenery = function (scNum) {
-		usedScenery = parseInt(usedScenery, 10) || 0;
-		if (sceneries[usedScenery])
+	}
+	chooseScenery(scNum) {
+		this.#usedScenery = parseInt(this.#usedScenery, 10) || 0;
+		if (this.#sceneries[this.#usedScenery])
 			document
-				.getElementById('buttonSceneryBuy' + usedScenery)
+				.getElementById('buttonSceneryBuy' + this.#usedScenery)
 				.setAttribute('class', 'button choose on');
 		else
 			document
-				.getElementById('buttonSceneryBuy' + usedScenery)
+				.getElementById('buttonSceneryBuy' + this.#usedScenery)
 				.setAttribute('class', 'button buy on');
 
 		document
 			.getElementById('buttonSceneryBuy' + scNum)
 			.setAttribute('class', 'button choose off');
-		usedScenery = scNum;
+		this.#usedScenery = scNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
 		config.saveGame();
-	};
+	}
 
-	this.sellScenery = function (scNum) {
-		if (!sceneries[scNum]) return;
+	sellScenery(scNum) {
+		if (!this.#sceneries[scNum]) return;
 
-		changeMoney(SELL * scenery.getSceneryData(scNum, SC_PRICE) * 0.5);
+		this.changeMoney(SELL * scenery.getSceneryData(scNum, SC_PRICE) * 0.5);
 		document.getElementById('buttonSceneryBuy' + scNum).setAttribute('class', 'button buy on');
 		document
 			.getElementById('buttonScenerySell' + scNum)
 			.setAttribute('class', 'button sell off');
-		sceneries[scNum] = false;
+		this.#sceneries[scNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (scNum === usedScenery) this.chooseScenery(0);
-		updateBuyButtons();
-	};
+		if (scNum === this.#usedScenery) this.chooseScenery(0);
+		this.#updateBuyButtons();
+	}
 
 	/*** AQUARIUM LIGHTING ***/
 
-	let usedLight = 0;
-	const lights = [];
-	lights[0] = true;
-
-	this.buyLight = function (liNum) {
-		if (lights[liNum]) {
+	buyLight(liNum) {
+		if (this.#lights[liNum]) {
 			this.chooseLight(liNum);
 		} else {
-			if (changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
+			if (this.changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
 				document
 					.getElementById('buttonLightBuy' + liNum)
 					.setAttribute('class', 'button choose on');
@@ -379,57 +425,53 @@ function aquariumConstructor() {
 					document
 						.getElementById('buttonLightSell' + liNum)
 						.setAttribute('class', 'button sell on');
-				lights[liNum] = true;
+				this.#lights[liNum] = true;
 				this.chooseLight(liNum);
-				updateBuyButtons();
+				this.#updateBuyButtons();
 			}
 		}
-	};
+	}
 
-	this.chooseLight = function (liNum) {
-		if (lights[usedLight])
+	chooseLight(liNum) {
+		if (this.#lights[this.#usedLight])
 			document
-				.getElementById('buttonLightBuy' + usedLight)
+				.getElementById('buttonLightBuy' + this.#usedLight)
 				.setAttribute('class', 'button choose on');
 		else
 			document
-				.getElementById('buttonLightBuy' + usedLight)
+				.getElementById('buttonLightBuy' + this.#usedLight)
 				.setAttribute('class', 'button buy on');
 
 		document
 			.getElementById('buttonLightBuy' + liNum)
 			.setAttribute('class', 'button choose off');
-		usedLight = liNum;
+		this.#usedLight = liNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
 		config.saveGame();
-	};
+	}
 
-	this.sellLight = function (liNum) {
-		if (!lights[liNum]) return;
+	sellLight(liNum) {
+		if (!this.#lights[liNum]) return;
 
-		changeMoney(SELL * lighting.getLightData(liNum, LI_PRICE) * 0.5);
+		this.changeMoney(SELL * lighting.getLightData(liNum, LI_PRICE) * 0.5);
 		document.getElementById('buttonLightBuy' + liNum).setAttribute('class', 'button buy on');
 		document.getElementById('buttonLightSell' + liNum).setAttribute('class', 'button sell off');
-		lights[liNum] = false;
+		this.#lights[liNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (liNum === usedLight) this.chooseLight(0);
-		updateBuyButtons();
-	};
+		if (liNum === this.#usedLight) this.chooseLight(0);
+		this.#updateBuyButtons();
+	}
 
 	/*** AQUARIUM FILTERS ***/
 
-	let usedFilter = 0;
-	const filters = [];
-	filters[0] = true;
-
-	this.buyFilter = function (fiNum) {
-		if (filters[fiNum]) {
+	buyFilter(fiNum) {
+		if (this.#filters[fiNum]) {
 			this.chooseFilter(fiNum);
 		} else {
-			if (changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
+			if (this.changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
 				document
 					.getElementById('buttonFilterBuy' + fiNum)
 					.setAttribute('class', 'button choose on');
@@ -437,78 +479,76 @@ function aquariumConstructor() {
 					document
 						.getElementById('buttonFilterSell' + fiNum)
 						.setAttribute('class', 'button sell on');
-				filters[fiNum] = true;
+				this.#filters[fiNum] = true;
 				this.chooseFilter(fiNum);
-				updateBuyButtons();
+				this.#updateBuyButtons();
 			}
 		}
-	};
+	}
 
-	this.chooseFilter = function (fiNum) {
-		if (filters[usedFilter])
+	chooseFilter(fiNum) {
+		if (this.#filters[this.#usedFilter])
 			document
-				.getElementById('buttonFilterBuy' + usedFilter)
+				.getElementById('buttonFilterBuy' + this.#usedFilter)
 				.setAttribute('class', 'button choose on');
 		else
 			document
-				.getElementById('buttonFilterBuy' + usedFilter)
+				.getElementById('buttonFilterBuy' + this.#usedFilter)
 				.setAttribute('class', 'button buy on');
 
 		document
 			.getElementById('buttonFilterBuy' + fiNum)
 			.setAttribute('class', 'button choose off');
-		usedFilter = fiNum;
+		this.#usedFilter = fiNum;
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
 		config.saveGame();
-	};
+	}
 
-	this.sellFilter = function (fiNum) {
-		if (!filters[fiNum]) return;
+	sellFilter(fiNum) {
+		if (!this.#filters[fiNum]) return;
 
-		changeMoney(SELL * filtration.getFilterData(fiNum, FI_PRICE) * 0.5);
+		this.changeMoney(SELL * filtration.getFilterData(fiNum, FI_PRICE) * 0.5);
 		document.getElementById('buttonFilterBuy' + fiNum).setAttribute('class', 'button buy on');
 		document
 			.getElementById('buttonFilterSell' + fiNum)
 			.setAttribute('class', 'button sell off');
-		filters[fiNum] = false;
+		this.#filters[fiNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (fiNum === usedFilter) this.chooseFilter(0);
-		updateBuyButtons();
-	};
+		if (fiNum === this.#usedFilter) this.chooseFilter(0);
+		this.#updateBuyButtons();
+	}
 
 	/*** BUY AQUARIUM BACKGROUNDS ***/
 
-	let usedBackground = 0;
+	buyBackground(bgNum) {
+		if (this.#usedBackground === bgNum) return;
 
-	this.buyBackground = function (bgNum) {
-		if (usedBackground === bgNum) return;
-
-		if (changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
+		if (this.changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
 			document
-				.getElementById('buttonBackgroundBuy' + usedBackground)
+				.getElementById('buttonBackgroundBuy' + this.#usedBackground)
 				.setAttribute('class', 'button buy on');
 			document
 				.getElementById('buttonBackgroundBuy' + bgNum)
 				.setAttribute('class', 'button buy off');
 			document.getElementById('view0').style.background =
 				'url(' + background.getBackgroundData(bgNum, BG_IMAGE) + ')';
-			usedBackground = bgNum;
-			updateBuyButtons();
+			this.#usedBackground = bgNum;
+			this.#updateBuyButtons();
 			config.saveGame();
 		}
-	};
+	}
 
 	/*** UPDATE AQUARIUM SHOPS - DISABLE OPTIONS YOU CAN'T AFFORD ***/
 
-	const updateBuyButtons = () => {
+	#updateBuyButtons() {
 		fishShop.updateView();
 
 		for (let i = 0; i < 9; i++) {
 			// update sceneries view
-			if (!sceneries[i]) {
-				if (aquarium.getMoney() < scenery.getSceneryData(i, SC_PRICE)) {
+			if (!this.#sceneries[i]) {
+				if (this.#money < scenery.getSceneryData(i, SC_PRICE)) {
 					document
 						.getElementById('buttonSceneryBuy' + i)
 						.setAttribute('class', 'button buy off');
@@ -520,8 +560,8 @@ function aquariumConstructor() {
 			}
 
 			// update lights view
-			if (!lights[i]) {
-				if (aquarium.getMoney() < lighting.getLightData(i, LI_PRICE)) {
+			if (!this.#lights[i]) {
+				if (this.#money < lighting.getLightData(i, LI_PRICE)) {
 					document
 						.getElementById('buttonLightBuy' + i)
 						.setAttribute('class', 'button buy off');
@@ -535,8 +575,8 @@ function aquariumConstructor() {
 
 		for (let i = 0; i < 6; i++) {
 			// update filters view
-			if (!filters[i]) {
-				if (aquarium.getMoney() < filtration.getFilterData(i, FI_PRICE)) {
+			if (!this.#filters[i]) {
+				if (this.#money < filtration.getFilterData(i, FI_PRICE)) {
 					document
 						.getElementById('buttonFilterBuy' + i)
 						.setAttribute('class', 'button buy off');
@@ -550,8 +590,8 @@ function aquariumConstructor() {
 
 		for (let i = 0; i < 15; i++) {
 			// update backgrounds view
-			if (i !== usedBackground) {
-				if (aquarium.getMoney() < background.getBackgroundData(i, BG_PRICE)) {
+			if (i !== this.#usedBackground) {
+				if (this.#money < background.getBackgroundData(i, BG_PRICE)) {
 					document
 						.getElementById('buttonBackgroundBuy' + i)
 						.setAttribute('class', 'button buy off');
@@ -562,58 +602,38 @@ function aquariumConstructor() {
 				}
 			}
 		}
-	};
+	}
 
-	this.updateBuyButtonsAlias = function () {
-		updateBuyButtons();
-	};
-
-	/*** AQUARIUM IMAGES ***/
-
-	const imageGlassFront = new Image();
-	const imageWater = new Image();
-	const imageGlassBack = new Image();
-	imageGlassFront.src = 'gfx/aquarium/tank/glassFront.png';
-	imageWater.src = 'gfx/aquarium/tank/water.png';
-	imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
+	updateBuyButtonsAlias() {
+		this.#updateBuyButtons();
+	}
 
 	/*** AQUARIUM LAYERS ***/
 
-	const layerFront = document.createElement('canvas');
-	layerFront.setAttribute('width', 360);
-	layerFront.setAttribute('height', 240);
-	const layerFrontCtx = layerFront.getContext('2d');
-
-	const layerBack = document.createElement('canvas');
-	layerBack.setAttribute('width', 360);
-	layerBack.setAttribute('height', 240);
-	const layerBackCtx = layerBack.getContext('2d');
-
-	this.layerFrontRefresh = function () {
-		layerFrontCtx.clearRect(0, 0, 360, 240);
-		layerFrontCtx.drawImage(scenery.getSceneryData(usedScenery, SC_FGIMAGE), 0, 0);
-		layerFrontCtx.drawImage(imageWater, 0, 16);
-		layerFrontCtx.drawImage(lighting.getLightData(usedLight, LI_IMAGE), 0, 0);
-		layerFrontCtx.drawImage(imageGlassFront, 0, 0);
-	};
-	this.layerBackRefresh = function () {
-		layerBackCtx.clearRect(0, 0, 360, 240);
-		layerBackCtx.drawImage(imageGlassBack, 0, 0);
-		layerBackCtx.drawImage(filtration.getFilterData(usedFilter, FI_IMAGE), 10, 0);
-		layerBackCtx.drawImage(scenery.getSceneryData(usedScenery, SC_BGIMAGE), 0, 0);
-	};
+	layerFrontRefresh() {
+		this.#layerFrontCtx.clearRect(0, 0, 360, 240);
+		this.#layerFrontCtx.drawImage(scenery.getSceneryData(this.#usedScenery, SC_FGIMAGE), 0, 0);
+		this.#layerFrontCtx.drawImage(this.#imageWater, 0, 16);
+		this.#layerFrontCtx.drawImage(lighting.getLightData(this.#usedLight, LI_IMAGE), 0, 0);
+		this.#layerFrontCtx.drawImage(this.#imageGlassFront, 0, 0);
+	}
+	layerBackRefresh() {
+		this.#layerBackCtx.clearRect(0, 0, 360, 240);
+		this.#layerBackCtx.drawImage(this.#imageGlassBack, 0, 0);
+		this.#layerBackCtx.drawImage(filtration.getFilterData(this.#usedFilter, FI_IMAGE), 10, 0);
+		this.#layerBackCtx.drawImage(scenery.getSceneryData(this.#usedScenery, SC_BGIMAGE), 0, 0);
+	}
 
 	/*** CREATE THE AQUARIUM ***/
 
-	this.create = function () {
-		canvasTank = document.getElementById('tank');
-		canvasTankCtx = canvasTank.getContext('2d');
+	create() {
+		this.#canvasTankCtx = document.getElementById('tank').getContext('2d');
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
-	};
+	}
 
 	// Photo making
-	this.exportPhoto = function () {
+	exportPhoto() {
 		const tempCanvas = document.createElement('canvas');
 		tempCanvas.setAttribute('width', 360);
 		tempCanvas.setAttribute('height', 240);
@@ -624,7 +644,7 @@ function aquariumConstructor() {
 		tempCtx.fillStyle = 'white';
 		tempCtx.fillRect(0, 0, 360, 240);
 		const wall = new Image();
-		wall.src = background.getBackgroundSrc(usedBackground);
+		wall.src = background.getBackgroundSrc(this.#usedBackground);
 		for (let x = 0; x < 6; x++) {
 			for (let y = 0; y < 4; y++) {
 				tempCtx.drawImage(wall, x * 64, y * 64);
@@ -632,9 +652,9 @@ function aquariumConstructor() {
 		}
 
 		// DRAW TANK
-		tempCtx.drawImage(layerBack, 0, 0);
-		for (let i = 0; i < fishNum; i++) {
-			const fishObj = fish[i];
+		tempCtx.drawImage(this.#layerBack, 0, 0);
+		for (let i = 0; i < this.#fishNum; i++) {
+			const fishObj = this.#fish[i];
 			tempCtx.save();
 			tempCtx.translate(fishObj.getX(), fishObj.getY());
 			tempCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
@@ -642,10 +662,10 @@ function aquariumConstructor() {
 			tempCtx.drawImage(fishObj.getImage(), 0, 0, fishObj.getSizeX(), fishObj.getSizeY());
 			tempCtx.restore();
 		}
-		tempCtx.drawImage(layerFront, 0, 0);
+		tempCtx.drawImage(this.#layerFront, 0, 0);
 		// The 2014 version handed the data URL to the packaged-app wrapper to open;
 		// there is no wrapper any more. A download/share flow is a later feature.
-	};
+	}
 
 	/********
 	*********
@@ -653,350 +673,328 @@ function aquariumConstructor() {
 	*********
 	*********/
 
-	/*** ADD/REMOVE THE FISH IN THE AQUARIUM ***/
-
-	const fish = []; // the list of all fish
-
-	let fishNum = 0; // number of fish in the aquarium
-	this.getFishNum = function () {
-		return fishNum;
-	};
-
-	const fishNumBySpecies = []; // count of every species in the aquarium
-	for (let i = 0; i < 29; i++) {
-		fishNumBySpecies[i] = 0;
+	getFishNum() {
+		return this.#fishNum;
 	}
 
-	this.getFishNumBySpecies = function (fSpec) {
-		return fishNumBySpecies[fSpec];
-	};
+	getFishNumBySpecies(fSpec) {
+		return this.#fishNumBySpecies[fSpec];
+	}
 
 	// Add a fish by species
-	this.addFish = function (sNum, size) {
-		fish[fishNum] = new Fish(sNum, size);
-		fishNum++;
+	addFish(sNum, size) {
+		this.#fish[this.#fishNum] = new Fish(sNum, size);
+		this.#fishNum++;
 
-		fishNumBySpecies[sNum]++;
+		this.#fishNumBySpecies[sNum]++;
 
-		aquarium.updateComfortSpecies();
-	};
+		this.updateComfortSpecies();
+	}
 
 	// Remove specific fish
-	this.removeFish = function (fNum) {
-		if (fNum >= fishNum) return;
+	removeFish(fNum) {
+		if (fNum >= this.#fishNum) return;
 
-		fishNumBySpecies[fish[fNum].getSpecNum()]--;
+		this.#fishNumBySpecies[this.#fish[fNum].getSpecNum()]--;
 
-		for (let i = fNum + 1; i < fishNum; i++) {
-			fish[i - 1] = fish[i];
+		for (let i = fNum + 1; i < this.#fishNum; i++) {
+			this.#fish[i - 1] = this.#fish[i];
 		}
 
-		fishNum--;
+		this.#fishNum--;
 
-		fish.length = fishNum;
+		this.#fish.length = this.#fishNum;
 
-		aquarium.updateComfortSpecies();
-	};
+		this.updateComfortSpecies();
+	}
 
 	// Fish is attacked and hurt
-	this.hurtFish = function (fNum, hurtNum) {
-		fish[fNum].changeCondition(hurtNum);
-	};
+	hurtFish(fNum, hurtNum) {
+		this.#fish[fNum].changeCondition(hurtNum);
+	}
 
 	/*** AQUARIUM POLLUTION ***/
 
-	let pollution = 0;
-	let pollutionChanged = false;
+	getPollution() {
+		return this.#pollution;
+	}
 
-	this.getPollution = function () {
-		return pollution;
-	};
+	changePollution(change) {
+		this.#pollution = this.#pollution + change;
+		if (this.#pollution < 0) this.#pollution = 0;
+		else if (this.#pollution > 32) this.#pollution = 32;
+		this.#pollutionChanged = true;
+	}
 
-	this.changePollution = function (change) {
-		pollution = pollution + change;
-		if (pollution < 0) pollution = 0;
-		else if (pollution > 32) pollution = 32;
-		pollutionChanged = true;
-	};
+	resetPollution() {
+		this.#pollution = 0;
+		this.#pollutionChanged = true;
+	}
 
-	this.resetPollution = function () {
-		pollution = 0;
-		pollutionChanged = true;
-	};
-
-	this.updatePollutionBar = function () {
-		document.getElementById('statusWaterBar').style.height = parseInt(pollution) + 'px';
-		pollutionChanged = false;
-	};
+	updatePollutionBar() {
+		document.getElementById('statusWaterBar').style.height = parseInt(this.#pollution) + 'px';
+		this.#pollutionChanged = false;
+	}
 
 	/*** AQUARIUM CLEANING ***/
 
-	this.clean = function () {
-		if (pollution < 1) return;
-		if (changeMoney(-10)) {
+	clean() {
+		if (this.#pollution < 1) return;
+		if (this.changeMoney(-10)) {
 			this.changePollution(Math.random() * -4 - 2);
 			this.updatePollutionBar();
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
-	this.waterChange = function () {
-		if (pollution < 1) return;
-		if (changeMoney(-40)) {
+	waterChange() {
+		if (this.#pollution < 1) return;
+		if (this.changeMoney(-40)) {
 			this.resetFood();
 			this.resetMedicine();
 			this.resetPollution();
 			this.resetGrowHormone();
 			this.resetBreedHormone();
 			this.updatePollutionBar();
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
 	/*** AQUARIUM MEDICINE, FOOD AND HORMONES ***/
 
 	/*** MEDICINE ***/
 
-	let medicine = 0;
-	this.getMedicine = function () {
-		return medicine;
-	};
-	this.changeMedicine = function (medNum) {
-		medicine = medicine + medNum;
-		if (medicine < 0) medicine = 0;
-		if (medicine > 100) medicine = 100;
-	};
-	this.resetMedicine = function () {
-		medicine = 0;
-	};
-	this.updateMedicine = function () {
+	getMedicine() {
+		return this.#medicine;
+	}
+	changeMedicine(medNum) {
+		this.#medicine = this.#medicine + medNum;
+		if (this.#medicine < 0) this.#medicine = 0;
+		if (this.#medicine > 100) this.#medicine = 100;
+	}
+	resetMedicine() {
+		this.#medicine = 0;
+	}
+	updateMedicine() {
 		const medicineMelt = Math.random();
 
-		if (medicine > 0) {
+		if (this.#medicine > 0) {
 			this.changeMedicine(medicineMelt * -0.8);
 			this.changePollution(medicineMelt * 0.02);
 		}
-	};
+	}
 
-	this.addMedicine = function () {
-		if (changeMoney(-20)) {
+	addMedicine() {
+		if (this.changeMoney(-20)) {
 			this.changeMedicine(Math.random() * 4 + 4);
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
 	/*** FOOD ***/
 
-	let food = 0;
-	this.getFood = function () {
-		return food;
-	};
+	getFood() {
+		return this.#food;
+	}
 
-	this.changeFood = function (foodNum) {
-		food = food + foodNum;
-		if (food < 0) food = 0;
-		if (food > 100) food = 100;
-	};
+	changeFood(foodNum) {
+		this.#food = this.#food + foodNum;
+		if (this.#food < 0) this.#food = 0;
+		if (this.#food > 100) this.#food = 100;
+	}
 
-	this.resetFood = function () {
-		food = 0;
-	};
+	resetFood() {
+		this.#food = 0;
+	}
 
-	this.updateFood = function () {
+	updateFood() {
 		const foodMelt = Math.random();
 
-		if (food > 0) {
+		if (this.#food > 0) {
 			this.changeFood(foodMelt * -0.04);
 			this.changePollution(foodMelt * 0.01);
 		}
-	};
+	}
 
-	this.addFood = function () {
-		if (changeMoney(-20)) {
+	addFood() {
+		if (this.changeMoney(-20)) {
 			this.changeFood(Math.random() * 8 + 8);
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
 	/*** HORMONES ***/
 
 	// GROW HORMONE
-	let growHormone = 0;
+	getGrowHormone() {
+		return this.#growHormone;
+	}
 
-	this.getGrowHormone = function () {
-		return growHormone;
-	};
+	resetGrowHormone() {
+		this.#growHormone = 0;
+	}
 
-	this.resetGrowHormone = function () {
-		growHormone = 0;
-	};
-
-	this.changeGrowHormone = function (ghNum) {
-		growHormone = growHormone + ghNum;
-		if (growHormone < 0) growHormone = 0;
-		if (growHormone > 100) growHormone = 100;
-	};
-	this.updateGrowHormone = function () {
+	changeGrowHormone(ghNum) {
+		this.#growHormone = this.#growHormone + ghNum;
+		if (this.#growHormone < 0) this.#growHormone = 0;
+		if (this.#growHormone > 100) this.#growHormone = 100;
+	}
+	updateGrowHormone() {
 		const growHormoneMelt = Math.random();
-		if (growHormone > 0) {
+		if (this.#growHormone > 0) {
 			this.changeGrowHormone(growHormoneMelt * -0.1);
 			this.changePollution(growHormoneMelt * 0.5);
 		}
-	};
+	}
 
-	this.addGrowHormone = function () {
-		if (changeMoney(-100)) {
+	addGrowHormone() {
+		if (this.changeMoney(-100)) {
 			this.changePollution(2);
 			this.changeGrowHormone(Math.random() * 4 + 4);
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
 	// BREED HORMONE
-	let breedHormone = 0;
+	getBreedHormone() {
+		return this.#breedHormone;
+	}
 
-	this.getBreedHormone = function () {
-		return breedHormone;
-	};
+	resetBreedHormone() {
+		this.#breedHormone = 0;
+	}
 
-	this.resetBreedHormone = function () {
-		breedHormone = 0;
-	};
+	changeBreedHormone(bhNum) {
+		this.#breedHormone = this.#breedHormone + bhNum;
+		if (this.#breedHormone < 0) this.#breedHormone = 0;
+		if (this.#breedHormone > 100) this.#breedHormone = 100;
+	}
 
-	this.changeBreedHormone = function (bhNum) {
-		breedHormone = breedHormone + bhNum;
-		if (breedHormone < 0) breedHormone = 0;
-		if (breedHormone > 100) breedHormone = 100;
-	};
-
-	this.updateBreedHormone = function () {
+	updateBreedHormone() {
 		const breedHormoneMelt = Math.random();
-		if (breedHormone > 0) {
+		if (this.#breedHormone > 0) {
 			this.changeBreedHormone(breedHormoneMelt * -0.2);
 			this.changePollution(breedHormoneMelt);
 		}
-	};
+	}
 
-	this.addBreedHormone = function () {
-		if (changeMoney(-200)) {
+	addBreedHormone() {
+		if (this.changeMoney(-200)) {
 			this.changePollution(4);
 			this.changeBreedHormone(Math.random() * 4 + 4);
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			stats.refreshStatsPage();
 		}
-	};
+	}
 
 	/*** AQUARIUM DISTRACTION - CONFUSES FISH SO THEY DON'T ATTACK ***/
-	let distraction = 0;
 
-	this.getDistraction = function () {
-		return distraction;
-	};
+	getDistraction() {
+		return this.#distraction;
+	}
 
-	this.distractFish = function () {
-		distraction = distraction + 10;
-		if (distraction > 100) distraction = 100;
+	distractFish() {
+		this.#distraction = this.#distraction + 10;
+		if (this.#distraction > 100) this.#distraction = 100;
 		stats.refreshStatsPage();
-	};
+	}
 
-	this.updateDistraction = function () {
-		if (distraction === 0) return;
-		distraction--;
-	};
+	updateDistraction() {
+		if (this.#distraction === 0) return;
+		this.#distraction--;
+	}
 
 	/*** SCARE / ATTRACT THE FISH ***/
-	this.scareFish = function () {
-		if (changeMoney(-5)) {
-			for (let i = 0; i < fishNum; i++) {
-				const dirX = fish[i].getX() > 180 ? 10 : -10;
-				const dirY = fish[i].getY() > 120 ? 5 : -5;
-				fish[i].rotate(dirX, dirY);
-				fish[i].speedUp();
+	scareFish() {
+		if (this.changeMoney(-5)) {
+			for (let i = 0; i < this.#fishNum; i++) {
+				const dirX = this.#fish[i].getX() > 180 ? 10 : -10;
+				const dirY = this.#fish[i].getY() > 120 ? 5 : -5;
+				this.#fish[i].rotate(dirX, dirY);
+				this.#fish[i].speedUp();
 			}
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			this.distractFish();
 		}
-	};
+	}
 
-	this.attractFish = function () {
-		if (changeMoney(-5)) {
-			for (let i = 0; i < fishNum; i++) {
-				const dirX = fish[i].getX() > 180 ? -10 : 10;
-				const dirY = fish[i].getY() > 120 ? -5 : 5;
-				fish[i].rotate(dirX, dirY);
-				fish[i].speedUp();
+	attractFish() {
+		if (this.changeMoney(-5)) {
+			for (let i = 0; i < this.#fishNum; i++) {
+				const dirX = this.#fish[i].getX() > 180 ? -10 : 10;
+				const dirY = this.#fish[i].getY() > 120 ? -5 : 5;
+				this.#fish[i].rotate(dirX, dirY);
+				this.#fish[i].speedUp();
 			}
-			updateBuyButtons();
+			this.#updateBuyButtons();
 			this.distractFish();
 		}
-	};
+	}
 
 	/*** *** REFRESH THE AQUARIUM *** ***/
 
 	/* MOVE FISH EVERY 32/1000 -- 1024/1000 SECONDS */
-	this.moveFish = function () {
-		for (let i = 0; i < fishNum; i++) fish[i].move();
+	moveFish() {
+		for (let i = 0; i < this.#fishNum; i++) this.#fish[i].move();
 		if (uio.getView() === VIEW_AQUARIUM) this.render();
-	};
+	}
 
-	let fishBirths = 0;
-	let fishDeaths = 0;
-	this.getFishBirths = function () {
-		return fishBirths;
-	};
-	this.getFishDeaths = function () {
-		return fishDeaths;
-	};
+	getFishBirths() {
+		return this.#fishBirths;
+	}
+	getFishDeaths() {
+		return this.#fishDeaths;
+	}
 
-	this.breedFishSet = function (bSpec) {
-		breedFish = bSpec;
-	};
+	breedFishSet(bSpec) {
+		this.#breedFish = bSpec;
+	}
 
 	/* UPDATE AQUARIUM EVERY 2 SECONDS */
-	this.update = function () {
+	update() {
 		/* FISH UPDATE */
-		for (let i = 0; i < fishNum; i++) {
+		for (let i = 0; i < this.#fishNum; i++) {
 			// Swim variations
 			const swimVar = Math.random();
-			if (swimVar < 0.3) fish[i].speedUp();
-			if (swimVar < 0.2) fish[i].changeDirection();
+			if (swimVar < 0.3) this.#fish[i].speedUp();
+			if (swimVar < 0.2) this.#fish[i].changeDirection();
 
 			// Grow
-			fish[i].grow();
+			this.#fish[i].grow();
 
 			// Breed
-			fish[i].breed();
+			this.#fish[i].breed();
 
 			// Pollute water
-			fish[i].pollute();
+			this.#fish[i].pollute();
 
 			// Diseases & Heal
-			fish[i].diseaseCheck();
+			this.#fish[i].diseaseCheck();
 
 			// Hunger & Eat
-			fish[i].hungerCheck();
+			this.#fish[i].hungerCheck();
 
 			// Attack
-			fish[i].fight(i);
+			this.#fish[i].fight(i);
 
 			// Getting older
-			fish[i].getOld();
+			this.#fish[i].getOld();
 
 			// Death Check
-			if (fish[i].getCondition() <= 0) {
-				killFish = i;
+			if (this.#fish[i].getCondition() <= 0) {
+				this.#killFish = i;
 			}
 		}
 
 		/* FILTERS UPDATE */
-		if (pollution > 0) {
-			if (changeMoney(filtration.getFilterData(usedFilter, FI_ENERGY))) {
-				aquarium.changePollution(filtration.getFilterData(usedFilter, FI_POLLUTION));
+		if (this.#pollution > 0) {
+			if (this.changeMoney(filtration.getFilterData(this.#usedFilter, FI_ENERGY))) {
+				this.changePollution(filtration.getFilterData(this.#usedFilter, FI_POLLUTION));
 			}
 		}
 
@@ -1016,24 +1014,24 @@ function aquariumConstructor() {
 		/* GUI UPDATE */
 
 		// pollution bar
-		if (pollutionChanged) {
+		if (this.#pollutionChanged) {
 			this.updatePollutionBar();
 		}
 
 		/*** BREED A NEW FISH ***/
-		if (breedFish > -1) {
-			fishBirths++;
-			this.addFish(breedFish, 0.2);
-			breedFish = -1;
+		if (this.#breedFish > -1) {
+			this.#fishBirths++;
+			this.addFish(this.#breedFish, 0.2);
+			this.#breedFish = -1;
 			uio.changeAlertNum(2);
 			config.saveGame();
 		}
 
 		/*** REMOVE DEAD FISH  ***/
-		if (killFish > -1) {
-			fishDeaths++;
-			this.removeFish(killFish);
-			killFish = -1;
+		if (this.#killFish > -1) {
+			this.#fishDeaths++;
+			this.removeFish(this.#killFish);
+			this.#killFish = -1;
 			uio.changeAlertNum(3);
 			config.saveGame();
 		}
@@ -1045,105 +1043,106 @@ function aquariumConstructor() {
 		}
 
 		stats.refreshStatsPage();
-	};
+	}
 
 	/* UPDATE AQUARIUM IN RELAX MODE EVERY 2 SECONDS */
-	this.updateRelaxMode = function () {
+	updateRelaxMode() {
 		/* FISH UPDATE */
-		for (let i = 0; i < fishNum; i++) {
+		for (let i = 0; i < this.#fishNum; i++) {
 			// Swim variations
 			const swimVar = Math.random();
-			if (swimVar < 0.3) fish[i].speedUp();
-			if (swimVar < 0.2) fish[i].changeDirection();
+			if (swimVar < 0.3) this.#fish[i].speedUp();
+			if (swimVar < 0.2) this.#fish[i].changeDirection();
 		}
-	};
+	}
 
 	/*** COMPUTE THE COMFORT FACTOR ***/
 	// Affects probability of breeding and attacking other fish
 
-	let comfortAquarium; // global aquarium factor
-	this.getComfortAquarium = function () {
-		return comfortAquarium;
-	};
+	getComfortAquarium() {
+		return this.#comfortAquarium;
+	}
 
-	this.updateComfortAquarium = function () {
-		comfortAquarium =
-			lighting.getLightData(usedLight, LI_COMFORT) *
-			scenery.getSceneryData(usedScenery, SC_COMFORT);
+	updateComfortAquarium() {
+		this.#comfortAquarium =
+			lighting.getLightData(this.#usedLight, LI_COMFORT) *
+			scenery.getSceneryData(this.#usedScenery, SC_COMFORT);
 		computeBreedingRate();
-	};
+	}
 
-	this.updateComfortSpecies = function () {
+	updateComfortSpecies() {
 		computeFishNumComfort();
-	};
+	}
 
 	/*** AQUARIUM RENDERING ***/
 
-	this.render = function () {
-		canvasTankCtx.clearRect(0, 0, 360, 240);
-		renderBackground();
-		for (let i = 0; i < fishNum; i++) {
-			renderFish(fish[i]);
+	render() {
+		this.#canvasTankCtx.clearRect(0, 0, 360, 240);
+		this.#renderBackground();
+		for (let i = 0; i < this.#fishNum; i++) {
+			this.#renderFish(this.#fish[i]);
 		}
-		renderForeground();
-	};
+		this.#renderForeground();
+	}
 
-	const renderForeground = () => {
-		canvasTankCtx.drawImage(layerFront, 0, 0);
-	};
+	#renderForeground() {
+		this.#canvasTankCtx.drawImage(this.#layerFront, 0, 0);
+	}
 
-	const renderBackground = () => {
-		canvasTankCtx.drawImage(layerBack, 0, 0);
-	};
+	#renderBackground() {
+		this.#canvasTankCtx.drawImage(this.#layerBack, 0, 0);
+	}
 
-	const renderFish = (fishObj) => {
-		canvasTankCtx.save();
-		canvasTankCtx.translate(fishObj.getX(), fishObj.getY());
-		canvasTankCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
-		canvasTankCtx.translate(fishObj.getBoxX1(), fishObj.getBoxY1());
-		canvasTankCtx.drawImage(fishObj.getImage(), 0, 0, fishObj.getSizeX(), fishObj.getSizeY());
-		canvasTankCtx.restore();
-	};
+	#renderFish(fishObj) {
+		this.#canvasTankCtx.save();
+		this.#canvasTankCtx.translate(fishObj.getX(), fishObj.getY());
+		this.#canvasTankCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
+		this.#canvasTankCtx.translate(fishObj.getBoxX1(), fishObj.getBoxY1());
+		this.#canvasTankCtx.drawImage(
+			fishObj.getImage(),
+			0,
+			0,
+			fishObj.getSizeX(),
+			fishObj.getSizeY()
+		);
+		this.#canvasTankCtx.restore();
+	}
 
 	// FOR STATISTICS — accessors by fish index
 
-	this.returnSpecNum = function (fNum) {
-		return fish[fNum].getSpecNum();
-	};
+	returnSpecNum(fNum) {
+		return this.#fish[fNum].getSpecNum();
+	}
 
-	this.returnSpecName = function (fNum) {
-		return fishSpecies[fish[fNum].getSpecNum()].name;
-	};
+	returnSpecName(fNum) {
+		return fishSpecies[this.#fish[fNum].getSpecNum()].name;
+	}
 
-	this.returnFishCondition = function (fNum) {
-		return fish[fNum].getCondition();
-	};
+	returnFishCondition(fNum) {
+		return this.#fish[fNum].getCondition();
+	}
 
-	this.returnFishHunger = function (fNum) {
-		return fish[fNum].getHunger();
-	};
-	this.returnFishDisease = function (fNum) {
-		return fish[fNum].getDisease();
-	};
+	returnFishHunger(fNum) {
+		return this.#fish[fNum].getHunger();
+	}
+	returnFishDisease(fNum) {
+		return this.#fish[fNum].getDisease();
+	}
 
-	this.returnFishSize = function (fNum) {
-		return fish[fNum].getSize();
-	};
+	returnFishSize(fNum) {
+		return this.#fish[fNum].getSize();
+	}
 
 	// sell fish
-	this.sellFish = function (fNum) {
-		changeMoney(fishSpecies[fish[fNum].getSpecNum()].price / 2);
-		aquarium.removeFish(fNum);
-		updateBuyButtons();
+	sellFish(fNum) {
+		this.changeMoney(fishSpecies[this.#fish[fNum].getSpecNum()].price / 2);
+		this.removeFish(fNum);
+		this.#updateBuyButtons();
 		stats.updateFishListTable();
-	};
-
-	this.addMoney = function (mNum) {
-		changeMoney(mNum);
-	};
+	}
 }
 
-export const aquarium = new aquariumConstructor();
+export const aquarium = new Aquarium();
 aquarium.updateComfortAquarium();
 
 // The 2014 code called a bare global updateBuyButtons() from several files.
