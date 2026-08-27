@@ -27,6 +27,13 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Capacitor / Android (future mobile target)
+# Android packaging (Bubblewrap TWA / Capacitor) — see docs/ANDROID.md
 /android/
 /ios/
+# signing keys and build artifacts must never be committed
+*.keystore
+*.jks
+*.aab
+*.apk
+android.keystore
+.bubblewrap/

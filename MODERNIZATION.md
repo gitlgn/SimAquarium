@@ -165,11 +165,42 @@ with screenshots / a device in the loop.
 
 ## Phase 5 — Android
 
-Two options, decide when Phase 4 lands:
+Route: **Trusted Web Activity** — a thin native shell around the deployed PWA,
+built with [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap) → AAB →
+Play Store. No app code to maintain; web updates ship without a resubmit.
+(Capacitor stays the fallback if a native API is ever needed — `/android` and
+`/ios` are git-ignored for it.)
 
-1. **Trusted Web Activity** (recommended if no native APIs are needed): wrap the
-   deployed PWA with [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap)
-   → AAB → Play Store. Needs a hosted HTTPS origin, a Play Console developer
-   account (one-time US$25), and Digital Asset Links.
-2. **Capacitor**: if native plugins become necessary. Needs Android Studio + JDK;
-   `/android` is already git-ignored for this.
+### ✅ 5a — packaging groundwork (done)
+
+- `vite.config.js` manifest completed for store submission: `id`, `dir`,
+  `categories`, explicit icon `purpose`, `lang`, `description`.
+- `public/.well-known/assetlinks.json` — Digital Asset Links file (placeholder
+  fingerprint). Verified it is copied into `dist/` and served as
+  `application/json`.
+- `twa-manifest.json` (repo root) — Bubblewrap config, all host/URL values as
+  `PLACEHOLDER_*` to fill in after deploy. `packageId: org.gitlgn.simaquarium`.
+- `pwa-maskable-512.png` regenerated with the icon at 60 % (was 80 %) so nothing
+  is clipped by a circular mask — safe-ring now 0 % content.
+- `.gitignore`: keystores (`*.keystore` / `*.jks` / `android.keystore`), bundles
+  (`*.aab` / `*.apk`), `.bubblewrap/`, `/android/`, `/ios/`.
+- `docs/ANDROID.md` — full playbook (Bubblewrap steps, Digital Asset Links,
+  Play submission) plus the PWABuilder cloud path and the Capacitor alternative.
+
+Build stays green: `npm run check` + `vite build` (207 precache entries).
+
+### 5b — publish (needs owner action, cannot be automated here)
+
+1. Deploy `dist/` to a public HTTPS origin (GitHub Pages / Netlify / Cloudflare
+   Pages / Vercel). Confirm `/manifest.webmanifest` and
+   `/.well-known/assetlinks.json` load.
+2. Fill the `PLACEHOLDER_*` values in `twa-manifest.json`.
+3. `npm i -g @bubblewrap/cli`; `bubblewrap init --manifest https://HOST/manifest.webmanifest`
+   (creates `android.keystore` — **back up the keystore + password**).
+4. `keytool -list -v -keystore android.keystore -alias android` → put the SHA-256
+   into `assetlinks.json`, rebuild, redeploy.
+5. `bubblewrap build` → upload the `.aab` to Play Console (developer account:
+   one-time US$25).
+
+JDK 17 + Android SDK are needed locally for step 3–5, or use
+<https://www.pwabuilder.com> to generate the same `.aab` in the cloud.
