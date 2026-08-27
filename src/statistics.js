@@ -6,7 +6,7 @@
 import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
 import { fishSpecies } from './species.js';
-import { SPEC_MAXCONDITION, SPEC_PRICE, VIEW_STATISTICS } from './constants.js';
+import { VIEW_STATISTICS } from './constants.js';
 
 const FISH_LIST_ROWS = 64;
 
@@ -64,7 +64,7 @@ function statsConstructor() {
 				aquarium.returnSpecName(i);
 			document.getElementById('fishTableHealthBoxBar' + i).style.width =
 				(aquarium.returnFishCondition(i) /
-					fishSpecies[aquarium.returnSpecNum(i)][SPEC_MAXCONDITION]) *
+					fishSpecies[aquarium.returnSpecNum(i)].maxCondition) *
 					25 +
 				'px';
 			document.getElementById('fishTableHungerBoxBar' + i).style.width =
@@ -74,7 +74,7 @@ function statsConstructor() {
 			const sizePercent = Math.round(aquarium.returnFishSize(i) * 100);
 			document.getElementById('fishTableSizeBox' + i).innerHTML = sizePercent + '%';
 			document.getElementById('fishTablePrice' + i).innerHTML =
-				fishSpecies[aquarium.returnSpecNum(i)][SPEC_PRICE] / 2;
+				fishSpecies[aquarium.returnSpecNum(i)].price / 2;
 		}
 
 		for (let i = fishNum; i < FISH_LIST_ROWS; i++) {

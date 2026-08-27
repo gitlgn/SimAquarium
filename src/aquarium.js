@@ -20,8 +20,6 @@ import {
 import {
 	BUY,
 	SELL,
-	SPEC_NAME,
-	SPEC_PRICE,
 	VIEW_AQUARIUM,
 	SC_FGIMAGE,
 	SC_BGIMAGE,
@@ -1114,7 +1112,7 @@ function aquariumConstructor() {
 	};
 
 	this.returnSpecName = function (fNum) {
-		return fishSpecies[fish[fNum].getSpecNum()][SPEC_NAME];
+		return fishSpecies[fish[fNum].getSpecNum()].name;
 	};
 
 	this.returnFishCondition = function (fNum) {
@@ -1134,7 +1132,7 @@ function aquariumConstructor() {
 
 	// sell fish
 	this.sellFish = function (fNum) {
-		changeMoney(fishSpecies[fish[fNum].getSpecNum()][SPEC_PRICE] / 2);
+		changeMoney(fishSpecies[fish[fNum].getSpecNum()].price / 2);
 		aquarium.removeFish(fNum);
 		updateBuyButtons();
 		stats.updateFishListTable();

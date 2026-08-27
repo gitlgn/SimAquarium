@@ -13,9 +13,6 @@ import {
 	SHOPSLOT_NAME,
 	SHOPSLOT_PRICE,
 	SHOPSLOT_LINK,
-	SPEC_NAME,
-	SPEC_PRICE,
-	SPEC_LINK,
 	BUY,
 	TIME_MINUTE,
 } from './constants.js';
@@ -43,10 +40,9 @@ function fishShopConstructor() {
 			}
 
 			fishShopSlot[i][SHOPSLOT_NUM] = parseInt((Math.random() * (10 - i) + (10 - i)) / 2);
-			fishShopSlot[i][SHOPSLOT_NAME] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]][SPEC_NAME];
-			fishShopSlot[i][SHOPSLOT_PRICE] =
-				fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]][SPEC_PRICE];
-			fishShopSlot[i][SHOPSLOT_LINK] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]][SPEC_LINK];
+			fishShopSlot[i][SHOPSLOT_NAME] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]].name;
+			fishShopSlot[i][SHOPSLOT_PRICE] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]].price;
+			fishShopSlot[i][SHOPSLOT_LINK] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]].link;
 
 			const slot = document.getElementById('fishSlot' + i);
 			slot.children[0].innerHTML = fishShopSlot[i][SHOPSLOT_NAME];
