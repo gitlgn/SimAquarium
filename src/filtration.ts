@@ -20,11 +20,11 @@ const PATH_FILTERS = 'gfx/filters/';
 const PATH_BGS = 'gfx/view4/';
 
 class Filtration {
-	#filter = [];
+	#filter: any[][] = [];
 
 	constructor() {
 		const add = (name, fileName, price, comfort, pollution, energyCost) => {
-			const row = [];
+			const row: any[] = [];
 			row[FI_NAME] = name;
 			row[FI_PRICE] = price;
 			row[FI_COMFORT] = comfort;
@@ -50,11 +50,11 @@ class Filtration {
 }
 
 class BackgroundWall {
-	#background = [];
+	#background: any[][] = [];
 
 	constructor() {
 		const add = (name, fileName, price) => {
-			const row = [];
+			const row: any[] = [];
 			row[BG_NAME] = name;
 			row[BG_PRICE] = price;
 			row[BG_IMAGE] = PATH_BGS + fileName;

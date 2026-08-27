@@ -19,7 +19,7 @@ import {
 } from './constants.js';
 
 class FishShop {
-	#slots = [];
+	#slots: any[][] = [];
 	#deliveryTime = 60;
 	#timer;
 
@@ -46,7 +46,7 @@ class FishShop {
 			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
 			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
 			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			/** @type {HTMLElement} */ (el.children[1]).style.backgroundImage =
+			(el.children[1] as HTMLElement).style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	}
@@ -141,7 +141,7 @@ class FishShop {
 			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
 			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
 			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			/** @type {HTMLElement} */ (el.children[1]).style.backgroundImage =
+			(el.children[1] as HTMLElement).style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	}

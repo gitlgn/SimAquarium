@@ -7,11 +7,11 @@ import { LI_NAME, LI_PRICE, LI_COMFORT, LI_ENERGY, LI_IMAGE } from './constants.
 const PATH_LIGHTING = 'gfx/lighting/';
 
 class Lighting {
-	#light = [];
+	#light: any[][] = [];
 
 	constructor() {
 		const add = (name, fileName, price, comfort, energyCost) => {
-			const row = [];
+			const row: any[] = [];
 			row[LI_NAME] = name;
 			row[LI_PRICE] = price;
 			row[LI_COMFORT] = comfort;

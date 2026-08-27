@@ -9,6 +9,7 @@ const ctxStub = new Proxy(
 	}
 );
 if (typeof HTMLCanvasElement !== 'undefined') {
+	// @ts-expect-error — jsdom has no canvas; a Proxy stub is enough for the specs
 	HTMLCanvasElement.prototype.getContext = () => ctxStub;
 }
 

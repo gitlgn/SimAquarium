@@ -32,7 +32,7 @@ class Config {
 
 	/** @returns {HTMLInputElement} */
 	#relaxCheckbox() {
-		return /** @type {HTMLInputElement} */ ($('confRelaxMode'));
+		return $('confRelaxMode') as HTMLInputElement;
 	}
 
 	relaxChange() {

@@ -59,11 +59,9 @@ class Aquarium {
 
 	#usedBackground = 0;
 
-	/** @type {Fish[]} */
-	#fish = []; // the list of all fish
+	#fish: Fish[] = []; // the list of all fish
 	#fishNum = 0;
-	/** @type {number[]} */
-	#fishNumBySpecies = Array(29).fill(0);
+	#fishNumBySpecies: number[] = Array(29).fill(0);
 
 	#pollution = 0;
 	#pollutionChanged = false;
@@ -547,7 +545,7 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = ctx2d(/** @type {HTMLCanvasElement} */ ($('tank')));
+		this.#canvasTankCtx = ctx2d($('tank') as HTMLCanvasElement);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
 	}

@@ -24,12 +24,12 @@ const SP_PRICE = 4;
 const SP_COMFORT = 5;
 
 class Scenery {
-	#scenery = []; // pre-made sceneries
-	#part = []; // custom scenery parts — no consumer yet (Scenery Creator is unfinished)
+	#scenery: any[][] = []; // pre-made sceneries
+	#part: any[][] = []; // custom scenery parts — no consumer yet (Scenery Creator is unfinished)
 
 	constructor() {
 		const add = (name, fgfile, bgfile, price, comfort, bonusfish) => {
-			const row = [];
+			const row: any[] = [];
 			row[SC_NAME] = name;
 			row[SC_PRICE] = price;
 			row[SC_COMFORT] = comfort;
@@ -53,7 +53,7 @@ class Scenery {
 		add('Seashell Palace', '8fg.png', '8bg.png', 51200, 0.99, 6);
 
 		const addPart = (name, file, sizeX, sizeY, price, comfort) => {
-			const row = [];
+			const row: any[] = [];
 			row[SP_NAME] = name;
 			row[SP_IMAGE] = new Image();
 			row[SP_IMAGE].src = PATH_SCENERY_PARTS + file;

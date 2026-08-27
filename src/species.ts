@@ -30,7 +30,7 @@ import { uio } from './uio.js';
 
 // FISH ANGLES — lookup by [vX][vY]
 
-export const fishAngle = [];
+export const fishAngle: number[][] = [];
 fishAngle[-10] = [];
 fishAngle[10] = [];
 
@@ -94,16 +94,14 @@ export const fishSpecies = [
 
 // Per-species derived rates, recomputed when aquarium comfort / fish count changes.
 
-/** @type {number[]} */
-const speciesBreedingRate = [];
+const speciesBreedingRate: number[] = [];
 export function computeBreedingRate() {
 	for (let i = 0; i < fishSpecies.length; i++) {
 		speciesBreedingRate[i] = aquarium.getComfortAquarium() * fishSpecies[i].breed;
 	}
 }
 
-/** @type {number[]} */
-const speciesFishNumComfort = [];
+const speciesFishNumComfort: number[] = [];
 export function computeFishNumComfort() {
 	for (let i = 0; i < fishSpecies.length; i++) {
 		speciesFishNumComfort[i] = fishSpecies[i].fishNumOptimal / aquarium.getFishNum();
@@ -112,8 +110,8 @@ export function computeFishNumComfort() {
 
 // FISH FRAMES — fishFrame{L,R}[species][frame]
 
-const fishFrameL = [];
-const fishFrameR = [];
+const fishFrameL: HTMLImageElement[][] = [];
+const fishFrameR: HTMLImageElement[][] = [];
 
 for (let i = 0; i < 29; i++) {
 	fishFrameL[i] = [];
