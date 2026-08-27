@@ -69,7 +69,7 @@ var fishShopConstructor = function() {
 	var fishShopTimer;
 
 	this.setDeliveryTimer = function() {
-		fishShopTimer = window.setTimeout( "fishShop.updateDeliveryTime()", TIME_MINUTE );
+		fishShopTimer = window.setTimeout( function () { fishShop.updateDeliveryTime(); }, TIME_MINUTE );
 	}
 
 	this.clearDerliveryTimer = function() {
@@ -85,7 +85,7 @@ var fishShopConstructor = function() {
 			config.setItem('coinAdd',1);
 		}
 		document.getElementById( "newFishTime" ).innerHTML = fishShopDeliveryTime;
-		fishShopTimer = window.setTimeout( "fishShop.updateDeliveryTime()", TIME_MINUTE );
+		fishShopTimer = window.setTimeout( function () { fishShop.updateDeliveryTime(); }, TIME_MINUTE );
 	}
 
 

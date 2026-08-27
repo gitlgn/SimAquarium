@@ -28,11 +28,10 @@ window.setTimeout(function() {
 
 
 /*** DEBUG MESSAGE FUNCTION ***/
-var debug = true;
+var debug = false;
 function dbg( msg ) {
 	if( !debug ) return;
-	// opera.postError( msg );
-	console.error
+	console.log( "[SimAquarium]", msg );
 }
 
 
@@ -55,8 +54,8 @@ window.addEventListener( "load", function() {
 		
 	
 	
-	smallInterval	= window.setInterval( "aquarium.moveFish()", 128 );
-	bigInterval		= window.setInterval( "aquarium.update()", 2000 );
+	smallInterval	= window.setInterval( function () { aquarium.moveFish(); }, 128 );
+	bigInterval		= window.setInterval( function () { aquarium.update(); }, 2000 );
 	updateBuyButtons();
 	
 }, false );

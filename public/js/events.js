@@ -8,21 +8,20 @@ function eventsCreate() {
 
 
 	document.getElementById( "buttonWidget0" ).addEventListener( "click", function() {
-		// uio.openHelp();
-		parent.postMessage({'command':'openHelp'}, "*");
-	} , false );	
-	
+		openTab( "https://xtrsyz.org/2014/02/simaquarium-extensions/" );
+	} , false );
+
 	document.getElementById( "buttonWidget2" ).addEventListener( "click", function() {
 		uio.closeWidget();
-		parent.postMessage({'command':'closeWidget'}, "*");
-	} , false );	
+		config.saveGame();
+	} , false );
 
 	document.getElementById( "pageMode" ).addEventListener( "click", function() {
 		uio.changeFrontPageMode();
 	} , false );
-	
+
 	document.getElementById( "Copyrights" ).addEventListener( "click", function() {
-		parent.postMessage({'command':'openURL','url': 'http://xtrsyz.org/'}, "*");
+		openTab( "https://xtrsyz.org/" );
 	} , false );
 
 

@@ -1,0 +1,12 @@
+# Build output / deps
+dist/
+dev-dist/
+node_modules/
+package-lock.json
+
+# Legacy game code — left as-is until the Phase 2b ES-module rewrite,
+# so the modernization diff stays reviewable and git blame survives.
+public/
+index.html
+
+LICENSE.md

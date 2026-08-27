@@ -128,7 +128,7 @@ var uioConstructor = function() {
 	
 	this.setSmallInterval = function( delay ) {
 		window.clearInterval( smallInterval );		
-		smallInterval = window.setInterval( "aquarium.moveFish()", smallIntervals[delay] );
+		smallInterval = window.setInterval( function () { aquarium.moveFish(); }, smallIntervals[delay] );
 		num = 389 + ( delay * 9 );
 		document.getElementById( "speedHandle" ).style.left = num + "px";
 		chosenSpeed = delay;
@@ -155,7 +155,7 @@ var uioConstructor = function() {
 		document.getElementById( "statusEvent" ).style.backgroundPosition = "38px";
 		document.getElementById( "statusEventIcon" ).style.background = "url(gfx/interface/alertLightIcon" + alertNumber + ".png)";
 		document.getElementById( "statusEventIcon" ).style.display = "block";
-		hideStatusE = window.setTimeout( "uio.hideStatusWidgetIcon()", 4000 );
+		hideStatusE = window.setTimeout( function () { uio.hideStatusWidgetIcon(); }, 4000 );
 	}
 	
 	this.hideStatusWidgetIcon = function() {

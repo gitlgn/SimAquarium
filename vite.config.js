@@ -1,18 +1,52 @@
 import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // SimAquarium — Vite config
 // Phase 1: the game still ships as classic scripts served from /public.
-// Phase 2 will move sources into /src as ES modules and add vite-plugin-pwa.
+// Phase 2 will move sources into /src as ES modules.
 export default defineConfig({
-  root: '.',
-  publicDir: 'public',
-  server: {
-    port: 5173,
-    open: false,
-  },
-  build: {
-    outDir: 'dist',
-    target: 'es2020',
-    sourcemap: true,
-  },
+	root: '.',
+	publicDir: 'public',
+	server: {
+		port: 5173,
+		open: false,
+	},
+	build: {
+		outDir: 'dist',
+		target: 'es2020',
+		sourcemap: true,
+	},
+	plugins: [
+		VitePWA({
+			registerType: 'autoUpdate',
+			includeAssets: ['gfx/favicon.png', 'gfx/apple-touch-icon.png'],
+			workbox: {
+				globPatterns: ['**/*.{js,css,html,png,jpg,svg,woff2}'],
+				// the game preloads ~120 small sprites; raise the default 2 MiB cap
+				maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+			},
+			manifest: {
+				name: 'SimAquarium',
+				short_name: 'SimAquarium',
+				description: 'Aquarium simulation game — buy, breed and sell fish.',
+				lang: 'en',
+				theme_color: '#0e4e7a',
+				background_color: '#0e4e7a',
+				display: 'standalone',
+				orientation: 'any',
+				start_url: '/',
+				scope: '/',
+				icons: [
+					{ src: 'gfx/pwa-192.png', sizes: '192x192', type: 'image/png' },
+					{ src: 'gfx/pwa-512.png', sizes: '512x512', type: 'image/png' },
+					{
+						src: 'gfx/pwa-maskable-512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'maskable',
+					},
+				],
+			},
+		}),
+	],
 });

@@ -18,7 +18,7 @@ var configConstructor = function() {
 	
 	relaxEnable = function() {
 		clearInterval( bigInterval );
-		bigInterval = window.setInterval( "aquarium.updateRelaxMode()", 2000 );
+		bigInterval = window.setInterval( function () { aquarium.updateRelaxMode(); }, 2000 );
 		document.getElementById( "statusEvent" ).style.backgroundPosition = "38px";
 		document.getElementById( "statusEventIcon" ).style.background = "url(gfx/interface/alertLightIcon5.png)";
 		document.getElementById( "statusEventIcon" ).style.display = "block";
@@ -26,7 +26,7 @@ var configConstructor = function() {
 
 	relaxDisable = function() {
 		clearInterval( bigInterval );
-		bigInterval = window.setInterval( "aquarium.update()", 2000 );
+		bigInterval = window.setInterval( function () { aquarium.update(); }, 2000 );
 		document.getElementById( "statusEvent" ).style.backgroundPosition = "0";	
 		document.getElementById( "statusEventIcon" ).style.display = "none";	
 	};
@@ -55,8 +55,8 @@ var configConstructor = function() {
 		
 		window.clearInterval( smallInterval );
 		window.clearInterval( bigInterval );
-		smallInterval	= window.setInterval( "aquarium.moveFish()", 128 );
-		bigInterval		= window.setInterval( "aquarium.update()", 2000 );
+		smallInterval	= window.setInterval( function () { aquarium.moveFish(); }, 128 );
+		bigInterval		= window.setInterval( function () { aquarium.update(); }, 2000 );
 		
 		document.getElementById( "confRelaxMode" ).checked = false;
 		
