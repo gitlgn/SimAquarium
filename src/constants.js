@@ -7,34 +7,10 @@
 export const BUY = -1;
 export const SELL = 1;
 
-// fishSpecies[] column indices.
-export const SPEC_NAME = 0;
-export const SPEC_RARITY = 1; // not used
-export const SPEC_PRICE = 2;
-export const SPEC_SIZEX = 3;
-export const SPEC_SIZEY = 4;
-export const SPEC_GROWTH = 5; // growth rate 0-1
-export const SPEC_BREED = 6; // breed rate 0-1
-export const SPEC_POLLUTION = 7; // pollution rate 0-1
-export const SPEC_POLLUTIONTOL = 8; // pollution tolerance 0-32
-export const SPEC_MAXCONDITION = 9;
-export const SPEC_FOODNEED = 10;
-export const SPEC_FISHNUMOPTIMAL = 11; // max breeding number
-export const SPEC_AGGRESSION = 12; // attack chance
-export const SPEC_STRENGTH = 13;
-export const SPEC_LONGEVITY = 14;
-export const SPEC_LINK = 15;
-export const SPEC_FISHNUMATTACK = 16; // min number before attacking
-
-// Fish facing.
+// Fish facing (vX values). Not yet referenced by name — species.js still uses
+// the literals 10 / -10.
 export const DIRECTION_LEFT = -10;
 export const DIRECTION_RIGHT = 10;
-
-// Fish rarity tiers.
-export const RARITY_POPULAR = 0;
-export const RARITY_MEDIUM = 1;
-export const RARITY_RARE = 2;
-export const RARITY_UNIQUE = 3;
 
 // Widget faces.
 export const PAGE_FRONT = 0;
