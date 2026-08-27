@@ -9,9 +9,9 @@ import { fishShop } from './fishshop.js';
 import { stats } from './statistics.js';
 import { uio } from './uio.js';
 import { openTab } from './util.js';
+import { $ } from './dom.js';
 
-const on = (id, type, handler) =>
-	document.getElementById(id).addEventListener(type, handler, false);
+const on = (id, type, handler) => $(id).addEventListener(type, handler, false);
 
 // The 2014 version gated this behind a code fetched from xtrsyz.org (now dead).
 // Just top up the balance directly.
@@ -88,7 +88,7 @@ export function eventsCreate() {
 
 	/*** FISH SHOP SLOTS (info = child 4, buy = child 5) ***/
 	for (let i = 0; i < 9; i++) {
-		const slot = document.getElementById('fishSlot' + i);
+		const slot = $('fishSlot' + i);
 		slot.children[4].addEventListener('click', () => fishShop.openFishInfo(i), false);
 		slot.children[5].addEventListener('click', () => fishShop.buyFish(i), false);
 	}

@@ -9,13 +9,8 @@
 		"skipLibCheck": true,
 		"types": ["vite/client"],
 
-		// Pragmatic first pass: catch wrong names / arg counts / bad property
-		// access without demanding a full DOM-null-safety pass on the 2014 code.
-		// Tightening `strict` / `strictNullChecks` file-by-file is a follow-up.
-		"strict": false,
+		"strict": true,
 		"noImplicitAny": false,
-		"strictNullChecks": false,
-		"noImplicitThis": true,
 		"noFallthroughCasesInSwitch": true
 	},
 	"include": ["src/**/*.js", "*.config.js"],

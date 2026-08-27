@@ -3,6 +3,7 @@
  **
  */
 
+import { $ } from './dom.js';
 import {
 	FI_NAME,
 	FI_PRICE,
@@ -107,12 +108,12 @@ class BackgroundWall {
 			bgSlotBuy.setAttribute('class', 'button buy on');
 			bgSlotBuy.setAttribute('id', 'buttonBackgroundBuy' + i);
 
-			document.getElementById('tabBackgroundShop').appendChild(bgSlot);
+			$('tabBackgroundShop').appendChild(bgSlot);
 			bgSlot.appendChild(bgSlotTitle);
 			bgSlot.appendChild(bgSlotMoney);
 			bgSlot.appendChild(bgSlotBuy);
 		}
-		document.getElementById('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
+		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
 	}
 }
 

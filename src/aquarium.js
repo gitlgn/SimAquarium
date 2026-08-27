@@ -17,6 +17,7 @@ import {
 	computeBreedingRate,
 	computeFishNumComfort,
 } from './species.js';
+import { $, ctx2d } from './dom.js';
 import {
 	BUY,
 	SELL,
@@ -35,6 +36,14 @@ import {
 	BG_PRICE,
 	BG_IMAGE,
 } from './constants.js';
+
+/** A 360x240 offscreen canvas for one of the two composited layers. */
+function makeLayerCanvas() {
+	const c = document.createElement('canvas');
+	c.width = 360;
+	c.height = 240;
+	return c;
+}
 
 class Aquarium {
 	#money = 0;
@@ -72,34 +81,24 @@ class Aquarium {
 	#breedFish = -1;
 	#killFish = -1;
 
-	/** @type {number} */
-	#comfortAquarium;
+	#comfortAquarium = 0;
 
 	// Canvas + offscreen layers
-	/** @type {CanvasRenderingContext2D} */
-	#canvasTankCtx;
 	#imageGlassFront = new Image();
 	#imageWater = new Image();
 	#imageGlassBack = new Image();
-	#layerFront = document.createElement('canvas');
-	#layerBack = document.createElement('canvas');
-	/** @type {CanvasRenderingContext2D} */
-	#layerFrontCtx;
-	/** @type {CanvasRenderingContext2D} */
-	#layerBackCtx;
+	#layerFront = makeLayerCanvas();
+	#layerBack = makeLayerCanvas();
+	#layerFrontCtx = ctx2d(this.#layerFront);
+	#layerBackCtx = ctx2d(this.#layerBack);
+	// The real tank context is wired in create(); a detached one stands in
+	// until then so the field is always a valid context.
+	#canvasTankCtx = ctx2d(document.createElement('canvas'));
 
 	constructor() {
 		this.#imageGlassFront.src = 'gfx/aquarium/tank/glassFront.png';
 		this.#imageWater.src = 'gfx/aquarium/tank/water.png';
 		this.#imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
-
-		this.#layerFront.width = 360;
-		this.#layerFront.height = 240;
-		this.#layerFrontCtx = this.#layerFront.getContext('2d');
-
-		this.#layerBack.width = 360;
-		this.#layerBack.height = 240;
-		this.#layerBackCtx = this.#layerBack.getContext('2d');
 	}
 
 	resetAquarium() {
@@ -108,35 +107,30 @@ class Aquarium {
 		this.#usedScenery = 0;
 		this.#sceneries.length = 0;
 		this.#sceneries[0] = true;
-		document.getElementById('buttonSceneryBuy0').setAttribute('class', 'button choose off');
+		$('buttonSceneryBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 9; i++) {
-			document
-				.getElementById('buttonScenerySell' + i)
-				.setAttribute('class', 'button sell off');
+			$('buttonScenerySell' + i).setAttribute('class', 'button sell off');
 		}
 
 		this.#usedLight = 0;
 		this.#lights.length = 0;
 		this.#lights[0] = true;
-		document.getElementById('buttonLightBuy0').setAttribute('class', 'button choose off');
+		$('buttonLightBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 9; i++) {
-			document.getElementById('buttonLightSell' + i).setAttribute('class', 'button sell off');
+			$('buttonLightSell' + i).setAttribute('class', 'button sell off');
 		}
 
 		this.#usedFilter = 0;
 		this.#filters.length = 0;
 		this.#filters[0] = true;
-		document.getElementById('buttonFilterBuy0').setAttribute('class', 'button choose off');
+		$('buttonFilterBuy0').setAttribute('class', 'button choose off');
 		for (let i = 1; i < 6; i++) {
-			document
-				.getElementById('buttonFilterSell' + i)
-				.setAttribute('class', 'button sell off');
+			$('buttonFilterSell' + i).setAttribute('class', 'button sell off');
 		}
 
 		this.#usedBackground = 0;
-		document.getElementById('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
-		document.getElementById('view0').style.background =
-			'url(' + background.getBackgroundData(0, BG_IMAGE) + ')';
+		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
+		$('view0').style.background = 'url(' + background.getBackgroundData(0, BG_IMAGE) + ')';
 
 		this.#fish.length = 0;
 		for (let i = 0; i < 29; i++) {
@@ -212,7 +206,7 @@ class Aquarium {
 
 	loadAquarium() {
 		this.#money = parseFloat(config.getItem('money'));
-		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
 
 		this.#usedScenery = parseInt(config.getItem('usedScenery'), 10);
 		this.#usedLight = parseInt(config.getItem('usedLight'), 10);
@@ -221,18 +215,12 @@ class Aquarium {
 			if (scStored === '1') {
 				this.#sceneries[i] = true;
 				if (i !== this.#usedScenery) {
-					document
-						.getElementById('buttonSceneryBuy' + i)
-						.setAttribute('class', 'button choose on');
+					$('buttonSceneryBuy' + i).setAttribute('class', 'button choose on');
 				} else {
-					document
-						.getElementById('buttonSceneryBuy' + i)
-						.setAttribute('class', 'button choose off');
+					$('buttonSceneryBuy' + i).setAttribute('class', 'button choose off');
 				}
 				if (i > 0) {
-					document
-						.getElementById('buttonScenerySell' + i)
-						.setAttribute('class', 'button sell on');
+					$('buttonScenerySell' + i).setAttribute('class', 'button sell on');
 				}
 			} else {
 				this.#sceneries[i] = false;
@@ -242,18 +230,12 @@ class Aquarium {
 			if (liStored === '1') {
 				this.#lights[i] = true;
 				if (i !== this.#usedLight) {
-					document
-						.getElementById('buttonLightBuy' + i)
-						.setAttribute('class', 'button choose on');
+					$('buttonLightBuy' + i).setAttribute('class', 'button choose on');
 				} else {
-					document
-						.getElementById('buttonLightBuy' + i)
-						.setAttribute('class', 'button choose off');
+					$('buttonLightBuy' + i).setAttribute('class', 'button choose off');
 				}
 				if (i > 0) {
-					document
-						.getElementById('buttonLightSell' + i)
-						.setAttribute('class', 'button sell on');
+					$('buttonLightSell' + i).setAttribute('class', 'button sell on');
 				}
 			} else {
 				this.#lights[i] = false;
@@ -265,28 +247,20 @@ class Aquarium {
 			if (fiStored === '1') {
 				this.#filters[i] = true;
 				if (i !== this.#usedFilter) {
-					document
-						.getElementById('buttonFilterBuy' + i)
-						.setAttribute('class', 'button choose on');
+					$('buttonFilterBuy' + i).setAttribute('class', 'button choose on');
 				} else {
-					document
-						.getElementById('buttonFilterBuy' + i)
-						.setAttribute('class', 'button choose off');
+					$('buttonFilterBuy' + i).setAttribute('class', 'button choose off');
 				}
 				if (i > 0) {
-					document
-						.getElementById('buttonFilterSell' + i)
-						.setAttribute('class', 'button sell on');
+					$('buttonFilterSell' + i).setAttribute('class', 'button sell on');
 				}
 			} else {
 				this.#filters[i] = false;
 			}
 		}
 		this.#usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
-		document
-			.getElementById('buttonBackgroundBuy' + this.#usedBackground)
-			.setAttribute('class', 'button buy off');
-		document.getElementById('view0').style.background =
+		$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy off');
+		$('view0').style.background =
 			'url(' + background.getBackgroundData(this.#usedBackground, BG_IMAGE) + ')';
 
 		// load fish data
@@ -342,14 +316,14 @@ class Aquarium {
 	}
 	resetMoney() {
 		this.#money = 100;
-		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
 	}
 
 	/** Returns false (and does nothing) when the change would overdraw. */
 	changeMoney(diff) {
 		if (this.#money + diff < 0) return false;
 		this.#money = this.#money + diff;
-		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
 		return true;
 	}
 
@@ -368,13 +342,8 @@ class Aquarium {
 			this.chooseScenery(scNum);
 		} else {
 			if (this.changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
-				document
-					.getElementById('buttonSceneryBuy' + scNum)
-					.setAttribute('class', 'button choose on');
-				if (scNum)
-					document
-						.getElementById('buttonScenerySell' + scNum)
-						.setAttribute('class', 'button sell on');
+				$('buttonSceneryBuy' + scNum).setAttribute('class', 'button choose on');
+				if (scNum) $('buttonScenerySell' + scNum).setAttribute('class', 'button sell on');
 				this.#sceneries[scNum] = true;
 				this.chooseScenery(scNum);
 				this.#updateBuyButtons();
@@ -384,17 +353,10 @@ class Aquarium {
 	chooseScenery(scNum) {
 		this.#usedScenery = Number(this.#usedScenery) || 0;
 		if (this.#sceneries[this.#usedScenery])
-			document
-				.getElementById('buttonSceneryBuy' + this.#usedScenery)
-				.setAttribute('class', 'button choose on');
-		else
-			document
-				.getElementById('buttonSceneryBuy' + this.#usedScenery)
-				.setAttribute('class', 'button buy on');
+			$('buttonSceneryBuy' + this.#usedScenery).setAttribute('class', 'button choose on');
+		else $('buttonSceneryBuy' + this.#usedScenery).setAttribute('class', 'button buy on');
 
-		document
-			.getElementById('buttonSceneryBuy' + scNum)
-			.setAttribute('class', 'button choose off');
+		$('buttonSceneryBuy' + scNum).setAttribute('class', 'button choose off');
 		this.#usedScenery = scNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
@@ -406,10 +368,8 @@ class Aquarium {
 		if (!this.#sceneries[scNum]) return;
 
 		this.changeMoney(SELL * scenery.getSceneryData(scNum, SC_PRICE) * 0.5);
-		document.getElementById('buttonSceneryBuy' + scNum).setAttribute('class', 'button buy on');
-		document
-			.getElementById('buttonScenerySell' + scNum)
-			.setAttribute('class', 'button sell off');
+		$('buttonSceneryBuy' + scNum).setAttribute('class', 'button buy on');
+		$('buttonScenerySell' + scNum).setAttribute('class', 'button sell off');
 		this.#sceneries[scNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -424,13 +384,8 @@ class Aquarium {
 			this.chooseLight(liNum);
 		} else {
 			if (this.changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
-				document
-					.getElementById('buttonLightBuy' + liNum)
-					.setAttribute('class', 'button choose on');
-				if (liNum)
-					document
-						.getElementById('buttonLightSell' + liNum)
-						.setAttribute('class', 'button sell on');
+				$('buttonLightBuy' + liNum).setAttribute('class', 'button choose on');
+				if (liNum) $('buttonLightSell' + liNum).setAttribute('class', 'button sell on');
 				this.#lights[liNum] = true;
 				this.chooseLight(liNum);
 				this.#updateBuyButtons();
@@ -440,17 +395,10 @@ class Aquarium {
 
 	chooseLight(liNum) {
 		if (this.#lights[this.#usedLight])
-			document
-				.getElementById('buttonLightBuy' + this.#usedLight)
-				.setAttribute('class', 'button choose on');
-		else
-			document
-				.getElementById('buttonLightBuy' + this.#usedLight)
-				.setAttribute('class', 'button buy on');
+			$('buttonLightBuy' + this.#usedLight).setAttribute('class', 'button choose on');
+		else $('buttonLightBuy' + this.#usedLight).setAttribute('class', 'button buy on');
 
-		document
-			.getElementById('buttonLightBuy' + liNum)
-			.setAttribute('class', 'button choose off');
+		$('buttonLightBuy' + liNum).setAttribute('class', 'button choose off');
 		this.#usedLight = liNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
@@ -462,8 +410,8 @@ class Aquarium {
 		if (!this.#lights[liNum]) return;
 
 		this.changeMoney(SELL * lighting.getLightData(liNum, LI_PRICE) * 0.5);
-		document.getElementById('buttonLightBuy' + liNum).setAttribute('class', 'button buy on');
-		document.getElementById('buttonLightSell' + liNum).setAttribute('class', 'button sell off');
+		$('buttonLightBuy' + liNum).setAttribute('class', 'button buy on');
+		$('buttonLightSell' + liNum).setAttribute('class', 'button sell off');
 		this.#lights[liNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -478,13 +426,8 @@ class Aquarium {
 			this.chooseFilter(fiNum);
 		} else {
 			if (this.changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
-				document
-					.getElementById('buttonFilterBuy' + fiNum)
-					.setAttribute('class', 'button choose on');
-				if (fiNum)
-					document
-						.getElementById('buttonFilterSell' + fiNum)
-						.setAttribute('class', 'button sell on');
+				$('buttonFilterBuy' + fiNum).setAttribute('class', 'button choose on');
+				if (fiNum) $('buttonFilterSell' + fiNum).setAttribute('class', 'button sell on');
 				this.#filters[fiNum] = true;
 				this.chooseFilter(fiNum);
 				this.#updateBuyButtons();
@@ -494,17 +437,10 @@ class Aquarium {
 
 	chooseFilter(fiNum) {
 		if (this.#filters[this.#usedFilter])
-			document
-				.getElementById('buttonFilterBuy' + this.#usedFilter)
-				.setAttribute('class', 'button choose on');
-		else
-			document
-				.getElementById('buttonFilterBuy' + this.#usedFilter)
-				.setAttribute('class', 'button buy on');
+			$('buttonFilterBuy' + this.#usedFilter).setAttribute('class', 'button choose on');
+		else $('buttonFilterBuy' + this.#usedFilter).setAttribute('class', 'button buy on');
 
-		document
-			.getElementById('buttonFilterBuy' + fiNum)
-			.setAttribute('class', 'button choose off');
+		$('buttonFilterBuy' + fiNum).setAttribute('class', 'button choose off');
 		this.#usedFilter = fiNum;
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
@@ -515,10 +451,8 @@ class Aquarium {
 		if (!this.#filters[fiNum]) return;
 
 		this.changeMoney(SELL * filtration.getFilterData(fiNum, FI_PRICE) * 0.5);
-		document.getElementById('buttonFilterBuy' + fiNum).setAttribute('class', 'button buy on');
-		document
-			.getElementById('buttonFilterSell' + fiNum)
-			.setAttribute('class', 'button sell off');
+		$('buttonFilterBuy' + fiNum).setAttribute('class', 'button buy on');
+		$('buttonFilterSell' + fiNum).setAttribute('class', 'button sell off');
 		this.#filters[fiNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -532,13 +466,9 @@ class Aquarium {
 		if (this.#usedBackground === bgNum) return;
 
 		if (this.changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
-			document
-				.getElementById('buttonBackgroundBuy' + this.#usedBackground)
-				.setAttribute('class', 'button buy on');
-			document
-				.getElementById('buttonBackgroundBuy' + bgNum)
-				.setAttribute('class', 'button buy off');
-			document.getElementById('view0').style.background =
+			$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy on');
+			$('buttonBackgroundBuy' + bgNum).setAttribute('class', 'button buy off');
+			$('view0').style.background =
 				'url(' + background.getBackgroundData(bgNum, BG_IMAGE) + ')';
 			this.#usedBackground = bgNum;
 			this.#updateBuyButtons();
@@ -555,26 +485,18 @@ class Aquarium {
 			// update sceneries view
 			if (!this.#sceneries[i]) {
 				if (this.#money < scenery.getSceneryData(i, SC_PRICE)) {
-					document
-						.getElementById('buttonSceneryBuy' + i)
-						.setAttribute('class', 'button buy off');
+					$('buttonSceneryBuy' + i).setAttribute('class', 'button buy off');
 				} else {
-					document
-						.getElementById('buttonSceneryBuy' + i)
-						.setAttribute('class', 'button buy on');
+					$('buttonSceneryBuy' + i).setAttribute('class', 'button buy on');
 				}
 			}
 
 			// update lights view
 			if (!this.#lights[i]) {
 				if (this.#money < lighting.getLightData(i, LI_PRICE)) {
-					document
-						.getElementById('buttonLightBuy' + i)
-						.setAttribute('class', 'button buy off');
+					$('buttonLightBuy' + i).setAttribute('class', 'button buy off');
 				} else {
-					document
-						.getElementById('buttonLightBuy' + i)
-						.setAttribute('class', 'button buy on');
+					$('buttonLightBuy' + i).setAttribute('class', 'button buy on');
 				}
 			}
 		}
@@ -583,13 +505,9 @@ class Aquarium {
 			// update filters view
 			if (!this.#filters[i]) {
 				if (this.#money < filtration.getFilterData(i, FI_PRICE)) {
-					document
-						.getElementById('buttonFilterBuy' + i)
-						.setAttribute('class', 'button buy off');
+					$('buttonFilterBuy' + i).setAttribute('class', 'button buy off');
 				} else {
-					document
-						.getElementById('buttonFilterBuy' + i)
-						.setAttribute('class', 'button buy on');
+					$('buttonFilterBuy' + i).setAttribute('class', 'button buy on');
 				}
 			}
 		}
@@ -598,13 +516,9 @@ class Aquarium {
 			// update backgrounds view
 			if (i !== this.#usedBackground) {
 				if (this.#money < background.getBackgroundData(i, BG_PRICE)) {
-					document
-						.getElementById('buttonBackgroundBuy' + i)
-						.setAttribute('class', 'button buy off');
+					$('buttonBackgroundBuy' + i).setAttribute('class', 'button buy off');
 				} else {
-					document
-						.getElementById('buttonBackgroundBuy' + i)
-						.setAttribute('class', 'button buy on');
+					$('buttonBackgroundBuy' + i).setAttribute('class', 'button buy on');
 				}
 			}
 		}
@@ -633,9 +547,7 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = /** @type {HTMLCanvasElement} */ (
-			document.getElementById('tank')
-		).getContext('2d');
+		this.#canvasTankCtx = ctx2d(/** @type {HTMLCanvasElement} */ ($('tank')));
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
 	}
@@ -645,7 +557,7 @@ class Aquarium {
 		const tempCanvas = document.createElement('canvas');
 		tempCanvas.width = 360;
 		tempCanvas.height = 240;
-		const tempCtx = tempCanvas.getContext('2d');
+		const tempCtx = ctx2d(tempCanvas);
 		tempCtx.globalCompositeOperation = 'source-over';
 
 		// DRAW BACKGROUND
@@ -744,7 +656,7 @@ class Aquarium {
 	}
 
 	updatePollutionBar() {
-		document.getElementById('statusWaterBar').style.height = Math.trunc(this.#pollution) + 'px';
+		$('statusWaterBar').style.height = Math.trunc(this.#pollution) + 'px';
 		this.#pollutionChanged = false;
 	}
 

@@ -7,6 +7,7 @@ import { aquarium } from './aquarium.js';
 import { config } from './config.js';
 import { loop, smallIntervals } from './loop.js';
 import { PAGE_FRONT, PAGE_BACK, PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
+import { $ } from './dom.js';
 
 class Uio {
 	#page = PAGE_FRONT;
@@ -23,20 +24,20 @@ class Uio {
 	// Minimizing & maximizing front page
 	changeFrontPageMode() {
 		if (this.#frontPageMode === PAGEMODE_MAXI) {
-			document.getElementById('aquariumViews').style.display = 'none';
-			document.getElementById('toolbarTools').style.display = 'none';
-			document.getElementById('pageMode').style.bottom = '193px';
-			document.getElementById('pageMode').style.content = 'url(gfx/interface/viewIcon1.png)';
-			document.getElementById('pageFront').style.backgroundPosition = '379px 0';
+			$('aquariumViews').style.display = 'none';
+			$('toolbarTools').style.display = 'none';
+			$('pageMode').style.bottom = '193px';
+			$('pageMode').style.content = 'url(gfx/interface/viewIcon1.png)';
+			$('pageFront').style.backgroundPosition = '379px 0';
 			this.#frontPageMode = PAGEMODE_MINI;
 			this.#rememberSpeed = loop.chosenSpeed;
 			this.setSmallInterval(0);
 		} else if (this.#frontPageMode === PAGEMODE_MINI) {
-			document.getElementById('aquariumViews').style.display = 'block';
-			document.getElementById('toolbarTools').style.display = 'block';
-			document.getElementById('pageMode').style.bottom = '13px';
-			document.getElementById('pageMode').style.content = 'url(gfx/interface/viewIcon0.png)';
-			document.getElementById('pageFront').style.backgroundPosition = '-78px 0';
+			$('aquariumViews').style.display = 'block';
+			$('toolbarTools').style.display = 'block';
+			$('pageMode').style.bottom = '13px';
+			$('pageMode').style.content = 'url(gfx/interface/viewIcon0.png)';
+			$('pageFront').style.backgroundPosition = '-78px 0';
 			this.#frontPageMode = PAGEMODE_MAXI;
 			this.setSmallInterval(this.#rememberSpeed);
 		}
@@ -45,12 +46,12 @@ class Uio {
 	// Flipping the widget
 	flipWidget() {
 		if (this.#page === PAGE_FRONT) {
-			document.getElementById('pageFront').style.display = 'none';
-			document.getElementById('pageBack').style.display = 'block';
+			$('pageFront').style.display = 'none';
+			$('pageBack').style.display = 'block';
 			this.#page = PAGE_BACK;
 		} else if (this.#page === PAGE_BACK) {
-			document.getElementById('pageBack').style.display = 'none';
-			document.getElementById('pageFront').style.display = 'block';
+			$('pageBack').style.display = 'none';
+			$('pageFront').style.display = 'block';
 			this.#page = PAGE_FRONT;
 		}
 	}
@@ -58,11 +59,11 @@ class Uio {
 	// Highlight view button On and Off
 	highlightViewButtonOn(viewNumber) {
 		if (this.#view === viewNumber) return;
-		document.getElementById('buttonView' + viewNumber).style.backgroundPosition = '48px 0';
+		$('buttonView' + viewNumber).style.backgroundPosition = '48px 0';
 	}
 	highlightViewButtonOff(viewNumber) {
 		if (this.#view === viewNumber) return;
-		document.getElementById('buttonView' + viewNumber).style.backgroundPosition = '0 0';
+		$('buttonView' + viewNumber).style.backgroundPosition = '0 0';
 	}
 
 	// Changing the view
@@ -71,15 +72,13 @@ class Uio {
 
 		if (viewNumber === VIEW_AQUARIUM) aquarium.render();
 
-		document.getElementById('buttonView' + this.#view).style.backgroundPosition = '0 0';
-		document.getElementById('buttonView' + this.#view).setAttribute('class', 'buttonView');
-		document.getElementById('view' + this.#view).style.display = 'none';
+		$('buttonView' + this.#view).style.backgroundPosition = '0 0';
+		$('buttonView' + this.#view).setAttribute('class', 'buttonView');
+		$('view' + this.#view).style.display = 'none';
 
-		document.getElementById('buttonView' + viewNumber).style.backgroundPosition = '24px 0';
-		document
-			.getElementById('buttonView' + viewNumber)
-			.setAttribute('class', 'buttonView active');
-		document.getElementById('view' + viewNumber).style.display = 'block';
+		$('buttonView' + viewNumber).style.backgroundPosition = '24px 0';
+		$('buttonView' + viewNumber).setAttribute('class', 'buttonView active');
+		$('view' + viewNumber).style.display = 'block';
 
 		this.#view = viewNumber;
 	}
@@ -94,11 +93,11 @@ class Uio {
 	}
 
 	changeTab(tabOff, tabOn) {
-		document.getElementById('tab' + tabOff).style.display = 'none';
-		document.getElementById('tab' + tabOn).style.display = 'block';
+		$('tab' + tabOff).style.display = 'none';
+		$('tab' + tabOn).style.display = 'block';
 
-		document.getElementById('tabButton' + tabOff).setAttribute('class', 'tab');
-		document.getElementById('tabButton' + tabOn).setAttribute('class', 'tab active');
+		$('tabButton' + tabOff).setAttribute('class', 'tab');
+		$('tabButton' + tabOn).setAttribute('class', 'tab active');
 	}
 
 	/*** Speed bar ***/
@@ -118,7 +117,7 @@ class Uio {
 			aquarium.moveFish();
 		}, smallIntervals[delay]);
 		const handleLeft = 389 + delay * 9;
-		document.getElementById('speedHandle').style.left = handleLeft + 'px';
+		$('speedHandle').style.left = handleLeft + 'px';
 		loop.chosenSpeed = delay;
 	}
 
@@ -131,18 +130,18 @@ class Uio {
 
 	blikStatusWidgetIcon() {
 		window.clearTimeout(this.#hideStatusTimer);
-		document.getElementById('statusEvent').style.backgroundPosition = '38px';
-		document.getElementById('statusEventIcon').style.background =
+		$('statusEvent').style.backgroundPosition = '38px';
+		$('statusEventIcon').style.background =
 			'url(gfx/interface/alertLightIcon' + this.#alertNumber + '.png)';
-		document.getElementById('statusEventIcon').style.display = 'block';
+		$('statusEventIcon').style.display = 'block';
 		this.#hideStatusTimer = window.setTimeout(() => {
 			this.hideStatusWidgetIcon();
 		}, 4000);
 	}
 
 	hideStatusWidgetIcon() {
-		document.getElementById('statusEvent').style.backgroundPosition = '0';
-		document.getElementById('statusEventIcon').style.display = 'none';
+		$('statusEvent').style.backgroundPosition = '0';
+		$('statusEventIcon').style.display = 'none';
 	}
 }
 
