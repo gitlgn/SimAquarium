@@ -17,14 +17,14 @@ ago) plus an incomplete Opera extension, so it no longer ran anywhere. This fork
 now runs as a plain static web app built with [Vite](https://vite.dev/), and is
 set up as an installable **PWA**.
 
-| Area            | State                                                                                                                                                                                                                            |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                                                       |
-| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                                                     |
-| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                                        |
-| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                                |
-| Code style      | 🟢 modern ES: modules + `class` (`#private`), `const`/`let`, `===`, data objects; `checkJs` type-checked (`npm run typecheck`) + 15 Vitest specs (`npm test`). Full `.ts` is Phase 3d — see [MODERNIZATION.md](MODERNIZATION.md) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                                                          |
+| Area            | State                                                                                                                                                                                                                |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                                           |
+| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                                         |
+| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
+| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
+| Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
+| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                                              |
 
 ## Requirements
 
@@ -43,7 +43,7 @@ Other scripts:
 npm run build      # production build into dist/
 npm run preview    # serve the production build locally
 npm run lint       # ESLint
-npm run typecheck  # tsc --checkJs (no emit)
+npm run typecheck  # tsc --strict (no emit)
 npm run test       # Vitest
 npm run check      # typecheck + lint + test
 npm run format     # Prettier
@@ -60,14 +60,15 @@ server.
 
 ```
 index.html          app shell (merged from the old mainpage.html + sandbox.html)
-src/                ES modules (classes), bundled by Vite
-  main.js           entry (<script type="module">) — bootstrap
-  aquarium.js …     one class per game object (Aquarium, Config, Uio, …),
+src/                TypeScript modules (classes), bundled by Vite
+  main.ts           entry (<script type="module">) — bootstrap
+  aquarium.ts …     one class per game object (Aquarium, Config, Uio, …),
                     exported as a singleton instance
-  species.js        fishSpecies data + `class Fish` (was fish.js)
-  events.js         wires the DOM controls to the game objects
-  constants.js      shared numeric constants
-  storage.js loop.js util.js   small support modules
+  species.ts        fishSpecies data + `class Fish` (was fish.js)
+  dom.ts            `$(id)` / `ctx2d()` helpers
+  events.ts         wires the DOM controls to the game objects
+  constants.ts      shared numeric constants
+  storage.ts loop.ts util.ts   small support modules
 test/               Vitest specs (jsdom)
 public/             served verbatim by Vite
   css/*.css         styles
@@ -75,8 +76,8 @@ public/             served verbatim by Vite
   stage.js          scales the fixed 457×300 widget to the viewport
 vite.config.js      Vite + vite-plugin-pwa
 vitest.config.js    test runner (jsdom, test/setup.js)
-jsconfig.json       tsc --checkJs settings
-eslint.config.js    flat config: src/** · test/** · *.config.js · public/*.js tiers
+tsconfig.json       tsc --strict settings
+eslint.config.js    flat config (config + public/*.js; src/ eslint.config.js    flat config: src/** · test/** · *.config.js · public/*.js tiers test/ are tsc-checked)
 ```
 
 ## Roadmap
