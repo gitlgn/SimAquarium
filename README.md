@@ -24,7 +24,7 @@ set up as an installable **PWA**.
 | Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
 | Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                                              |
+| Mobile layout   | 🟡 widget scales to the viewport (safe-area aware) + touch-hardened (pointer-drag speed bar, no tap delay); a fluid/reflowing layout is Phase 4b                                                                     |
 
 ## Requirements
 

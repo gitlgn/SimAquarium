@@ -138,9 +138,30 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 
 ## Phase 4 — responsive / mobile layout
 
-- The UI is a fixed ~457×300 px "desktop widget". Make the tank and views scale
-  to viewport; touch targets ≥ 44 px; respect safe-area insets.
-- Pointer events instead of mouse-only handlers.
+### ✅ 4a — touch / mobile hardening (done)
+
+- `public/css/mobile.css`: safe-area padding on `#viewport`;
+  `touch-action` / `-webkit-tap-highlight` / `user-select` on `#stage`;
+  `touch-action: none` on the speed bar.
+- `stage.js` measures `#viewport`'s content box (safe-area already removed),
+  caps at 4× and re-fits on `visualViewport` resize.
+- Speed bar is drag-to-set via pointer events (mouse / pen / touch).
+- `cursor: hand` → `cursor: pointer` (12×); dead `-apple-dashboard-region`
+  declarations removed (7×).
+
+### 4b — fluid re-layout (needs visual iteration)
+
+The whole 2014 UI is `position: absolute` + pixel coordinates. Making the
+**tank grow to fill the space** and the **shop panels reflow into a scrollable
+column on a narrow screen** is effectively a new layout (flex/grid), and it
+has to be built while looking at it on real screen sizes — not blind. Do this
+with screenshots / a device in the loop.
+
+- Tank `<canvas>` sizes to its container (keep the 360×240 draw buffer,
+  `object-fit`-style CSS scaling, or raise the buffer + rescale sprites).
+- Toolbar + views stack under the tank in portrait; side-by-side in landscape.
+- Real ≥ 44 px hit targets (not just the scaled pixel buttons).
+- Replace the widget-frame background art with CSS chrome so it can resize.
 
 ## Phase 5 — Android
 
