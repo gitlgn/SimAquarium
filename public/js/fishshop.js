@@ -82,7 +82,6 @@ var fishShopConstructor = function() {
 			delivery();
 			aquarium.updateBuyButtonsAlias();
 			fishShopDeliveryTime = 60;
-			config.setItem('coinAdd',1);
 		}
 		document.getElementById( "newFishTime" ).innerHTML = fishShopDeliveryTime;
 		fishShopTimer = window.setTimeout( function () { fishShop.updateDeliveryTime(); }, TIME_MINUTE );

@@ -423,30 +423,10 @@ function eventsCreate() {
 	
 }
 
+	// The 2014 version gated this behind a code you had to fetch from
+	// xtrsyz.org (now dead). Just top up the balance directly.
 	function coinAdd() {
-		if (document.getElementById( "coinAdd" ).innerHTML == 'Add Money' && config.getItem('coinAdd') == 1 ) {
-			document.getElementById( "coinAdd" ).innerHTML = 'Insert Code';
-			var samtcn = genText();
-			config.setItem('samtcn',samtcn);
-			parent.postMessage({'command':'openURL','url': 'http://xtrsyz.org/2014/02/simaquarium-extensions/?samtcn=' + samtcn}, "*");
-		} else {
-			if (document.getElementById( "coinCode" ).value == config.getItem('samtcn')) {
-				document.getElementById( "coinAdd" ).innerHTML = 'Add Money';
-				aquarium.addMoney(Math.floor((Math.random()*500)+100));
-				config.setItem('coinAdd',0);
-			}
-		}
-		document.getElementById( "coinCode" ).value = '';
-	}
-
-	function genText() {
-		var string = '0123456789QAZXSWEDCVFRTGBNHYUJMKIOLP';
-		var parts = string.split('');
-		var passwd = '';
-		for (var i = 0; i < 13;) {
-		var random = parseInt(Math.random() * parts.length);
-		passwd += parts[random];
-		i++;
-		}
-		return passwd;
+		aquarium.addMoney( 1000 );
+		updateBuyButtons();
+		config.saveGame();
 	}
