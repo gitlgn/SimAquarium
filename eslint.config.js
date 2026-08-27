@@ -3,10 +3,11 @@ import globals from 'globals';
 import prettier from 'eslint-config-prettier';
 
 /**
- * Flat config. Two tiers:
- *  - src/**        : the game as ES modules. Phase 3 turned on the syntax
- *                    rules (no-var, prefer-const, eqeqeq) alongside the
- *                    correctness rules (no-undef, no-implied-eval).
+ * Flat config. Tiers:
+ *  - src/**        : the game as ES modules + classes. Strict syntax rules
+ *                    (no-var, prefer-const, eqeqeq) + correctness rules.
+ *  - test/**       : Vitest specs (jsdom env).
+ *  - *.config.js   : Node tooling config.
  *  - public/*.js   : classic browser scripts — only `stage.js` remains.
  */
 export default [
@@ -43,6 +44,20 @@ export default [
 			ecmaVersion: 2023,
 			sourceType: 'module',
 			globals: { ...globals.node },
+		},
+	},
+
+	// Vitest specs run in a jsdom environment.
+	{
+		files: ['test/**/*.js'],
+		languageOptions: {
+			ecmaVersion: 2023,
+			sourceType: 'module',
+			globals: { ...globals.browser },
+		},
+		rules: {
+			'no-undef': 'error',
+			eqeqeq: ['error', 'always'],
 		},
 	},
 

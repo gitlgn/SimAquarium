@@ -1154,8 +1154,10 @@ class Aquarium {
 	}
 }
 
+// The constructor only wires up its own canvases/images — it does not touch the
+// other singletons — so importing this module has no cross-module side effects.
+// The initial comfort factor is seeded from main.js `boot()`.
 export const aquarium = new Aquarium();
-aquarium.updateComfortAquarium();
 
 // The 2014 code called a bare global updateBuyButtons() from several files.
 export function updateBuyButtons() {
