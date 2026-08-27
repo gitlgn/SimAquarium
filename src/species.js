@@ -6,6 +6,26 @@
 import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
 
+/**
+ * @typedef {object} Species
+ * @property {string} name
+ * @property {number} price
+ * @property {number} sizeX
+ * @property {number} sizeY
+ * @property {number} growth        growth rate per tick, 0-1
+ * @property {number} breed         base breed rate, 0-1
+ * @property {number} pollution     pollution per tick (negative = cleans water)
+ * @property {number} pollutionTol  pollution tolerance, 0-32
+ * @property {number} maxCondition
+ * @property {number} foodNeed
+ * @property {number} fishNumOptimal  comfortable population for this species
+ * @property {number} aggression   attack chance, 0-1
+ * @property {number} strength
+ * @property {number} longevity    0-1; higher lives longer
+ * @property {string} link         info URL
+ * @property {number} fishNumAttack  min tank population before it starts attacking
+ */
+
 /*** GLOBALS ***/
 
 // FISH ANGLES — lookup by [vX][vY]
@@ -37,9 +57,8 @@ fishAngle[10][3] = -5.9917;
 fishAngle[10][4] = -5.9026;
 fishAngle[10][5] = -5.8195;
 
-// FISH SPECIES. `link` is an info URL; `pollution` can be negative (a few
-// species clean the water). All 29 share the same (vestigial) rarity tier,
-// so it is not stored.
+// FISH SPECIES. All 29 share the same (vestigial) rarity tier, so it is not stored.
+/** @type {Species[]} */
 // prettier-ignore
 export const fishSpecies = [
 	{ name: 'Test fish', price: 10, sizeX: 21, sizeY: 11, growth: 0.001, breed: 0.001, pollution: 0.01, pollutionTol: 10, maxCondition: 4, foodNeed: 0.005, fishNumOptimal: 10, aggression: 0.001, strength: 0.1, longevity: 0.999, link: 'http://xtrsyz.org/', fishNumAttack: 20 },
@@ -75,6 +94,7 @@ export const fishSpecies = [
 
 // Per-species derived rates, recomputed when aquarium comfort / fish count changes.
 
+/** @type {number[]} */
 const speciesBreedingRate = [];
 export function computeBreedingRate() {
 	for (let i = 0; i < fishSpecies.length; i++) {
@@ -82,6 +102,7 @@ export function computeBreedingRate() {
 	}
 }
 
+/** @type {number[]} */
 const speciesFishNumComfort = [];
 export function computeFishNumComfort() {
 	for (let i = 0; i < fishSpecies.length; i++) {
@@ -131,6 +152,10 @@ export class Fish {
 	#hunger = 0;
 	#condition;
 
+	/**
+	 * @param {number} sNum   species index into fishSpecies
+	 * @param {number} fSize   initial size, 0-1
+	 */
 	constructor(sNum, fSize) {
 		this.#specNum = sNum;
 		this.#specName = fishSpecies[sNum].name;
@@ -138,8 +163,8 @@ export class Fish {
 		this.#size = fSize;
 		this.grow();
 		this.speedUp();
-		this.#x = parseInt(Math.random() * 180 + 90);
-		this.#y = parseInt(Math.random() * 120 + 60);
+		this.#x = Math.trunc(Math.random() * 180 + 90);
+		this.#y = Math.trunc(Math.random() * 120 + 60);
 		this.changeDirection();
 		this.setCondition();
 	}
@@ -234,8 +259,8 @@ export class Fish {
 	}
 
 	changeDirection() {
-		if (Math.random() < 0.5) this.rotate(10, parseInt(Math.random() * 11 - 5));
-		else this.rotate(-10, parseInt(Math.random() * 11 - 5));
+		if (Math.random() < 0.5) this.rotate(10, Math.trunc(Math.random() * 11 - 5));
+		else this.rotate(-10, Math.trunc(Math.random() * 11 - 5));
 	}
 
 	rotate(rX, rY) {
@@ -409,7 +434,7 @@ export class Fish {
 	}
 
 	attackEnemy(me) {
-		const enemy = parseInt(Math.random() * aquarium.getFishNum());
+		const enemy = Math.trunc(Math.random() * aquarium.getFishNum());
 
 		if (enemy === me) return;
 
@@ -427,6 +452,7 @@ export class Fish {
 	}
 
 	/*** FISH DATA SERIALIZING ***/
+	/** @returns {string} `specNum|size|disease|hunger|condition` */
 	serialize() {
 		return (
 			this.#specNum +
