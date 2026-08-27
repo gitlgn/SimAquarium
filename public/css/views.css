@@ -7,7 +7,6 @@
 	top: 256px;
 	background: url(../gfx/interface/buttonBig.png);
 	cursor: pointer !important;
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
 }
 
 #buttonView0 {
