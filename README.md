@@ -17,14 +17,14 @@ ago) plus an incomplete Opera extension, so it no longer ran anywhere. This fork
 now runs as a plain static web app built with [Vite](https://vite.dev/), and is
 set up as an installable **PWA**.
 
-| Area            | State                                                                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                        |
-| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                      |
-| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                         |
-| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                 |
-| Code style      | 🟢 ES modules + `class` (private `#fields`), `const`/`let`, `===`, data objects — `src/` is modern JS (Phase 2b + 3a + 3b). Next: JSDoc/`checkJS` → TS — see [MODERNIZATION.md](MODERNIZATION.md) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                           |
+| Area            | State                                                                                                                                                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                                                       |
+| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                                                     |
+| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                                        |
+| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                                |
+| Code style      | 🟢 modern ES: modules + `class` (`#private`), `const`/`let`, `===`, data objects; `checkJs` type-checked (`npm run typecheck`) + 15 Vitest specs (`npm test`). Full `.ts` is Phase 3d — see [MODERNIZATION.md](MODERNIZATION.md) |
+| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                                                          |
 
 ## Requirements
 
@@ -40,10 +40,13 @@ npm run dev      # http://localhost:5173
 Other scripts:
 
 ```bash
-npm run build    # production build into dist/
-npm run preview  # serve the production build locally
-npm run lint     # ESLint
-npm run format   # Prettier (modern sources only; legacy game code is left as-is for now)
+npm run build      # production build into dist/
+npm run preview    # serve the production build locally
+npm run lint       # ESLint
+npm run typecheck  # tsc --checkJs (no emit)
+npm run test       # Vitest
+npm run check      # typecheck + lint + test
+npm run format     # Prettier
 ```
 
 ## Editor
@@ -65,12 +68,15 @@ src/                ES modules (classes), bundled by Vite
   events.js         wires the DOM controls to the game objects
   constants.js      shared numeric constants
   storage.js loop.js util.js   small support modules
+test/               Vitest specs (jsdom)
 public/             served verbatim by Vite
   css/*.css         styles
   gfx/**            sprites, UI art, icons
   stage.js          scales the fixed 457×300 widget to the viewport
 vite.config.js      Vite + vite-plugin-pwa
-eslint.config.js    flat config: src/** (module) vs public/*.js (classic script) tiers
+vitest.config.js    test runner (jsdom, test/setup.js)
+jsconfig.json       tsc --checkJs settings
+eslint.config.js    flat config: src/** · test/** · *.config.js · public/*.js tiers
 ```
 
 ## Roadmap

@@ -73,8 +73,9 @@ class Stats {
 				aquarium.returnFishDisease(i) > 0 ? 'SICK' : '';
 			const sizePercent = Math.round(aquarium.returnFishSize(i) * 100);
 			document.getElementById('fishTableSizeBox' + i).innerHTML = sizePercent + '%';
-			document.getElementById('fishTablePrice' + i).innerHTML =
-				fishSpecies[aquarium.returnSpecNum(i)].price / 2;
+			document.getElementById('fishTablePrice' + i).innerHTML = String(
+				fishSpecies[aquarium.returnSpecNum(i)].price / 2
+			);
 		}
 
 		for (let i = fishNum; i < FISH_LIST_ROWS; i++) {
@@ -88,20 +89,20 @@ class Stats {
 		if (document.getElementById('tabFishList').style.display === 'block') {
 			this.updateFishListTable();
 		} else {
-			document.getElementById('statFishNumber').innerHTML = aquarium.getFishNum();
-			document.getElementById('statFishBirths').innerHTML = aquarium.getFishBirths();
-			document.getElementById('statFishDeaths').innerHTML = aquarium.getFishDeaths();
+			document.getElementById('statFishNumber').innerHTML = String(aquarium.getFishNum());
+			document.getElementById('statFishBirths').innerHTML = String(aquarium.getFishBirths());
+			document.getElementById('statFishDeaths').innerHTML = String(aquarium.getFishDeaths());
 			document.getElementById('statPollution').innerHTML =
-				parseInt(aquarium.getPollution() * 3.15) + '%';
-			document.getElementById('statFood').innerHTML = parseInt(aquarium.getFood()) + '%';
+				Math.trunc(aquarium.getPollution() * 3.15) + '%';
+			document.getElementById('statFood').innerHTML = Math.trunc(aquarium.getFood()) + '%';
 			document.getElementById('statMedicine').innerHTML =
-				parseInt(aquarium.getMedicine()) + '%';
+				Math.trunc(aquarium.getMedicine()) + '%';
 			document.getElementById('statGrowH').innerHTML =
-				parseInt(aquarium.getGrowHormone()) + '%';
+				Math.trunc(aquarium.getGrowHormone()) + '%';
 			document.getElementById('statBreedH').innerHTML =
-				parseInt(aquarium.getBreedHormone()) + '%';
+				Math.trunc(aquarium.getBreedHormone()) + '%';
 			document.getElementById('statDistraction').innerHTML =
-				parseInt(aquarium.getDistraction()) + '%';
+				Math.trunc(aquarium.getDistraction()) + '%';
 		}
 	}
 }

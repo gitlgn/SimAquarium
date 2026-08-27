@@ -97,12 +97,32 @@ Vite from a single `<script type="module" src="/src/main.js">`.
   preview by exercising the game through its API and by clicking every button
   family via dispatched `MouseEvent`s.
 
-## Phase 3c — TypeScript-ready (next)
+## ✅ Phase 3c — type-checked + tested (done)
 
-- `jsconfig.json` + `checkJS`, JSDoc types on the public API of each module.
-- Convert file-by-file to `.ts` once types are stable.
-- Add a test runner (Vitest) around the economy/breeding logic first — it's the
-  most rule-heavy and least DOM-coupled part.
+- **3c-1** `jsconfig.json` with `checkJs`. Pragmatic level for now:
+  `strict` / `strictNullChecks` **off** so the DOM-heavy 2014 code doesn't
+  need a null-safety pass first; `noImplicitThis` + `noFallthroughCasesInSwitch`
+  on. `@typedef Species`; `fishSpecies: Species[]`, `Aquarium.#fish: Fish[]`,
+  the 2d contexts typed. The 40 findings fixed behaviour-preservingly —
+  `parseInt(<number>)` → `Math.trunc`, `el.innerHTML = <number>` → `String(…)`,
+  `canvas.setAttribute('width', 360)` → `.width = 360`, typed
+  `HTMLInputElement` / `HTMLCanvasElement` casts. `npm run typecheck`.
+- **3c-2** Vitest (jsdom) + 15 specs — fishSpecies data integrity and the
+  economy invariants (overdraw guard, add/remove bookkeeping, per-species
+  counts, `Fish` serialize round-trip, condition clamping). `npm test`;
+  `npm run check` = typecheck + lint + test.
+- Import-order fix: `aquarium.updateComfortAquarium()` no longer runs at
+  module-eval (it hit `fishSpecies`'s TDZ through the `species ↔ aquarium`
+  cycle when `species.js` was imported first) — it seeds from `main.js` boot().
+
+## Phase 3d — full TypeScript (deferred)
+
+- Add a `dom.js` helper (`$(id)` that asserts non-null), then flip
+  `strictNullChecks` on file-by-file.
+- Rename `src/*.js` → `.ts`, drop the JSDoc `@type` casts for real annotations,
+  switch ESLint to `typescript-eslint`.
+
+## Phase 4 — responsive / mobile layout
 
 ## Phase 4 — responsive / mobile layout
 

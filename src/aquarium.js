@@ -50,8 +50,10 @@ class Aquarium {
 
 	#usedBackground = 0;
 
+	/** @type {Fish[]} */
 	#fish = []; // the list of all fish
 	#fishNum = 0;
+	/** @type {number[]} */
 	#fishNumBySpecies = Array(29).fill(0);
 
 	#pollution = 0;
@@ -70,16 +72,20 @@ class Aquarium {
 	#breedFish = -1;
 	#killFish = -1;
 
+	/** @type {number} */
 	#comfortAquarium;
 
 	// Canvas + offscreen layers
+	/** @type {CanvasRenderingContext2D} */
 	#canvasTankCtx;
 	#imageGlassFront = new Image();
 	#imageWater = new Image();
 	#imageGlassBack = new Image();
 	#layerFront = document.createElement('canvas');
 	#layerBack = document.createElement('canvas');
+	/** @type {CanvasRenderingContext2D} */
 	#layerFrontCtx;
+	/** @type {CanvasRenderingContext2D} */
 	#layerBackCtx;
 
 	constructor() {
@@ -87,12 +93,12 @@ class Aquarium {
 		this.#imageWater.src = 'gfx/aquarium/tank/water.png';
 		this.#imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
 
-		this.#layerFront.setAttribute('width', 360);
-		this.#layerFront.setAttribute('height', 240);
+		this.#layerFront.width = 360;
+		this.#layerFront.height = 240;
 		this.#layerFrontCtx = this.#layerFront.getContext('2d');
 
-		this.#layerBack.setAttribute('width', 360);
-		this.#layerBack.setAttribute('height', 240);
+		this.#layerBack.width = 360;
+		this.#layerBack.height = 240;
 		this.#layerBackCtx = this.#layerBack.getContext('2d');
 	}
 
@@ -206,7 +212,7 @@ class Aquarium {
 
 	loadAquarium() {
 		this.#money = parseFloat(config.getItem('money'));
-		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
+		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
 
 		this.#usedScenery = parseInt(config.getItem('usedScenery'), 10);
 		this.#usedLight = parseInt(config.getItem('usedLight'), 10);
@@ -336,14 +342,14 @@ class Aquarium {
 	}
 	resetMoney() {
 		this.#money = 100;
-		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
+		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
 	}
 
 	/** Returns false (and does nothing) when the change would overdraw. */
 	changeMoney(diff) {
 		if (this.#money + diff < 0) return false;
 		this.#money = this.#money + diff;
-		document.getElementById('statusMoney').innerHTML = parseInt(this.#money);
+		document.getElementById('statusMoney').innerHTML = String(Math.trunc(this.#money));
 		return true;
 	}
 
@@ -376,7 +382,7 @@ class Aquarium {
 		}
 	}
 	chooseScenery(scNum) {
-		this.#usedScenery = parseInt(this.#usedScenery, 10) || 0;
+		this.#usedScenery = Number(this.#usedScenery) || 0;
 		if (this.#sceneries[this.#usedScenery])
 			document
 				.getElementById('buttonSceneryBuy' + this.#usedScenery)
@@ -627,7 +633,9 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = document.getElementById('tank').getContext('2d');
+		this.#canvasTankCtx = /** @type {HTMLCanvasElement} */ (
+			document.getElementById('tank')
+		).getContext('2d');
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
 	}
@@ -635,8 +643,8 @@ class Aquarium {
 	// Photo making
 	exportPhoto() {
 		const tempCanvas = document.createElement('canvas');
-		tempCanvas.setAttribute('width', 360);
-		tempCanvas.setAttribute('height', 240);
+		tempCanvas.width = 360;
+		tempCanvas.height = 240;
 		const tempCtx = tempCanvas.getContext('2d');
 		tempCtx.globalCompositeOperation = 'source-over';
 
@@ -681,7 +689,11 @@ class Aquarium {
 		return this.#fishNumBySpecies[fSpec];
 	}
 
-	// Add a fish by species
+	/**
+	 * Add a fish by species.
+	 * @param {number} sNum   species index
+	 * @param {number} size   initial size, 0-1
+	 */
 	addFish(sNum, size) {
 		this.#fish[this.#fishNum] = new Fish(sNum, size);
 		this.#fishNum++;
@@ -732,7 +744,7 @@ class Aquarium {
 	}
 
 	updatePollutionBar() {
-		document.getElementById('statusWaterBar').style.height = parseInt(this.#pollution) + 'px';
+		document.getElementById('statusWaterBar').style.height = Math.trunc(this.#pollution) + 'px';
 		this.#pollutionChanged = false;
 	}
 
@@ -1142,8 +1154,10 @@ class Aquarium {
 	}
 }
 
+// The constructor only wires up its own canvases/images — it does not touch the
+// other singletons — so importing this module has no cross-module side effects.
+// The initial comfort factor is seeded from main.js `boot()`.
 export const aquarium = new Aquarium();
-aquarium.updateComfortAquarium();
 
 // The 2014 code called a bare global updateBuyButtons() from several files.
 export function updateBuyButtons() {

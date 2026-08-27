@@ -24,7 +24,7 @@ class FishShop {
 
 	#delivery() {
 		for (let i = 0; i < 9; i++) {
-			this.#slots[i][SHOPSLOT_SPEC] = 3 * i + parseInt(Math.random() * 3) + 1;
+			this.#slots[i][SHOPSLOT_SPEC] = 3 * i + Math.trunc(Math.random() * 3) + 1;
 
 			// The dolphin is a rarity — needs a swimming pool to appear.
 			if (i === 8) {
@@ -36,7 +36,7 @@ class FishShop {
 			}
 
 			const spec = fishSpecies[this.#slots[i][SHOPSLOT_SPEC]];
-			this.#slots[i][SHOPSLOT_NUM] = parseInt((Math.random() * (10 - i) + (10 - i)) / 2);
+			this.#slots[i][SHOPSLOT_NUM] = Math.trunc((Math.random() * (10 - i) + (10 - i)) / 2);
 			this.#slots[i][SHOPSLOT_NAME] = spec.name;
 			this.#slots[i][SHOPSLOT_PRICE] = spec.price;
 			this.#slots[i][SHOPSLOT_LINK] = spec.link;
@@ -45,7 +45,7 @@ class FishShop {
 			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
 			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
 			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			el.children[1].style.backgroundImage =
+			/** @type {HTMLElement} */ (el.children[1]).style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	}
@@ -75,7 +75,7 @@ class FishShop {
 			aquarium.updateBuyButtonsAlias();
 			this.#deliveryTime = 60;
 		}
-		document.getElementById('newFishTime').innerHTML = this.#deliveryTime;
+		document.getElementById('newFishTime').innerHTML = String(this.#deliveryTime);
 		this.#timer = window.setTimeout(() => this.updateDeliveryTime(), TIME_MINUTE);
 	}
 
@@ -134,14 +134,14 @@ class FishShop {
 				10
 			);
 			this.#slots[i][SHOPSLOT_LINK] = config.getItem('fishShopSlot' + i + 'link');
-			this.#deliveryTime = config.getItem('fishShopDeliveryTime');
+			this.#deliveryTime = parseInt(config.getItem('fishShopDeliveryTime'), 10);
 
-			document.getElementById('newFishTime').innerHTML = this.#deliveryTime;
+			document.getElementById('newFishTime').innerHTML = String(this.#deliveryTime);
 			const el = document.getElementById('fishSlot' + i);
 			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
 			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
 			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			el.children[1].style.backgroundImage =
+			/** @type {HTMLElement} */ (el.children[1]).style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	}

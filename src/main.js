@@ -34,6 +34,7 @@ if (import.meta.env.DEV) {
 }
 
 function boot() {
+	aquarium.updateComfortAquarium(); // seed the comfort factor / breeding rates
 	background.createBackgroundSlots();
 	eventsCreate();
 	aquarium.create();

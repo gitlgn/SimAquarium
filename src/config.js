@@ -30,8 +30,13 @@ class Config {
 		document.getElementById('statusEventIcon').style.display = 'none';
 	}
 
+	/** @returns {HTMLInputElement} */
+	#relaxCheckbox() {
+		return /** @type {HTMLInputElement} */ (document.getElementById('confRelaxMode'));
+	}
+
 	relaxChange() {
-		if (document.getElementById('confRelaxMode').checked === true) this.#relaxEnable();
+		if (this.#relaxCheckbox().checked === true) this.#relaxEnable();
 		else this.#relaxDisable();
 		this.saveGame();
 	}
@@ -56,7 +61,7 @@ class Config {
 			aquarium.update();
 		}, 2000);
 
-		document.getElementById('confRelaxMode').checked = false;
+		this.#relaxCheckbox().checked = false;
 
 		updateBuyButtons();
 		this.saveGame();
