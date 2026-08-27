@@ -17,14 +17,14 @@ ago) plus an incomplete Opera extension, so it no longer ran anywhere. This fork
 now runs as a plain static web app built with [Vite](https://vite.dev/), and is
 set up as an installable **PWA**.
 
-| Area            | State                                                                                                                                                                 |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                            |
-| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                          |
-| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                             |
-| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                     |
-| Code style      | 🟡 ES modules, `const`/`let`, `===` throughout `src/` (Phase 2b + 3a). Next: `fishSpecies` → objects, `class` shape, types — see [MODERNIZATION.md](MODERNIZATION.md) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                               |
+| Area            | State                                                                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                        |
+| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                      |
+| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                         |
+| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                 |
+| Code style      | 🟢 ES modules + `class` (private `#fields`), `const`/`let`, `===`, data objects — `src/` is modern JS (Phase 2b + 3a + 3b). Next: JSDoc/`checkJS` → TS — see [MODERNIZATION.md](MODERNIZATION.md) |
+| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                           |
 
 ## Requirements
 
@@ -57,10 +57,12 @@ server.
 
 ```
 index.html          app shell (merged from the old mainpage.html + sandbox.html)
-src/                ES modules, bundled by Vite
+src/                ES modules (classes), bundled by Vite
   main.js           entry (<script type="module">) — bootstrap
-  aquarium.js …     one module per game singleton
-  species.js        fish species table + fish factory (was fish.js)
+  aquarium.js …     one class per game object (Aquarium, Config, Uio, …),
+                    exported as a singleton instance
+  species.js        fishSpecies data + `class Fish` (was fish.js)
+  events.js         wires the DOM controls to the game objects
   constants.js      shared numeric constants
   storage.js loop.js util.js   small support modules
 public/             served verbatim by Vite

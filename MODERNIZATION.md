@@ -77,16 +77,27 @@ Vite from a single `<script type="module" src="/src/main.js">`.
   render, save/load round-trip, buy/sell, tools, scare/attract, `update()` tick,
   view switching, New Game — all clean. 0 lint errors.
 
-## Phase 3b — data + class shape (next)
+## ✅ Phase 3b — data + class shape (done)
 
-- `fishSpecies` array-of-arrays → array of objects (`{ name, price, … }`);
-  delete the `SPEC_*` index constants. Coordinated change across `species.js`,
-  `aquarium.js`, `fishshop.js`, `statistics.js` — do value-by-value.
-- Convert the nine `*Constructor` functions to ES `class` (private `#fields`
-  for the closure state), one file per commit, each re-validated.
-- Arrow the remaining `function () {}` event callbacks in `events.js`.
+- **3b-1** `fishSpecies` array-of-arrays → array of objects
+  (`{ name, price, sizeX, … }`); `SPEC_*` (and the "not used" `SPEC_RARITY` +
+  `RARITY_*`) removed from `constants.js`. Table regenerated + verified
+  byte-for-byte by script; 30 index accesses across four files rewritten to
+  `.field`. Column-1 rarity was `RARITY_POPULAR` for all 29 and read by
+  nothing — not carried over.
+- **3b-2** the nine `*Constructor` functions → ES `class` with `#private`
+  fields/methods: `Lighting`, `Filtration`, `BackgroundWall`, `Scenery`,
+  `Config`, `FishShop`, `Stats`, `Uio`, `Aquarium`, and `fishConstructor` →
+  `class Fish` (21 `#fields`, a `get #spec()` accessor). `aquarium.changeMoney`
+  is now a real public method; `#updateBuyButtons` / `#render*` are private.
+  Done in two commits (everything, then `aquarium.js` alone), each re-validated.
+- **3b-3** `events.js` ~900 lines of copy-pasted `addEventListener` → ~95 lines
+  of loops over the button families + an `on(id, type, fn)` helper.
+- Bundle 49.5 → ~49.4 kB. Every step validated in dev and a clean production
+  preview by exercising the game through its API and by clicking every button
+  family via dispatched `MouseEvent`s.
 
-## Phase 3c — TypeScript-ready
+## Phase 3c — TypeScript-ready (next)
 
 - `jsconfig.json` + `checkJS`, JSDoc types on the public API of each module.
 - Convert file-by-file to `.ts` once types are stable.
