@@ -17,23 +17,21 @@ import {
 
 /*** CONSTANTS ***/
 
-var PATH_FILTERS = 'gfx/filters/';
+const PATH_FILTERS = 'gfx/filters/';
 
-var filtrationConstructor = function () {
-	var filter = new Array();
-	var filterNum = filter.length;
+function filtrationConstructor() {
+	const filter = [];
 
-	var createFilter = function (name, fileName, price, comfort, pollution, energyCost) {
-		filter[filterNum] = new Array();
-		filter[filterNum][FI_NAME] = name;
-		filter[filterNum][FI_PRICE] = price;
-		filter[filterNum][FI_COMFORT] = comfort;
-		filter[filterNum][FI_POLLUTION] = pollution;
-
-		filter[filterNum][FI_ENERGY] = energyCost;
-		filter[filterNum][FI_IMAGE] = new Image();
-		filter[filterNum][FI_IMAGE].src = PATH_FILTERS + fileName;
-		filterNum = filter.length;
+	const createFilter = (name, fileName, price, comfort, pollution, energyCost) => {
+		const row = [];
+		row[FI_NAME] = name;
+		row[FI_PRICE] = price;
+		row[FI_COMFORT] = comfort;
+		row[FI_POLLUTION] = pollution;
+		row[FI_ENERGY] = energyCost;
+		row[FI_IMAGE] = new Image();
+		row[FI_IMAGE].src = PATH_FILTERS + fileName;
+		filter.push(row);
 	};
 
 	createFilter('Box filter', 'filter0.png', 0, 0.95, -0.06, 0.032);
@@ -43,42 +41,38 @@ var filtrationConstructor = function () {
 	createFilter('Power filter', 'filter4.png', 1920, 0.96, -0.96, 0.002);
 	createFilter('Advanced Power Filter', 'filter5.png', 7680, 0.98, -1.92, 0.001);
 
-	this.getFilterData = function (num, data) {
-		num = parseInt(num) || 0;
-		return filter[num][data];
+	this.getFilterData = (num, data) => {
+		const idx = Number.parseInt(num, 10) || 0;
+		return filter[idx][data];
 	};
-};
+}
 
 export const filtration = new filtrationConstructor();
 
 /*** BACKGROUND WALL OBJECT ***/
 
-var PATH_BGS = 'gfx/view4/';
+const PATH_BGS = 'gfx/view4/';
 
-var backgroundConstructor = function () {
-	var background = new Array();
-	var backgroundNum = background.length;
+function backgroundConstructor() {
+	const background = [];
 
-	var createBackground = function (name, fileName, price) {
-		background[backgroundNum] = new Array();
-
-		background[backgroundNum][BG_NAME] = name;
-		background[backgroundNum][BG_PRICE] = price;
-		background[backgroundNum][BG_IMAGE] = PATH_BGS + fileName;
-		backgroundNum = background.length;
+	const createBackground = (name, fileName, price) => {
+		const row = [];
+		row[BG_NAME] = name;
+		row[BG_PRICE] = price;
+		row[BG_IMAGE] = PATH_BGS + fileName;
+		background.push(row);
 	};
 
-	this.getBackgroundSrc = function (bg) {
-		return background[bg][BG_IMAGE];
-	};
+	this.getBackgroundSrc = (bg) => background[bg][BG_IMAGE];
 
 	/*** CREATE HTML FOR BACKGROUNDS ***/
-	this.createBackgroundSlots = function () {
-		for (var i = 0; i < backgroundNum; i++) {
-			var bgSlot = document.createElement('div');
-			var bgSlotTitle = document.createElement('div');
-			var bgSlotMoney = document.createElement('div');
-			var bgSlotBuy = document.createElement('div');
+	this.createBackgroundSlots = () => {
+		for (let i = 0; i < background.length; i++) {
+			const bgSlot = document.createElement('div');
+			const bgSlotTitle = document.createElement('div');
+			const bgSlotMoney = document.createElement('div');
+			const bgSlotBuy = document.createElement('div');
 
 			bgSlot.setAttribute('class', 'backgroundSlot');
 			bgSlot.setAttribute('id', 'backgroundSlot' + i);
@@ -118,9 +112,7 @@ var backgroundConstructor = function () {
 	createBackground('Fun', 'bg13.png', 180);
 	createBackground('Transparent', 'bg14.png', 240);
 
-	this.getBackgroundData = function (num, data) {
-		return background[num][data];
-	};
-};
+	this.getBackgroundData = (num, data) => background[num][data];
+}
 
 export const background = new backgroundConstructor();

@@ -17,14 +17,14 @@ ago) plus an incomplete Opera extension, so it no longer ran anywhere. This fork
 now runs as a plain static web app built with [Vite](https://vite.dev/), and is
 set up as an installable **PWA**.
 
-| Area            | State                                                                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                 |
-| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                               |
-| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                  |
-| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                          |
-| Code style      | 🟡 ES modules under `src/` (Phase 2b done); syntax still 2014-era (`var`, `==`) pending Phase 3 — see [MODERNIZATION.md](MODERNIZATION.md) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                    |
+| Area            | State                                                                                                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                            |
+| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                          |
+| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                             |
+| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                     |
+| Code style      | 🟡 ES modules, `const`/`let`, `===` throughout `src/` (Phase 2b + 3a). Next: `fishSpecies` → objects, `class` shape, types — see [MODERNIZATION.md](MODERNIZATION.md) |
+| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                               |
 
 ## Requirements
 

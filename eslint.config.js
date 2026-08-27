@@ -4,9 +4,9 @@ import prettier from 'eslint-config-prettier';
 
 /**
  * Flat config. Two tiers:
- *  - src/**        : the game as ES modules (Phase 2b). Enforces import
- *                    correctness (no-undef) and no-implied-eval; syntax rules
- *                    (no-var, eqeqeq) wait for Phase 3.
+ *  - src/**        : the game as ES modules. Phase 3 turned on the syntax
+ *                    rules (no-var, prefer-const, eqeqeq) alongside the
+ *                    correctness rules (no-undef, no-implied-eval).
  *  - public/*.js   : classic browser scripts — only `stage.js` remains.
  */
 export default [
@@ -28,12 +28,11 @@ export default [
 		rules: {
 			'no-undef': 'error',
 			'no-implied-eval': 'error',
-			// benign `var` re-declarations in the 2014 code; Phase 3 (const/let) removes them
-			'no-redeclare': 'warn',
+			'no-redeclare': 'error',
 			'no-unused-vars': 'warn',
-			'no-var': 'off',
-			'prefer-const': 'off',
-			eqeqeq: 'off',
+			'no-var': 'error',
+			'prefer-const': 'error',
+			eqeqeq: ['error', 'always'],
 		},
 	},
 

@@ -38,14 +38,10 @@ import {
 	BG_IMAGE,
 } from './constants.js';
 
-var aquariumConstructor = function () {
-	// Loop counters and transient scratch values that the 2014 code used as
-	// implicit globals; module strict mode requires them declared.
-	var i, x, y;
-	var tempCtx, tempFishNum;
-	var breedFish, killFish;
-	var swimVar, dirX, dirY;
-	var medicineMelt, foodMelt, growHormoneMelt, breedHormoneMelt;
+function aquariumConstructor() {
+	// Set in one method, consumed in update(); genuinely shared across the instance.
+	let breedFish = -1;
+	let killFish = -1;
 
 	this.resetAquarium = function () {
 		this.resetMoney();
@@ -54,7 +50,7 @@ var aquariumConstructor = function () {
 		sceneries.length = 0;
 		sceneries[0] = true;
 		document.getElementById('buttonSceneryBuy0').setAttribute('class', 'button choose off');
-		for (i = 1; i < 9; i++) {
+		for (let i = 1; i < 9; i++) {
 			document
 				.getElementById('buttonScenerySell' + i)
 				.setAttribute('class', 'button sell off');
@@ -64,7 +60,7 @@ var aquariumConstructor = function () {
 		lights.length = 0;
 		lights[0] = true;
 		document.getElementById('buttonLightBuy0').setAttribute('class', 'button choose off');
-		for (i = 1; i < 9; i++) {
+		for (let i = 1; i < 9; i++) {
 			document.getElementById('buttonLightSell' + i).setAttribute('class', 'button sell off');
 		}
 
@@ -72,7 +68,7 @@ var aquariumConstructor = function () {
 		filters.length = 0;
 		filters[0] = true;
 		document.getElementById('buttonFilterBuy0').setAttribute('class', 'button choose off');
-		for (i = 1; i < 6; i++) {
+		for (let i = 1; i < 6; i++) {
 			document
 				.getElementById('buttonFilterSell' + i)
 				.setAttribute('class', 'button sell off');
@@ -84,8 +80,7 @@ var aquariumConstructor = function () {
 			'url(' + background.getBackgroundData(0, BG_IMAGE) + ')';
 
 		fish.length = 0;
-		//fishNumBySpecies.length = 0;
-		for (i = 0; i < 29; i++) {
+		for (let i = 0; i < 29; i++) {
 			fishNumBySpecies[i] = 0;
 		}
 
@@ -119,35 +114,22 @@ var aquariumConstructor = function () {
 
 		config.setItem('usedScenery', usedScenery);
 		config.setItem('usedLight', usedLight);
-		for (i = 0; i < 9; i++) {
-			if (sceneries[i] == true) {
-				config.setItem('sceneries' + i, '1');
-			} else {
-				config.setItem('sceneries' + i, '0');
-			}
-			if (lights[i] == true) {
-				config.setItem('lights' + i, '1');
-			} else {
-				config.setItem('lights' + i, '0');
-			}
+		for (let i = 0; i < 9; i++) {
+			config.setItem('sceneries' + i, sceneries[i] === true ? '1' : '0');
+			config.setItem('lights' + i, lights[i] === true ? '1' : '0');
 		}
 		config.setItem('usedFilter', usedFilter);
-		for (i = 0; i < 6; i++) {
-			if (filters[i] == true) {
-				config.setItem('filters' + i, '1');
-			} else {
-				config.setItem('filters' + i, '0');
-			}
+		for (let i = 0; i < 6; i++) {
+			config.setItem('filters' + i, filters[i] === true ? '1' : '0');
 		}
 		config.setItem('usedBackground', usedBackground);
 
 		// save the fish
 		config.setItem('fishNum', fishNum);
-		for (i = 0; i < 29; i++) {
+		for (let i = 0; i < 29; i++) {
 			config.setItem('fishNumBySpecies' + i, fishNumBySpecies[i]);
-			//dbg( "saved fishnumBS: " + fishNumBySpecies[i] )
 		}
-		for (i = 0; i < fishNum; i++) {
+		for (let i = 0; i < fishNum; i++) {
 			config.setItem('fish' + i, fish[i].serialize());
 		}
 
@@ -173,13 +155,13 @@ var aquariumConstructor = function () {
 		money = parseFloat(config.getItem('money'));
 		document.getElementById('statusMoney').innerHTML = parseInt(money);
 
-		usedScenery = parseInt(config.getItem('usedScenery'));
-		usedLight = parseInt(config.getItem('usedLight'));
-		for (i = 0; i < 9; i++) {
-			var tmp = config.getItem('sceneries' + i);
-			if (tmp == '1') {
+		usedScenery = parseInt(config.getItem('usedScenery'), 10);
+		usedLight = parseInt(config.getItem('usedLight'), 10);
+		for (let i = 0; i < 9; i++) {
+			const scStored = config.getItem('sceneries' + i);
+			if (scStored === '1') {
 				sceneries[i] = true;
-				if (i != usedScenery) {
+				if (i !== usedScenery) {
 					document
 						.getElementById('buttonSceneryBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -197,10 +179,10 @@ var aquariumConstructor = function () {
 				sceneries[i] = false;
 			}
 
-			var tmp = config.getItem('lights' + i);
-			if (tmp == '1') {
+			const liStored = config.getItem('lights' + i);
+			if (liStored === '1') {
 				lights[i] = true;
-				if (i != usedLight) {
+				if (i !== usedLight) {
 					document
 						.getElementById('buttonLightBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -218,12 +200,12 @@ var aquariumConstructor = function () {
 				lights[i] = false;
 			}
 		}
-		usedFilter = parseInt(config.getItem('usedFilter'));
-		for (i = 0; i < 6; i++) {
-			var tmp = config.getItem('filters' + i);
-			if (tmp == '1') {
+		usedFilter = parseInt(config.getItem('usedFilter'), 10);
+		for (let i = 0; i < 6; i++) {
+			const fiStored = config.getItem('filters' + i);
+			if (fiStored === '1') {
 				filters[i] = true;
-				if (i != usedFilter) {
+				if (i !== usedFilter) {
 					document
 						.getElementById('buttonFilterBuy' + i)
 						.setAttribute('class', 'button choose on');
@@ -241,7 +223,7 @@ var aquariumConstructor = function () {
 				filters[i] = false;
 			}
 		}
-		usedBackground = parseInt(config.getItem('usedBackground')) || 0;
+		usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
 		document
 			.getElementById('buttonBackgroundBuy' + usedBackground)
 			.setAttribute('class', 'button buy off');
@@ -250,22 +232,17 @@ var aquariumConstructor = function () {
 
 		// load fish data
 
-		tempFishNum = parseInt(config.getItem('fishNum'));
-		//dbg( tempFishNum );
-		for (i = 0; i < 29; i++) {
-			var tmp = config.getItem('fishNumBySpecies' + i);
-			fishNumBySpecies[i] = parseInt(tmp);
+		const storedFishNum = parseInt(config.getItem('fishNum'), 10);
+		for (let i = 0; i < 29; i++) {
+			fishNumBySpecies[i] = parseInt(config.getItem('fishNumBySpecies' + i), 10);
 		}
 		fishNum = 0;
-		for (i = 0; i < tempFishNum; i++) {
-			var serialized = config.getItem('fish' + i);
-			var unSerialize = serialized.split('|');
-			var spec = parseInt(unSerialize[0]);
+		for (let i = 0; i < storedFishNum; i++) {
+			const unSerialize = config.getItem('fish' + i).split('|');
+			const spec = parseInt(unSerialize[0], 10);
 
 			fish[i] = new fishConstructor(spec, 0.9999);
 			fishNum++;
-
-			//fishNumBySpecies[spec]++;
 
 			fish[i].changeData(
 				parseFloat(unSerialize[1]),
@@ -287,11 +264,11 @@ var aquariumConstructor = function () {
 		breedHormone = parseFloat(config.getItem('breedHormone'));
 		distraction = parseFloat(config.getItem('distraction'));
 
-		killFish = parseInt(config.getItem('killFish'));
-		breedFish = parseInt(config.getItem('breedFish'));
+		killFish = parseInt(config.getItem('killFish'), 10);
+		breedFish = parseInt(config.getItem('breedFish'), 10);
 
-		fishBirths = parseInt(config.getItem('fishBirths'));
-		fishDeaths = parseInt(config.getItem('fishDeaths'));
+		fishBirths = parseInt(config.getItem('fishBirths'), 10);
+		fishDeaths = parseInt(config.getItem('fishDeaths'), 10);
 
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
@@ -300,12 +277,11 @@ var aquariumConstructor = function () {
 	};
 
 	/*** AQUARIUM CANVAS & CONTEXT ***/
-	var canvasTank;
-	var canvasTankCtx;
-	var canvasTankGameCtx;
+	let canvasTank;
+	let canvasTankCtx;
 
 	/*** AQUARIUM MONEY ***/
-	var money = 0; //
+	let money = 0;
 
 	this.getMoney = function () {
 		return money;
@@ -315,7 +291,7 @@ var aquariumConstructor = function () {
 		document.getElementById('statusMoney').innerHTML = parseInt(money);
 	};
 
-	var changeMoney = function (diff) {
+	const changeMoney = (diff) => {
 		if (money + diff < 0) return false;
 		money = money + diff;
 		document.getElementById('statusMoney').innerHTML = parseInt(money);
@@ -325,13 +301,13 @@ var aquariumConstructor = function () {
 
 	/*** AQUARIUM SCENERIES ***/
 
-	var usedScenery = 0; // Which scenery is used in the aquarium;
-	var sceneries = new Array(); // Which sceneries are available to the user
+	let usedScenery = 0; // which scenery is used in the aquarium
+	const sceneries = []; // which sceneries the user owns
 	this.getSceneries = function (sNum) {
 		return sceneries[sNum];
 	};
 
-	sceneries[0] = true; // The first scenery is always available
+	sceneries[0] = true; // the first scenery is always available
 
 	this.buyScenery = function (scNum) {
 		if (sceneries[scNum]) {
@@ -352,8 +328,7 @@ var aquariumConstructor = function () {
 		}
 	};
 	this.chooseScenery = function (scNum) {
-		//dbg( "chooseScenery( " + scNum + " )" )
-		usedScenery = parseInt(usedScenery) || 0;
+		usedScenery = parseInt(usedScenery, 10) || 0;
 		if (sceneries[usedScenery])
 			document
 				.getElementById('buttonSceneryBuy' + usedScenery)
@@ -384,15 +359,15 @@ var aquariumConstructor = function () {
 		sceneries[scNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (scNum == usedScenery) this.chooseScenery(0);
+		if (scNum === usedScenery) this.chooseScenery(0);
 		updateBuyButtons();
 	};
 
 	/*** AQUARIUM LIGHTING ***/
 
-	var usedLight = 0; // Which scenery is used in the aquarium;
-	var lights = new Array(); // Which sceneries are available to the user
-	lights[0] = true; // The first scenery is always available
+	let usedLight = 0;
+	const lights = [];
+	lights[0] = true;
 
 	this.buyLight = function (liNum) {
 		if (lights[liNum]) {
@@ -442,15 +417,15 @@ var aquariumConstructor = function () {
 		lights[liNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (liNum == usedLight) this.chooseLight(0);
+		if (liNum === usedLight) this.chooseLight(0);
 		updateBuyButtons();
 	};
 
 	/*** AQUARIUM FILTERS ***/
 
-	var usedFilter = 0; // Which scenery is used in the aquarium;
-	var filters = new Array(); // Which sceneries are available to the user
-	filters[0] = true; // The first scenery is always available
+	let usedFilter = 0;
+	const filters = [];
+	filters[0] = true;
 
 	this.buyFilter = function (fiNum) {
 		if (filters[fiNum]) {
@@ -501,16 +476,16 @@ var aquariumConstructor = function () {
 		filters[fiNum] = false;
 
 		// Return to custom scenery if you sell current scenery
-		if (fiNum == usedFilter) this.chooseFilter(0);
+		if (fiNum === usedFilter) this.chooseFilter(0);
 		updateBuyButtons();
 	};
 
-	/*** BUY AQUARIUM BACKGROUNS ***/
+	/*** BUY AQUARIUM BACKGROUNDS ***/
 
-	var usedBackground = 0; // Which background is used in the aquarium;
+	let usedBackground = 0;
 
 	this.buyBackground = function (bgNum) {
-		if (usedBackground == bgNum) return;
+		if (usedBackground === bgNum) return;
 
 		if (changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
 			document
@@ -527,12 +502,12 @@ var aquariumConstructor = function () {
 		}
 	};
 
-	/*** UPDATE AQUARIUM SCENERIES - DISABLE OPTIONS YOU CAN'T AFFORD ***/
+	/*** UPDATE AQUARIUM SHOPS - DISABLE OPTIONS YOU CAN'T AFFORD ***/
 
-	var updateBuyButtons = function () {
+	const updateBuyButtons = () => {
 		fishShop.updateView();
 
-		for (i = 0; i < 9; i++) {
+		for (let i = 0; i < 9; i++) {
 			// update sceneries view
 			if (!sceneries[i]) {
 				if (aquarium.getMoney() < scenery.getSceneryData(i, SC_PRICE)) {
@@ -560,7 +535,7 @@ var aquariumConstructor = function () {
 			}
 		}
 
-		for (i = 0; i < 6; i++) {
+		for (let i = 0; i < 6; i++) {
 			// update filters view
 			if (!filters[i]) {
 				if (aquarium.getMoney() < filtration.getFilterData(i, FI_PRICE)) {
@@ -575,9 +550,9 @@ var aquariumConstructor = function () {
 			}
 		}
 
-		for (i = 0; i < 15; i++) {
-			// update filters view
-			if (i != usedBackground) {
+		for (let i = 0; i < 15; i++) {
+			// update backgrounds view
+			if (i !== usedBackground) {
 				if (aquarium.getMoney() < background.getBackgroundData(i, BG_PRICE)) {
 					document
 						.getElementById('buttonBackgroundBuy' + i)
@@ -597,27 +572,26 @@ var aquariumConstructor = function () {
 
 	/*** AQUARIUM IMAGES ***/
 
-	var imageGlassFront = new Image();
-	var imageWater = new Image();
-	var imageGlassBack = new Image();
+	const imageGlassFront = new Image();
+	const imageWater = new Image();
+	const imageGlassBack = new Image();
 	imageGlassFront.src = 'gfx/aquarium/tank/glassFront.png';
 	imageWater.src = 'gfx/aquarium/tank/water.png';
 	imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
 
 	/*** AQUARIUM LAYERS ***/
 
-	var layerFront = document.createElement('canvas');
+	const layerFront = document.createElement('canvas');
 	layerFront.setAttribute('width', 360);
 	layerFront.setAttribute('height', 240);
-	var layerFrontCtx = layerFront.getContext('2d');
+	const layerFrontCtx = layerFront.getContext('2d');
 
-	var layerBack = document.createElement('canvas');
+	const layerBack = document.createElement('canvas');
 	layerBack.setAttribute('width', 360);
 	layerBack.setAttribute('height', 240);
-	var layerBackCtx = layerBack.getContext('2d');
+	const layerBackCtx = layerBack.getContext('2d');
 
 	this.layerFrontRefresh = function () {
-		//dbg("layerFrontRefresh")
 		layerFrontCtx.clearRect(0, 0, 360, 240);
 		layerFrontCtx.drawImage(scenery.getSceneryData(usedScenery, SC_FGIMAGE), 0, 0);
 		layerFrontCtx.drawImage(imageWater, 0, 16);
@@ -625,7 +599,6 @@ var aquariumConstructor = function () {
 		layerFrontCtx.drawImage(imageGlassFront, 0, 0);
 	};
 	this.layerBackRefresh = function () {
-		//dbg("layerFrontRefresh")
 		layerBackCtx.clearRect(0, 0, 360, 240);
 		layerBackCtx.drawImage(imageGlassBack, 0, 0);
 		layerBackCtx.drawImage(filtration.getFilterData(usedFilter, FI_IMAGE), 10, 0);
@@ -637,35 +610,33 @@ var aquariumConstructor = function () {
 	this.create = function () {
 		canvasTank = document.getElementById('tank');
 		canvasTankCtx = canvasTank.getContext('2d');
-		canvasTankGameCtx = canvasTank.getContext('opera-2dgame');
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
 	};
 
-	//Photo MAKING
-
+	// Photo making
 	this.exportPhoto = function () {
-		var tempCanvas = document.createElement('canvas');
+		const tempCanvas = document.createElement('canvas');
 		tempCanvas.setAttribute('width', 360);
 		tempCanvas.setAttribute('height', 240);
-		tempCtx = tempCanvas.getContext('2d');
+		const tempCtx = tempCanvas.getContext('2d');
 		tempCtx.globalCompositeOperation = 'source-over';
 
 		// DRAW BACKGROUND
 		tempCtx.fillStyle = 'white';
 		tempCtx.fillRect(0, 0, 360, 240);
-		var wall = new Image();
+		const wall = new Image();
 		wall.src = background.getBackgroundSrc(usedBackground);
-		for (x = 0; x < 6; x++) {
-			for (y = 0; y < 4; y++) {
+		for (let x = 0; x < 6; x++) {
+			for (let y = 0; y < 4; y++) {
 				tempCtx.drawImage(wall, x * 64, y * 64);
 			}
 		}
 
 		// DRAW TANK
 		tempCtx.drawImage(layerBack, 0, 0);
-		for (i = 0; i < fishNum; i++) {
-			var fishObj = fish[i];
+		for (let i = 0; i < fishNum; i++) {
+			const fishObj = fish[i];
 			tempCtx.save();
 			tempCtx.translate(fishObj.getX(), fishObj.getY());
 			tempCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
@@ -674,32 +645,31 @@ var aquariumConstructor = function () {
 			tempCtx.restore();
 		}
 		tempCtx.drawImage(layerFront, 0, 0);
-		// widget.openURL( tempCanvas.toDataURL() );
-		// parent.postMessage({'command':'openURL','url': tempCanvas.toDataURL()}, "*");
+		// The 2014 version handed the data URL to the packaged-app wrapper to open;
+		// there is no wrapper any more. A download/share flow is a later feature.
 	};
 
-	/******** 
+	/********
 	*********
-	F   I  S  H 
+	F   I  S  H
 	*********
 	*********/
 
 	/*** ADD/REMOVE THE FISH IN THE AQUARIUM ***/
 
-	var fish = new Array(); // the list of all fish
+	const fish = []; // the list of all fish
 
-	var fishNum = 0; // number of fish in the aquarium
+	let fishNum = 0; // number of fish in the aquarium
 	this.getFishNum = function () {
 		return fishNum;
 	};
 
-	var fishNumBySpecies = new Array(); // number of every specie in the aquarium
-	for (i = 0; i < 29; i++) {
+	const fishNumBySpecies = []; // count of every species in the aquarium
+	for (let i = 0; i < 29; i++) {
 		fishNumBySpecies[i] = 0;
 	}
 
 	this.getFishNumBySpecies = function (fSpec) {
-		//dbg( fishNumBySpecies[ fSpec ] );
 		return fishNumBySpecies[fSpec];
 	};
 
@@ -715,12 +685,11 @@ var aquariumConstructor = function () {
 
 	// Remove specific fish
 	this.removeFish = function (fNum) {
-		//dbg( "this.removeFish( " + fNum + ")" )
 		if (fNum >= fishNum) return;
 
 		fishNumBySpecies[fish[fNum].getSpecNum()]--;
 
-		for (i = fNum + 1; i < fishNum; i++) {
+		for (let i = fNum + 1; i < fishNum; i++) {
 			fish[i - 1] = fish[i];
 		}
 
@@ -736,10 +705,10 @@ var aquariumConstructor = function () {
 		fish[fNum].changeCondition(hurtNum);
 	};
 
-	/*** AQUARIUM POLUTION ***/
+	/*** AQUARIUM POLLUTION ***/
 
-	var pollution = 0;
-	var pollutionChanged = false;
+	let pollution = 0;
+	let pollutionChanged = false;
 
 	this.getPollution = function () {
 		return pollution;
@@ -762,7 +731,7 @@ var aquariumConstructor = function () {
 		pollutionChanged = false;
 	};
 
-	/***AQUARIUM CLEANING ***/
+	/*** AQUARIUM CLEANING ***/
 
 	this.clean = function () {
 		if (pollution < 1) return;
@@ -792,7 +761,7 @@ var aquariumConstructor = function () {
 
 	/*** MEDICINE ***/
 
-	var medicine = 0;
+	let medicine = 0;
 	this.getMedicine = function () {
 		return medicine;
 	};
@@ -805,7 +774,7 @@ var aquariumConstructor = function () {
 		medicine = 0;
 	};
 	this.updateMedicine = function () {
-		medicineMelt = Math.random();
+		const medicineMelt = Math.random();
 
 		if (medicine > 0) {
 			this.changeMedicine(medicineMelt * -0.8);
@@ -815,7 +784,6 @@ var aquariumConstructor = function () {
 
 	this.addMedicine = function () {
 		if (changeMoney(-20)) {
-			//this.changePollution( pollution );
 			this.changeMedicine(Math.random() * 4 + 4);
 			updateBuyButtons();
 			stats.refreshStatsPage();
@@ -824,7 +792,7 @@ var aquariumConstructor = function () {
 
 	/*** FOOD ***/
 
-	var food = 0;
+	let food = 0;
 	this.getFood = function () {
 		return food;
 	};
@@ -840,7 +808,7 @@ var aquariumConstructor = function () {
 	};
 
 	this.updateFood = function () {
-		foodMelt = Math.random();
+		const foodMelt = Math.random();
 
 		if (food > 0) {
 			this.changeFood(foodMelt * -0.04);
@@ -850,7 +818,6 @@ var aquariumConstructor = function () {
 
 	this.addFood = function () {
 		if (changeMoney(-20)) {
-			//this.changePollution( 1 );
 			this.changeFood(Math.random() * 8 + 8);
 			updateBuyButtons();
 			stats.refreshStatsPage();
@@ -860,7 +827,7 @@ var aquariumConstructor = function () {
 	/*** HORMONES ***/
 
 	// GROW HORMONE
-	var growHormone = 0;
+	let growHormone = 0;
 
 	this.getGrowHormone = function () {
 		return growHormone;
@@ -876,11 +843,10 @@ var aquariumConstructor = function () {
 		if (growHormone > 100) growHormone = 100;
 	};
 	this.updateGrowHormone = function () {
-		growHormoneMelt = Math.random();
+		const growHormoneMelt = Math.random();
 		if (growHormone > 0) {
 			this.changeGrowHormone(growHormoneMelt * -0.1);
 			this.changePollution(growHormoneMelt * 0.5);
-			//dbg( "growH: " + growHormone );
 		}
 	};
 
@@ -894,7 +860,7 @@ var aquariumConstructor = function () {
 	};
 
 	// BREED HORMONE
-	var breedHormone = 0;
+	let breedHormone = 0;
 
 	this.getBreedHormone = function () {
 		return breedHormone;
@@ -911,11 +877,10 @@ var aquariumConstructor = function () {
 	};
 
 	this.updateBreedHormone = function () {
-		breedHormoneMelt = Math.random();
+		const breedHormoneMelt = Math.random();
 		if (breedHormone > 0) {
 			this.changeBreedHormone(breedHormoneMelt * -0.2);
 			this.changePollution(breedHormoneMelt);
-			//dbg( "breedH: " + breedHormone );
 		}
 	};
 
@@ -928,8 +893,8 @@ var aquariumConstructor = function () {
 		}
 	};
 
-	/*** AQUARIUM DISTRASTION - CONFUSES FISH SO THEY DON'T ATTACK ***/
-	var distraction = 0;
+	/*** AQUARIUM DISTRACTION - CONFUSES FISH SO THEY DON'T ATTACK ***/
+	let distraction = 0;
 
 	this.getDistraction = function () {
 		return distraction;
@@ -942,20 +907,16 @@ var aquariumConstructor = function () {
 	};
 
 	this.updateDistraction = function () {
-		if (distraction == 0) return;
+		if (distraction === 0) return;
 		distraction--;
-		//dbg("distraction " + distraction)
 	};
 
 	/*** SCARE / ATTRACT THE FISH ***/
 	this.scareFish = function () {
-		var dirX, dirY;
 		if (changeMoney(-5)) {
-			for (i = 0; i < fishNum; i++) {
-				if (fish[i].getX() > 180) dirX = 10;
-				else dirX = -10;
-				if (fish[i].getY() > 120) dirY = 5;
-				else dirY = -5;
+			for (let i = 0; i < fishNum; i++) {
+				const dirX = fish[i].getX() > 180 ? 10 : -10;
+				const dirY = fish[i].getY() > 120 ? 5 : -5;
 				fish[i].rotate(dirX, dirY);
 				fish[i].speedUp();
 			}
@@ -966,11 +927,9 @@ var aquariumConstructor = function () {
 
 	this.attractFish = function () {
 		if (changeMoney(-5)) {
-			for (i = 0; i < fishNum; i++) {
-				if (fish[i].getX() > 180) dirX = -10;
-				else dirX = 10;
-				if (fish[i].getY() > 120) dirY = -5;
-				else dirY = 5;
+			for (let i = 0; i < fishNum; i++) {
+				const dirX = fish[i].getX() > 180 ? -10 : 10;
+				const dirY = fish[i].getY() > 120 ? -5 : 5;
 				fish[i].rotate(dirX, dirY);
 				fish[i].speedUp();
 			}
@@ -983,15 +942,12 @@ var aquariumConstructor = function () {
 
 	/* MOVE FISH EVERY 32/1000 -- 1024/1000 SECONDS */
 	this.moveFish = function () {
-		for (i = 0; i < fishNum; i++) fish[i].move();
-		if (uio.getView() == VIEW_AQUARIUM) this.render();
+		for (let i = 0; i < fishNum; i++) fish[i].move();
+		if (uio.getView() === VIEW_AQUARIUM) this.render();
 	};
 
-	killFish = -1;
-	breedFish = -1;
-
-	var fishBirths = 0;
-	var fishDeaths = 0;
+	let fishBirths = 0;
+	let fishDeaths = 0;
 	this.getFishBirths = function () {
 		return fishBirths;
 	};
@@ -1006,9 +962,9 @@ var aquariumConstructor = function () {
 	/* UPDATE AQUARIUM EVERY 2 SECONDS */
 	this.update = function () {
 		/* FISH UPDATE */
-		for (i = 0; i < fishNum; i++) {
+		for (let i = 0; i < fishNum; i++) {
 			// Swim variations
-			swimVar = Math.random();
+			const swimVar = Math.random();
 			if (swimVar < 0.3) fish[i].speedUp();
 			if (swimVar < 0.2) fish[i].changeDirection();
 
@@ -1027,11 +983,9 @@ var aquariumConstructor = function () {
 			// Hunger & Eat
 			fish[i].hungerCheck();
 
-			//dbg("Attack");
 			// Attack
 			fish[i].fight(i);
 
-			//dbg("Getting older");
 			// Getting older
 			fish[i].getOld();
 
@@ -1047,8 +1001,6 @@ var aquariumConstructor = function () {
 				aquarium.changePollution(filtration.getFilterData(usedFilter, FI_POLLUTION));
 			}
 		}
-
-		/* LIGHTS UPDATE */
 
 		/* MEDICINE UPDATE */
 		this.updateMedicine();
@@ -1100,18 +1052,18 @@ var aquariumConstructor = function () {
 	/* UPDATE AQUARIUM IN RELAX MODE EVERY 2 SECONDS */
 	this.updateRelaxMode = function () {
 		/* FISH UPDATE */
-		for (i = 0; i < fishNum; i++) {
+		for (let i = 0; i < fishNum; i++) {
 			// Swim variations
-			swimVar = Math.random();
+			const swimVar = Math.random();
 			if (swimVar < 0.3) fish[i].speedUp();
 			if (swimVar < 0.2) fish[i].changeDirection();
 		}
 	};
 
 	/*** COMPUTE THE COMFORT FACTOR ***/
-	// Affects probability of breading and attacking other fishes
+	// Affects probability of breeding and attacking other fish
 
-	var comfortAquarium; // global aquarium factor
+	let comfortAquarium; // global aquarium factor
 	this.getComfortAquarium = function () {
 		return comfortAquarium;
 	};
@@ -1121,8 +1073,6 @@ var aquariumConstructor = function () {
 			lighting.getLightData(usedLight, LI_COMFORT) *
 			scenery.getSceneryData(usedScenery, SC_COMFORT);
 		computeBreedingRate();
-
-		//dbg( comfortAquarium );
 	};
 
 	this.updateComfortSpecies = function () {
@@ -1134,21 +1084,21 @@ var aquariumConstructor = function () {
 	this.render = function () {
 		canvasTankCtx.clearRect(0, 0, 360, 240);
 		renderBackground();
-		for (i = 0; i < fishNum; i++) {
+		for (let i = 0; i < fishNum; i++) {
 			renderFish(fish[i]);
 		}
 		renderForeground();
 	};
 
-	var renderForeground = function () {
+	const renderForeground = () => {
 		canvasTankCtx.drawImage(layerFront, 0, 0);
 	};
 
-	var renderBackground = function () {
+	const renderBackground = () => {
 		canvasTankCtx.drawImage(layerBack, 0, 0);
 	};
 
-	var renderFish = function (fishObj) {
+	const renderFish = (fishObj) => {
 		canvasTankCtx.save();
 		canvasTankCtx.translate(fishObj.getX(), fishObj.getY());
 		canvasTankCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
@@ -1157,8 +1107,7 @@ var aquariumConstructor = function () {
 		canvasTankCtx.restore();
 	};
 
-	// FOR STATISTICS
-	/*** return fish species ***/
+	// FOR STATISTICS — accessors by fish index
 
 	this.returnSpecNum = function (fNum) {
 		return fish[fNum].getSpecNum();
@@ -1194,7 +1143,7 @@ var aquariumConstructor = function () {
 	this.addMoney = function (mNum) {
 		changeMoney(mNum);
 	};
-};
+}
 
 export const aquarium = new aquariumConstructor();
 aquarium.updateComfortAquarium();

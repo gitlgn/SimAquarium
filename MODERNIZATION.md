@@ -51,12 +51,43 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 - Validated dev + `vite build`: boots clean, canvas renders, save/load
   round-trips, buy/sell/add-money work, 0 lint errors.
 
-## Phase 3 — TypeScript-ready
+## ✅ Phase 3a — syntax modernization (done)
 
-- Syntax modernization first: `var`→`const`/`let`, `==`→`===`, then flip the
-  `src/**` ESLint rules back on. Loop-ify the 64 hand-written `sellFish`
-  listeners in `statistics.js`; turn the `fishSpecies` array-of-arrays into an
-  array of objects.
+- Every `var` in `src/**` → `const`/`let`; every loose `==`/`!=` → `===`/`!==`
+  (all 37 sites reviewed individually — each was number↔number, string↔string or
+  otherwise semantics-preserving). `src/**` ESLint tier now enforces `no-var`,
+  `prefer-const`, `eqeqeq`, `no-redeclare`.
+- The `*Constructor` IIFEs became plain `function` declarations; helper methods
+  that don't touch `this` are arrows, singleton self-calls go through the export
+  name (`uio.setSmallInterval(…)`), so no `var self = this`.
+- `statistics.js`: the 64 hand-written `fishTableSellFish{N}` listeners → one
+  `for` loop wiring `() => aquarium.sellFish(i)` on each row as it is built;
+  row construction factored through a `makeDiv(class, id)` helper. −540 lines.
+- `species.js`: `fishSpecies` restored to a compact `// prettier-ignore` table
+  (values verified byte-for-byte against the pre-refactor data with a diff
+  script). Dead `breedChance` / `setBreedChance` removed.
+- `aquarium.js`: the implicit-global scratch block is gone — `i`, `x`, `y`,
+  `*Melt`, `swimVar`, `dirX/dirY`, `tempCtx`, `tempFishNum` are now properly
+  block- or method-scoped; dead `canvasTankGameCtx` (`getContext('opera-2dgame')`)
+  removed. Bundle 57.8 → 49.5 kB.
+- `parseInt(localStorage value)` calls got an explicit `, 10` radix. `parseInt`
+  applied to a _number_ for display truncation was left as-is (changing it to
+  `Math.trunc` would be a behaviour tweak, not this pass).
+- Validated dev + prod build via scripted API calls and real DOM clicks: boot,
+  render, save/load round-trip, buy/sell, tools, scare/attract, `update()` tick,
+  view switching, New Game — all clean. 0 lint errors.
+
+## Phase 3b — data + class shape (next)
+
+- `fishSpecies` array-of-arrays → array of objects (`{ name, price, … }`);
+  delete the `SPEC_*` index constants. Coordinated change across `species.js`,
+  `aquarium.js`, `fishshop.js`, `statistics.js` — do value-by-value.
+- Convert the nine `*Constructor` functions to ES `class` (private `#fields`
+  for the closure state), one file per commit, each re-validated.
+- Arrow the remaining `function () {}` event callbacks in `events.js`.
+
+## Phase 3c — TypeScript-ready
+
 - `jsconfig.json` + `checkJS`, JSDoc types on the public API of each module.
 - Convert file-by-file to `.ts` once types are stable.
 - Add a test runner (Vitest) around the economy/breeding logic first — it's the

@@ -9,10 +9,10 @@ import { storage } from './storage.js';
 import { loop } from './loop.js';
 import { computeBreedingRate, computeFishNumComfort } from './species.js';
 
-var configConstructor = function () {
-	var relaxEnable = function () {
+function configConstructor() {
+	const relaxEnable = () => {
 		clearInterval(loop.big);
-		loop.big = window.setInterval(function () {
+		loop.big = window.setInterval(() => {
 			aquarium.updateRelaxMode();
 		}, 2000);
 		document.getElementById('statusEvent').style.backgroundPosition = '38px';
@@ -21,9 +21,9 @@ var configConstructor = function () {
 		document.getElementById('statusEventIcon').style.display = 'block';
 	};
 
-	var relaxDisable = function () {
+	const relaxDisable = () => {
 		clearInterval(loop.big);
-		loop.big = window.setInterval(function () {
+		loop.big = window.setInterval(() => {
 			aquarium.update();
 		}, 2000);
 		document.getElementById('statusEvent').style.backgroundPosition = '0';
@@ -31,7 +31,7 @@ var configConstructor = function () {
 	};
 
 	this.relaxChange = function () {
-		if (document.getElementById('confRelaxMode').checked == true) relaxEnable();
+		if (document.getElementById('confRelaxMode').checked === true) relaxEnable();
 		else relaxDisable();
 		this.saveGame();
 	};
@@ -50,10 +50,10 @@ var configConstructor = function () {
 
 		window.clearInterval(loop.small);
 		window.clearInterval(loop.big);
-		loop.small = window.setInterval(function () {
+		loop.small = window.setInterval(() => {
 			aquarium.moveFish();
 		}, 128);
-		loop.big = window.setInterval(function () {
+		loop.big = window.setInterval(() => {
 			aquarium.update();
 		}, 2000);
 
@@ -64,13 +64,9 @@ var configConstructor = function () {
 	};
 
 	this.checkFirstTime = function () {
-		var firstRun = this.getItem('firstRun');
-		if (firstRun == '1') {
-			return false;
-		} else {
-			this.setItem('firstRun', '1');
-			return true;
-		}
+		if (this.getItem('firstRun') === '1') return false;
+		this.setItem('firstRun', '1');
+		return true;
 	};
 
 	this.saveGame = function () {
@@ -83,13 +79,11 @@ var configConstructor = function () {
 		fishShop.load();
 	};
 
-	this.setItem = function (key, val) {
+	this.setItem = (key, val) => {
 		storage.setItem(key, val);
 	};
 
-	this.getItem = function (key) {
-		return storage.getItem(key);
-	};
-};
+	this.getItem = (key) => storage.getItem(key);
+}
 
 export const config = new configConstructor();

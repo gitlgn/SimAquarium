@@ -20,29 +20,21 @@ import {
 	TIME_MINUTE,
 } from './constants.js';
 
-var fishShopConstructor = function () {
+function fishShopConstructor() {
 	/*** FISH SHOP INIT ***/
 
-	var fishShopSlot = new Array();
-
-	/* Initialize the fish shop */
-	this.init = function () {
-		fishShopDeliveryTime = 60;
-		for (var i = 0; i < 9; i++) {
-			fishShopSlot[i] = new Array();
-		}
-		delivery();
-		this.updateDeliveryTime(); // start the fish shop counter
-	};
+	const fishShopSlot = [];
+	let fishShopDeliveryTime = 60;
+	let fishShopTimer;
 
 	/*** FISH SHOP DELIVERY ***/
 
-	var delivery = function () {
-		for (var i = 0; i < 9; i++) {
+	const delivery = () => {
+		for (let i = 0; i < 9; i++) {
 			fishShopSlot[i][SHOPSLOT_SPEC] = 3 * i + parseInt(Math.random() * 3) + 1;
 
 			// DOLPHIN IS A RARITY AND YOU NEED TO HAVE A SWIMMING POOL TO GET IT
-			if (i == 8) {
+			if (i === 8) {
 				if (aquarium.getSceneries(4)) {
 					if (Math.random() < 0.1) {
 						fishShopSlot[i][SHOPSLOT_SPEC] = 28;
@@ -56,52 +48,57 @@ var fishShopConstructor = function () {
 				fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]][SPEC_PRICE];
 			fishShopSlot[i][SHOPSLOT_LINK] = fishSpecies[fishShopSlot[i][SHOPSLOT_SPEC]][SPEC_LINK];
 
-			document.getElementById('fishSlot' + i).children[0].innerHTML =
-				fishShopSlot[i][SHOPSLOT_NAME];
-			document.getElementById('fishSlot' + i).children[2].innerHTML =
-				fishShopSlot[i][SHOPSLOT_PRICE];
-			document.getElementById('fishSlot' + i).children[3].innerHTML =
-				fishShopSlot[i][SHOPSLOT_NUM];
-			document.getElementById('fishSlot' + i).children[1].style.backgroundImage =
+			const slot = document.getElementById('fishSlot' + i);
+			slot.children[0].innerHTML = fishShopSlot[i][SHOPSLOT_NAME];
+			slot.children[2].innerHTML = fishShopSlot[i][SHOPSLOT_PRICE];
+			slot.children[3].innerHTML = fishShopSlot[i][SHOPSLOT_NUM];
+			slot.children[1].style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + fishShopSlot[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	};
 
+	/* Initialize the fish shop */
+	this.init = () => {
+		fishShopDeliveryTime = 60;
+		for (let i = 0; i < 9; i++) {
+			fishShopSlot[i] = [];
+		}
+		delivery();
+		fishShop.updateDeliveryTime(); // start the fish shop counter
+	};
+
 	/*** FISH SHOP DELIVERY TIMER ***/
 
-	var fishShopDeliveryTime = 60;
-	var fishShopTimer;
-
-	this.setDeliveryTimer = function () {
-		fishShopTimer = window.setTimeout(function () {
+	this.setDeliveryTimer = () => {
+		fishShopTimer = window.setTimeout(() => {
 			fishShop.updateDeliveryTime();
 		}, TIME_MINUTE);
 	};
 
-	this.clearDerliveryTimer = function () {
+	this.clearDerliveryTimer = () => {
 		window.clearTimeout(fishShopTimer);
 	};
 
-	this.updateDeliveryTime = function () {
+	this.updateDeliveryTime = () => {
 		fishShopDeliveryTime--;
-		if (fishShopDeliveryTime == 0) {
+		if (fishShopDeliveryTime === 0) {
 			delivery();
 			aquarium.updateBuyButtonsAlias();
 			fishShopDeliveryTime = 60;
 		}
 		document.getElementById('newFishTime').innerHTML = fishShopDeliveryTime;
-		fishShopTimer = window.setTimeout(function () {
+		fishShopTimer = window.setTimeout(() => {
 			fishShop.updateDeliveryTime();
 		}, TIME_MINUTE);
 	};
 
 	/*** OPEN FISH INFO ***/
-	this.openFishInfo = function (slotNum) {
+	this.openFishInfo = (slotNum) => {
 		openTab(fishShopSlot[slotNum][SHOPSLOT_LINK]);
 	};
 
 	/*** BUY FISH ***/
-	this.buyFish = function (slotNum) {
+	this.buyFish = (slotNum) => {
 		if (fishShopSlot[slotNum][SHOPSLOT_NUM] < 1) return;
 		if (aquarium.getFishNum() > 63) return;
 
@@ -115,26 +112,21 @@ var fishShopConstructor = function () {
 		}
 	};
 
-	this.updateView = function () {
-		for (var i = 0; i < 9; i++) {
+	this.updateView = () => {
+		for (let i = 0; i < 9; i++) {
+			const buyButton = document.getElementById('fishSlot' + i).children[5];
 			if (fishShopSlot[i][SHOPSLOT_PRICE] > aquarium.getMoney()) {
-				document
-					.getElementById('fishSlot' + i)
-					.children[5].setAttribute('class', 'button buy off');
-			} else if (fishShopSlot[i][SHOPSLOT_NUM] == 0) {
-				document
-					.getElementById('fishSlot' + i)
-					.children[5].setAttribute('class', 'button buy off');
+				buyButton.setAttribute('class', 'button buy off');
+			} else if (fishShopSlot[i][SHOPSLOT_NUM] === 0) {
+				buyButton.setAttribute('class', 'button buy off');
 			} else {
-				document
-					.getElementById('fishSlot' + i)
-					.children[5].setAttribute('class', 'button buy on');
+				buyButton.setAttribute('class', 'button buy on');
 			}
 		}
 	};
 
-	this.save = function () {
-		for (var i = 0; i < 9; i++) {
+	this.save = () => {
+		for (let i = 0; i < 9; i++) {
 			config.setItem('fishShopSlot' + i + 'spec', fishShopSlot[i][SHOPSLOT_SPEC]);
 			config.setItem('fishShopSlot' + i + 'num', fishShopSlot[i][SHOPSLOT_NUM]);
 			config.setItem('fishShopSlot' + i + 'name', fishShopSlot[i][SHOPSLOT_NAME]);
@@ -144,28 +136,33 @@ var fishShopConstructor = function () {
 		}
 	};
 
-	this.load = function () {
-		for (var i = 0; i < 9; i++) {
-			fishShopSlot[i][SHOPSLOT_SPEC] = parseInt(config.getItem('fishShopSlot' + i + 'spec'));
-			fishShopSlot[i][SHOPSLOT_NUM] = parseInt(config.getItem('fishShopSlot' + i + 'num'));
+	this.load = () => {
+		for (let i = 0; i < 9; i++) {
+			fishShopSlot[i][SHOPSLOT_SPEC] = parseInt(
+				config.getItem('fishShopSlot' + i + 'spec'),
+				10
+			);
+			fishShopSlot[i][SHOPSLOT_NUM] = parseInt(
+				config.getItem('fishShopSlot' + i + 'num'),
+				10
+			);
 			fishShopSlot[i][SHOPSLOT_NAME] = config.getItem('fishShopSlot' + i + 'name');
 			fishShopSlot[i][SHOPSLOT_PRICE] = parseInt(
-				config.getItem('fishShopSlot' + i + 'price')
+				config.getItem('fishShopSlot' + i + 'price'),
+				10
 			);
 			fishShopSlot[i][SHOPSLOT_LINK] = config.getItem('fishShopSlot' + i + 'link');
 			fishShopDeliveryTime = config.getItem('fishShopDeliveryTime');
 
 			document.getElementById('newFishTime').innerHTML = fishShopDeliveryTime;
-			document.getElementById('fishSlot' + i).children[0].innerHTML =
-				fishShopSlot[i][SHOPSLOT_NAME];
-			document.getElementById('fishSlot' + i).children[2].innerHTML =
-				fishShopSlot[i][SHOPSLOT_PRICE];
-			document.getElementById('fishSlot' + i).children[3].innerHTML =
-				fishShopSlot[i][SHOPSLOT_NUM];
-			document.getElementById('fishSlot' + i).children[1].style.backgroundImage =
+			const slot = document.getElementById('fishSlot' + i);
+			slot.children[0].innerHTML = fishShopSlot[i][SHOPSLOT_NAME];
+			slot.children[2].innerHTML = fishShopSlot[i][SHOPSLOT_PRICE];
+			slot.children[3].innerHTML = fishShopSlot[i][SHOPSLOT_NUM];
+			slot.children[1].style.backgroundImage =
 				'url(gfx/aquarium/fishes/fish' + fishShopSlot[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
 	};
-};
+}
 
 export const fishShop = new fishShopConstructor();

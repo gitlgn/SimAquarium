@@ -4,21 +4,20 @@
 
 import { LI_NAME, LI_PRICE, LI_COMFORT, LI_ENERGY, LI_IMAGE } from './constants.js';
 
-var PATH_LIGHTING = 'gfx/lighting/';
+const PATH_LIGHTING = 'gfx/lighting/';
 
-var lightingConstructor = function () {
-	var light = new Array();
-	var lightNum = light.length;
+function lightingConstructor() {
+	const light = [];
 
-	var createLight = function (name, fileName, price, comfort, energyCost) {
-		light[lightNum] = new Array();
-		light[lightNum][LI_NAME] = name;
-		light[lightNum][LI_PRICE] = price;
-		light[lightNum][LI_COMFORT] = comfort;
-		light[lightNum][LI_ENERGY] = energyCost;
-		light[lightNum][LI_IMAGE] = new Image();
-		light[lightNum][LI_IMAGE].src = PATH_LIGHTING + fileName;
-		lightNum = light.length;
+	const createLight = (name, fileName, price, comfort, energyCost) => {
+		const row = [];
+		row[LI_NAME] = name;
+		row[LI_PRICE] = price;
+		row[LI_COMFORT] = comfort;
+		row[LI_ENERGY] = energyCost;
+		row[LI_IMAGE] = new Image();
+		row[LI_IMAGE].src = PATH_LIGHTING + fileName;
+		light.push(row);
 	};
 
 	createLight('Simple Light', 'light0.png', 0, 0.91, 0.01);
@@ -31,10 +30,10 @@ var lightingConstructor = function () {
 	createLight('Star Lamps', 'light7.png', 2800, 0.98, 0.08);
 	createLight('Corner Reflectors', 'light8.png', 3600, 0.99, 0.09);
 
-	this.getLightData = function (num, data) {
-		num = parseInt(num) || 0;
-		return light[num][data];
+	this.getLightData = (num, data) => {
+		const idx = Number.parseInt(num, 10) || 0;
+		return light[idx][data];
 	};
-};
+}
 
 export const lighting = new lightingConstructor();
