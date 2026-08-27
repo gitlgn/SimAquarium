@@ -25,6 +25,7 @@ set up as an installable **PWA**.
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
 | Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
 | Mobile layout   | 🟡 widget scales to the viewport (safe-area aware) + touch-hardened (pointer-drag speed bar, no tap delay); a fluid/reflowing layout is Phase 4b                                                                     |
+| Android         | 🟡 TWA packaging groundwork in place (`twa-manifest.json`, Digital Asset Links, [docs/ANDROID.md](docs/ANDROID.md)); building the `.aab` needs a deployed HTTPS origin + a Play Console account                        |
 
 ## Requirements
 
@@ -74,6 +75,9 @@ public/             served verbatim by Vite
   css/*.css         styles
   gfx/**            sprites, UI art, icons
   stage.js          scales the widget to the viewport; mobile.css touch-hardens it
+  .well-known/assetlinks.json   Digital Asset Links for the Android TWA
+docs/ANDROID.md     Play-Store packaging playbook (Bubblewrap / PWABuilder)
+twa-manifest.json   Bubblewrap config (fill placeholders after deploy)
 vite.config.js      Vite + vite-plugin-pwa
 vitest.config.js    test runner (jsdom, test/setup.js)
 tsconfig.json       tsc --strict settings
