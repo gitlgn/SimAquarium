@@ -67,7 +67,7 @@
 	height: 13px;
 	text-align: center;
 	border: 1px solid rgb( 80, 80, 80 );
-	cursor: hand;
+	cursor: pointer;
 }
 
 .scenerySlot  .button.on:hover {

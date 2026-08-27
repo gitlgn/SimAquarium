@@ -100,18 +100,18 @@ class Uio {
 		$('tabButton' + tabOn).setAttribute('class', 'tab active');
 	}
 
-	/*** Speed bar ***/
-	speedBarSet(domEvent) {
-		const e = domEvent || window.event;
-		if (e.offsetX < 7) this.setSmallInterval(0);
-		else if (e.offsetX < 15) this.setSmallInterval(1);
-		else if (e.offsetX < 25) this.setSmallInterval(2);
-		else if (e.offsetX < 33) this.setSmallInterval(3);
-		else if (e.offsetX < 42) this.setSmallInterval(4);
+	/*** Speed bar — map the x offset within the 50px bar to one of six speeds. */
+	speedBarSet(e: MouseEvent) {
+		const x = e.offsetX;
+		if (x < 7) this.setSmallInterval(0);
+		else if (x < 15) this.setSmallInterval(1);
+		else if (x < 25) this.setSmallInterval(2);
+		else if (x < 33) this.setSmallInterval(3);
+		else if (x < 42) this.setSmallInterval(4);
 		else this.setSmallInterval(5);
 	}
 
-	setSmallInterval(delay) {
+	setSmallInterval(delay: number) {
 		window.clearInterval(loop.small);
 		loop.small = window.setInterval(() => {
 			aquarium.moveFish();

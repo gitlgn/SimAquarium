@@ -1,0 +1,45 @@
+/*
+ * mobile.css — touch / small-screen hardening for the scaled widget.
+ * Loaded last. The fluid/reflowing layout (bigger tank, panels that stack on
+ * a phone in portrait) is still to come — see MODERNIZATION.md Phase 4b.
+ */
+
+#viewport {
+	/* Keep the widget clear of a notch / rounded corners / home indicator. */
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+		env(safe-area-inset-left);
+	box-sizing: border-box;
+}
+
+#stage {
+	/* No 300 ms tap delay, no grey flash, no accidental text selection or
+	   long-press callout when tapping the pixel-art buttons. */
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* The speed bar is now drag-to-set (pointer events) — don't let the browser
+   claim the gesture for scrolling/zooming. */
+#speedBar,
+#speedHandle {
+	touch-action: none;
+}
+
+/* Everything clickable gets the hand cursor on desktop (belt-and-braces on top
+   of the per-file fixes) and a comfortable min hit area is handled by the scale. */
+.buttonTool,
+.buttonView,
+.buttonWidget,
+.tab,
+#pageMode,
+#cameraTool,
+#speedBar,
+#speedHandle,
+#confNewGame,
+#coinAdd,
+[id^='button'] {
+	cursor: pointer;
+}

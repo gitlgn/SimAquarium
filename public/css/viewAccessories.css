@@ -61,7 +61,7 @@
 	height: 13px;
 	text-align: center;
 	border: 1px solid rgb( 80, 80, 80 );
-	cursor: hand;
+	cursor: pointer;
 }
 
 .filterSlot  .button.on:hover {
@@ -168,7 +168,7 @@
 	height: 13px;
 	text-align: center;
 	border: 1px solid rgb( 80, 80, 80 );
-	cursor: hand;
+	cursor: pointer;
 }
 
 .backgroundSlot  .button.on:hover {

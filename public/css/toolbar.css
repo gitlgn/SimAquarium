@@ -4,8 +4,7 @@
 	position: absolute;
 	top: 12px;
 	background: url(../gfx/interface/buttonSmall.png);
-	cursor: hand;
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
+	cursor: pointer;
 }
 .buttonWidget:hover {
 	background-position: 28px 0;
@@ -73,8 +72,7 @@
 	height: 20px;
 	position: absolute;
 	background: url(../gfx/interface/buttonMedium.png);
-	cursor: hand;
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
+	cursor: pointer;
 }
 .buttonTool:hover {
 	background-position: 40px 0;
@@ -178,7 +176,6 @@
 	width: 50px;
 	height: 10px;
 	background: url(../gfx/interface/gameSpeedBar.png);
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
 }
 #speedHandle {
 	position: absolute;
@@ -187,7 +184,6 @@
 	width: 13px;
 	height: 13px;
 	background: url(../gfx/interface/gameSpeedHandle.png);
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
 }
 #pageMode {
 	width: 14px;
@@ -196,8 +192,7 @@
 	bottom: 13px;
 	right: 9px;
 	background: url(../gfx/interface/viewMode.png);
-	cursor: hand;
-	-apple-dashboard-region: dashboard-region(control rectangle 0px 0px 0px 0px);
+	cursor: pointer;
 	content: url(../gfx/interface/viewIcon0.png);
 }
 #pageMode:hover {

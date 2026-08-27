@@ -24,7 +24,7 @@ set up as an installable **PWA**.
 | Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
 | Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
-| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                                                                                              |
+| Mobile layout   | 🟡 widget scales to the viewport (safe-area aware) + touch-hardened (pointer-drag speed bar, no tap delay); a fluid/reflowing layout is Phase 4b                                                                     |
 
 ## Requirements
 
@@ -64,7 +64,7 @@ src/                TypeScript modules (classes), bundled by Vite
   main.ts           entry (<script type="module">) — bootstrap
   aquarium.ts …     one class per game object (Aquarium, Config, Uio, …),
                     exported as a singleton instance
-  species.ts        fishSpecies data + `class Fish` (was fish.js)
+  species.ts        fishSpecies data + `class Fish`
   dom.ts            `$(id)` / `ctx2d()` helpers
   events.ts         wires the DOM controls to the game objects
   constants.ts      shared numeric constants
@@ -73,11 +73,11 @@ test/               Vitest specs (jsdom)
 public/             served verbatim by Vite
   css/*.css         styles
   gfx/**            sprites, UI art, icons
-  stage.js          scales the fixed 457×300 widget to the viewport
+  stage.js          scales the widget to the viewport; mobile.css touch-hardens it
 vite.config.js      Vite + vite-plugin-pwa
 vitest.config.js    test runner (jsdom, test/setup.js)
 tsconfig.json       tsc --strict settings
-eslint.config.js    flat config (config + public/*.js; src/ eslint.config.js    flat config: src/** · test/** · *.config.js · public/*.js tiers test/ are tsc-checked)
+eslint.config.js    lints *.config.js + public/*.js (src/ & test/ are tsc-checked)
 ```
 
 ## Roadmap

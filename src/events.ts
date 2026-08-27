@@ -84,7 +84,27 @@ export function eventsCreate() {
 	tools.forEach((method, i) => on('buttonTool' + i, 'click', () => aquarium[method]()));
 
 	on('cameraTool', 'click', () => aquarium.exportPhoto());
-	on('speedBar', 'click', (e) => uio.speedBarSet(e));
+
+	// Speed bar: drag (or tap) to set — one handler for mouse, pen and touch.
+	const speedBar = $('speedBar');
+	let draggingSpeed = false;
+	speedBar.addEventListener('pointerdown', (e) => {
+		draggingSpeed = true;
+		try {
+			speedBar.setPointerCapture(e.pointerId);
+		} catch {
+			/* no active pointer (synthetic event) — the flag is enough */
+		}
+		uio.speedBarSet(e);
+	});
+	speedBar.addEventListener('pointermove', (e) => {
+		if (draggingSpeed) uio.speedBarSet(e);
+	});
+	const endSpeedDrag = () => {
+		draggingSpeed = false;
+	};
+	speedBar.addEventListener('pointerup', endSpeedDrag);
+	speedBar.addEventListener('pointercancel', endSpeedDrag);
 
 	/*** FISH SHOP SLOTS (info = child 4, buy = child 5) ***/
 	for (let i = 0; i < 9; i++) {
