@@ -4,9 +4,10 @@ import prettier from 'eslint-config-prettier';
 
 /**
  * Flat config. Two tiers:
- *  - src/**       : new/modernized code, strict rules (added during the ESM migration)
- *  - public/js/** : the original 2014 game code, relaxed rules so lint stays
- *                   actionable while it is incrementally rewritten.
+ *  - src/**        : the game as ES modules (Phase 2b). Enforces import
+ *                    correctness (no-undef) and no-implied-eval; syntax rules
+ *                    (no-var, eqeqeq) wait for Phase 3.
+ *  - public/*.js   : classic browser scripts — only `stage.js` remains.
  */
 export default [
 	{ ignores: ['dist/**', 'node_modules/**', 'dev-dist/**', 'android/**', 'ios/**'] },
@@ -14,7 +15,9 @@ export default [
 	js.configs.recommended,
 	prettier,
 
-	// Modernized sources (ES modules).
+	// ES-module sources (Phase 2b). The module *structure* is modern; syntax
+	// modernization (var -> const/let, == -> ===, TypeScript) is Phase 3, so
+	// those rules stay off here for now to keep that diff separate.
 	{
 		files: ['src/**/*.{js,mjs}'],
 		languageOptions: {
@@ -23,10 +26,14 @@ export default [
 			globals: { ...globals.browser },
 		},
 		rules: {
-			'no-var': 'error',
-			'prefer-const': 'error',
-			eqeqeq: ['error', 'smart'],
+			'no-undef': 'error',
 			'no-implied-eval': 'error',
+			// benign `var` re-declarations in the 2014 code; Phase 3 (const/let) removes them
+			'no-redeclare': 'warn',
+			'no-unused-vars': 'warn',
+			'no-var': 'off',
+			'prefer-const': 'off',
+			eqeqeq: 'off',
 		},
 	},
 
@@ -40,59 +47,17 @@ export default [
 		},
 	},
 
-	// Classic browser scripts (the modernization wrapper + the legacy game code,
-	// which shares one global scope).
+	// Classic browser scripts served from /public (currently just stage.js).
 	{
-		files: [
-			'public/js/**/*.js',
-			'public/storageAPI.js',
-			'public/sandbox.js',
-			'public/stage.js',
-		],
+		files: ['public/**/*.js'],
 		languageOptions: {
-			ecmaVersion: 5,
+			ecmaVersion: 2020,
 			sourceType: 'script',
-			globals: {
-				...globals.browser,
-				// cross-file singletons and helpers defined across the game modules
-				storageAPI: 'writable',
-				aquarium: 'writable',
-				config: 'writable',
-				fishShop: 'writable',
-				stats: 'writable',
-				uio: 'writable',
-				scenery: 'writable',
-				lighting: 'writable',
-				filtration: 'writable',
-				background: 'writable',
-				eventsCreate: 'writable',
-				updateBuyButtons: 'writable',
-				computeBreedingRate: 'writable',
-				computeFishNumComfort: 'writable',
-				openTab: 'writable',
-				dbg: 'writable',
-				debug: 'writable',
-				result: 'writable',
-				smallInterval: 'writable',
-				bigInterval: 'writable',
-				smallIntervals: 'writable',
-				chosenSpeed: 'writable',
-				fishSpecies: 'writable',
-				fishSpeciesNum: 'writable',
-				fishAngle: 'writable',
-				fishFrameL: 'writable',
-				fishFrameR: 'writable',
-				speciesBreedingRate: 'writable',
-				speciesFishNumComfort: 'writable',
-				fishConstructor: 'writable',
-			},
+			globals: { ...globals.browser },
 		},
 		rules: {
 			'no-unused-vars': 'warn',
-			'no-undef': 'warn',
 			'no-implied-eval': 'warn',
-			'no-redeclare': 'warn',
-			'no-empty': 'warn',
 		},
 	},
 ];
