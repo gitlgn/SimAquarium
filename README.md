@@ -17,14 +17,14 @@ ago) plus an incomplete Opera extension, so it no longer ran anywhere. This fork
 now runs as a plain static web app built with [Vite](https://vite.dev/), and is
 set up as an installable **PWA**.
 
-| Area            | State                                                                                                                                            |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                       |
-| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                     |
-| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                        |
-| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                |
-| Code style      | ⚠️ still the original 2014 ES5 (globals, one shared scope). ES-module migration is the next milestone — see [MODERNIZATION.md](MODERNIZATION.md) |
-| Mobile layout   | ⚠️ fixed ~457×300 "widget" size; responsive/mobile layout not done yet                                                                           |
+| Area            | State                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                 |
+| Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                               |
+| Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                  |
+| Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                          |
+| Code style      | 🟡 ES modules under `src/` (Phase 2b done); syntax still 2014-era (`var`, `==`) pending Phase 3 — see [MODERNIZATION.md](MODERNIZATION.md) |
+| Mobile layout   | 🟡 fixed 457×300 "widget" now scales uniformly to the viewport (`public/stage.js`); a fluid/reflowing layout is Phase 4                    |
 
 ## Requirements
 
@@ -57,14 +57,18 @@ server.
 
 ```
 index.html          app shell (merged from the old mainpage.html + sandbox.html)
+src/                ES modules, bundled by Vite
+  main.js           entry (<script type="module">) — bootstrap
+  aquarium.js …     one module per game singleton
+  species.js        fish species table + fish factory (was fish.js)
+  constants.js      shared numeric constants
+  storage.js loop.js util.js   small support modules
 public/             served verbatim by Vite
-  js/*.js           the game modules (classic scripts, loaded in order by index.html)
   css/*.css         styles
   gfx/**            sprites, UI art, icons
-  storageAPI.js     storage abstraction (now: localStorage)
-  sandbox.js        legacy bootstrap shim (to be folded into the ESM entry)
+  stage.js          scales the fixed 457×300 widget to the viewport
 vite.config.js      Vite + vite-plugin-pwa
-eslint.config.js    flat config: strict for src/**, relaxed for the legacy public/js/**
+eslint.config.js    flat config: src/** (module) vs public/*.js (classic script) tiers
 ```
 
 ## Roadmap

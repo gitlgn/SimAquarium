@@ -23,21 +23,8 @@
 	<!-- Scale-to-fit wrapper for the fixed 457x300 widget layout (loaded last to win the cascade). -->
 	<link rel="stylesheet" href="/css/stage.css" type="text/css">
 
-	<!-- Phase 1: classic scripts, loaded in original order. Phase 2 converts these to ES modules. -->
 	<script defer src="/stage.js"></script>
-	<script defer src="/storageAPI.js"></script>
-	<script defer src="/sandbox.js"></script>
-	<script defer src="/js/main.js"></script>
-	<script defer src="/js/fish.js"></script>
-	<script defer src="/js/scenery.js"></script>
-	<script defer src="/js/config.js"></script>
-	<script defer src="/js/lighting.js"></script>
-	<script defer src="/js/filtration.js"></script>
-	<script defer src="/js/statistics.js"></script>
-	<script defer src="/js/fishshop.js"></script>
-	<script defer src="/js/aquarium.js"></script>
-	<script defer src="/js/events.js"></script>
-	<script defer src="/js/uio.js"></script>
+	<script type="module" src="/src/main.js"></script>
 </head>
 <body>
 

@@ -25,25 +25,38 @@ Staged so the game stays runnable and testable after every step.
   `postMessage` to a parent frame that no longer exists — they call `openTab()` /
   `config.saveGame()` directly.
 
-## ▶ Phase 2b — ES modules (next)
+## ✅ Phase 2b — ES modules (done)
 
-Convert `public/js/**` from one shared global scope to ES modules under `src/`.
+`public/js/**` (one shared global scope) → ES modules under `src/`, bundled by
+Vite from a single `<script type="module" src="/src/main.js">`.
 
-- One singleton per file (`aquarium`, `config`, `fishShop`, `stats`, `uio`,
-  `scenery`, `lighting`, `filtration`, `background`) → `export`.
-- Shared constants (`SPEC_*`, `VIEW_*`, `DIRECTION_*`, `RARITY_*`, `BUY`/`SELL`,
-  `fishSpecies`, …) → a `constants.js` / `species.js` module.
-- Free functions (`eventsCreate`, `updateBuyButtons`, `computeBreedingRate`,
-  `computeFishNumComfort`, `openTab`, `dbg`) → explicit imports.
-- Single `src/main.js` entry, loaded as `<script type="module">`; delete
-  `sandbox.js` and the `DOMContentLoaded`/`load` double-bootstrap in `js/main.js`.
-- Fix the implicit-global loop vars (`i`, `num`, `e`) flagged by `no-undef`.
-- Move `src/**` onto the strict ESLint tier; format with Prettier.
-- Re-validate: boot with no console errors, canvas renders, save/load round-trips,
-  buy/sell/breed still work.
+- One module per singleton: `aquarium`, `config`, `fishShop` (`fishshop.js`),
+  `stats` (`statistics.js`), `uio`, `scenery`, `lighting`, `filtration` +
+  `background`.
+- New support modules: `constants.js` (all shared `SPEC_*`/`VIEW_*`/`BUY`… ),
+  `species.js` (was `fish.js`: table + `fishConstructor` + `computeBreedingRate`/
+  `computeFishNumComfort`), `util.js` (`dbg`, `openTab`), `storage.js`
+  (localStorage), `loop.js` (the `smallInterval`/`bigInterval`/`chosenSpeed`
+  state that several files reassigned — now a shared object).
+- `storageAPI.js` + `sandbox.js` deleted; `js/main.js`'s DOMContentLoaded +1 s
+  setTimeout hack collapsed into one `load` handler in `src/main.js`.
+- `changeMoney` exposed as `aquarium.changeMoney`; bare `updateBuyButtons()`
+  re-exported as a thin wrapper over `aquarium.updateBuyButtonsAlias()`.
+- Implicit-global loop/scratch vars (`i`, `num`, `e`, `tmp`, `dirX`…) declared
+  for module strict mode. **Semantics unchanged** — no `var`→`const`, no
+  `==`→`===` yet (that's Phase 3), so the `src/**` ESLint tier keeps `no-var` /
+  `eqeqeq` off for now and enforces `no-undef` / `no-implied-eval`.
+- Dev-only: `src/main.js` puts the singletons on `window` under
+  `import.meta.env.DEV` for DevTools poking (stripped from the prod bundle).
+- Validated dev + `vite build`: boots clean, canvas renders, save/load
+  round-trips, buy/sell/add-money work, 0 lint errors.
 
 ## Phase 3 — TypeScript-ready
 
+- Syntax modernization first: `var`→`const`/`let`, `==`→`===`, then flip the
+  `src/**` ESLint rules back on. Loop-ify the 64 hand-written `sellFish`
+  listeners in `statistics.js`; turn the `fishSpecies` array-of-arrays into an
+  array of objects.
 - `jsconfig.json` + `checkJS`, JSDoc types on the public API of each module.
 - Convert file-by-file to `.ts` once types are stable.
 - Add a test runner (Vitest) around the economy/breeding logic first — it's the
