@@ -9,8 +9,8 @@ import { storage } from './storage.js';
 import { loop } from './loop.js';
 import { computeBreedingRate, computeFishNumComfort } from './species.js';
 
-function configConstructor() {
-	const relaxEnable = () => {
+class Config {
+	#relaxEnable() {
 		clearInterval(loop.big);
 		loop.big = window.setInterval(() => {
 			aquarium.updateRelaxMode();
@@ -19,26 +19,25 @@ function configConstructor() {
 		document.getElementById('statusEventIcon').style.background =
 			'url(gfx/interface/alertLightIcon5.png)';
 		document.getElementById('statusEventIcon').style.display = 'block';
-	};
+	}
 
-	const relaxDisable = () => {
+	#relaxDisable() {
 		clearInterval(loop.big);
 		loop.big = window.setInterval(() => {
 			aquarium.update();
 		}, 2000);
 		document.getElementById('statusEvent').style.backgroundPosition = '0';
 		document.getElementById('statusEventIcon').style.display = 'none';
-	};
+	}
 
-	this.relaxChange = function () {
-		if (document.getElementById('confRelaxMode').checked === true) relaxEnable();
-		else relaxDisable();
+	relaxChange() {
+		if (document.getElementById('confRelaxMode').checked === true) this.#relaxEnable();
+		else this.#relaxDisable();
 		this.saveGame();
-	};
+	}
 
 	/*** NEW GAME ***/
-
-	this.newGame = function () {
+	newGame() {
 		fishShop.clearDerliveryTimer();
 		fishShop.init();
 
@@ -61,29 +60,31 @@ function configConstructor() {
 
 		updateBuyButtons();
 		this.saveGame();
-	};
+	}
 
-	this.checkFirstTime = function () {
+	checkFirstTime() {
 		if (this.getItem('firstRun') === '1') return false;
 		this.setItem('firstRun', '1');
 		return true;
-	};
+	}
 
-	this.saveGame = function () {
+	saveGame() {
 		aquarium.saveAquarium();
 		fishShop.save();
-	};
+	}
 
-	this.loadGame = function () {
+	loadGame() {
 		aquarium.loadAquarium();
 		fishShop.load();
-	};
+	}
 
-	this.setItem = (key, val) => {
+	setItem(key, val) {
 		storage.setItem(key, val);
-	};
+	}
 
-	this.getItem = (key) => storage.getItem(key);
+	getItem(key) {
+		return storage.getItem(key);
+	}
 }
 
-export const config = new configConstructor();
+export const config = new Config();

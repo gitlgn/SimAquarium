@@ -10,15 +10,15 @@ import { VIEW_STATISTICS } from './constants.js';
 
 const FISH_LIST_ROWS = 64;
 
-function statsConstructor() {
-	const makeDiv = (className, id) => {
-		const div = document.createElement('div');
-		div.setAttribute('class', className);
-		if (id) div.setAttribute('id', id);
-		return div;
-	};
+function makeDiv(className, id) {
+	const div = document.createElement('div');
+	div.setAttribute('class', className);
+	if (id) div.setAttribute('id', id);
+	return div;
+}
 
-	this.createFishListTable = () => {
+class Stats {
+	createFishListTable() {
 		const container = document.getElementById('fishTableContainer');
 
 		for (let i = 0; i < FISH_LIST_ROWS; i++) {
@@ -42,9 +42,9 @@ function statsConstructor() {
 
 			sell.addEventListener('click', () => aquarium.sellFish(i), false);
 		}
-	};
+	}
 
-	this.updateFishListTable = () => {
+	updateFishListTable() {
 		const fishNum = aquarium.getFishNum();
 
 		document.getElementById('fishTableContainer').style.overflow =
@@ -80,13 +80,13 @@ function statsConstructor() {
 		for (let i = fishNum; i < FISH_LIST_ROWS; i++) {
 			document.getElementById('fishTableRow' + i).style.display = 'none';
 		}
-	};
+	}
 
-	this.refreshStatsPage = () => {
+	refreshStatsPage() {
 		if (uio.getView() !== VIEW_STATISTICS) return;
 
 		if (document.getElementById('tabFishList').style.display === 'block') {
-			stats.updateFishListTable();
+			this.updateFishListTable();
 		} else {
 			document.getElementById('statFishNumber').innerHTML = aquarium.getFishNum();
 			document.getElementById('statFishBirths').innerHTML = aquarium.getFishBirths();
@@ -103,7 +103,7 @@ function statsConstructor() {
 			document.getElementById('statDistraction').innerHTML =
 				parseInt(aquarium.getDistraction()) + '%';
 		}
-	};
+	}
 }
 
-export const stats = new statsConstructor();
+export const stats = new Stats();

@@ -11,7 +11,7 @@ import { filtration, background } from './filtration.js';
 import { stats } from './statistics.js';
 import { uio } from './uio.js';
 import {
-	fishConstructor,
+	Fish,
 	fishSpecies,
 	fishAngle,
 	computeBreedingRate,
@@ -239,7 +239,7 @@ function aquariumConstructor() {
 			const unSerialize = config.getItem('fish' + i).split('|');
 			const spec = parseInt(unSerialize[0], 10);
 
-			fish[i] = new fishConstructor(spec, 0.9999);
+			fish[i] = new Fish(spec, 0.9999);
 			fishNum++;
 
 			fish[i].changeData(
@@ -673,7 +673,7 @@ function aquariumConstructor() {
 
 	// Add a fish by species
 	this.addFish = function (sNum, size) {
-		fish[fishNum] = new fishConstructor(sNum, size);
+		fish[fishNum] = new Fish(sNum, size);
 		fishNum++;
 
 		fishNumBySpecies[sNum]++;

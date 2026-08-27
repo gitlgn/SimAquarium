@@ -108,175 +108,197 @@ for (let i = 0; i < 29; i++) {
 	fishFrameR[i][0].src = 'gfx/aquarium/fishes/fish' + spriteNum + 'R.png';
 }
 
-export function fishConstructor(sNum, fSize) {
-	// Fish position
-	let x, y;
-	this.getX = function () {
-		return x;
-	};
-	this.getY = function () {
-		return y;
-	};
+export class Fish {
+	#x;
+	#y;
+	#vX;
+	#vY;
+	#speed;
+	#maxSpeed;
+	#movX;
+	#movY;
+	#size;
+	#sizeX;
+	#sizeY;
+	#boxX1;
+	#boxY1;
+	#boxX2;
+	#boxY2;
+	#image = new Image();
+	#specNum;
+	#specName;
+	#disease = 0;
+	#hunger = 0;
+	#condition;
 
-	// Fish direction and speed
-	let vX, vY, speed, maxSpeed, movX, movY;
-	this.getVX = function () {
-		return vX;
-	};
-	this.getVY = function () {
-		return vY;
-	};
+	constructor(sNum, fSize) {
+		this.#specNum = sNum;
+		this.#specName = fishSpecies[sNum].name;
 
-	// Fish size and box points
-	let size, sizeX, sizeY, boxX1, boxY1, boxX2, boxY2;
-	this.getSize = function () {
-		return size;
-	};
-	this.getSizeX = function () {
-		return sizeX;
-	};
-	this.getSizeY = function () {
-		return sizeY;
-	};
-	this.getBoxX1 = function () {
-		return boxX1;
-	};
-	this.getBoxY1 = function () {
-		return boxY1;
-	};
-	this.getBoxX2 = function () {
-		return boxX2;
-	};
-	this.getBoxY2 = function () {
-		return boxY2;
-	};
+		this.#size = fSize;
+		this.grow();
+		this.speedUp();
+		this.#x = parseInt(Math.random() * 180 + 90);
+		this.#y = parseInt(Math.random() * 120 + 60);
+		this.changeDirection();
+		this.setCondition();
+	}
 
-	// Fish image
-	let image = new Image();
-	this.getImage = function () {
-		return image;
-	};
+	get #spec() {
+		return fishSpecies[this.#specNum];
+	}
 
-	// Fish species
-	const specNum = sNum;
-	const specName = fishSpecies[specNum].name;
-	this.getSpecNum = function () {
-		return specNum;
-	};
-	this.getSpecName = function () {
-		return specName;
-	};
+	getX() {
+		return this.#x;
+	}
+	getY() {
+		return this.#y;
+	}
+	getVX() {
+		return this.#vX;
+	}
+	getVY() {
+		return this.#vY;
+	}
+	getSize() {
+		return this.#size;
+	}
+	getSizeX() {
+		return this.#sizeX;
+	}
+	getSizeY() {
+		return this.#sizeY;
+	}
+	getBoxX1() {
+		return this.#boxX1;
+	}
+	getBoxY1() {
+		return this.#boxY1;
+	}
+	getBoxX2() {
+		return this.#boxX2;
+	}
+	getBoxY2() {
+		return this.#boxY2;
+	}
+	getImage() {
+		return this.#image;
+	}
+	getSpecNum() {
+		return this.#specNum;
+	}
+	getSpecName() {
+		return this.#specName;
+	}
+	getDisease() {
+		return this.#disease;
+	}
+	getHunger() {
+		return this.#hunger;
+	}
+	getCondition() {
+		return this.#condition;
+	}
 
 	/*** FISH MOVEMENT ***/
 
-	/* Move fish */
-	this.move = function () {
-		x = x + movX;
-		y = y + movY;
+	move() {
+		this.#x = this.#x + this.#movX;
+		this.#y = this.#y + this.#movY;
 
 		// Fish hits borders check
-		if (x > 355 - boxX2) {
-			if (vX === 10) this.rotate(-10, vY);
-		} else if (x < 5 + boxX2) {
-			if (vX === -10) this.rotate(10, vY);
+		if (this.#x > 355 - this.#boxX2) {
+			if (this.#vX === 10) this.rotate(-10, this.#vY);
+		} else if (this.#x < 5 + this.#boxX2) {
+			if (this.#vX === -10) this.rotate(10, this.#vY);
 		}
-		if (y > 215 - boxY2) {
-			if (vY > 0) this.rotate(vX, vY * -1);
-		} else if (y < 25 + boxY2) {
-			if (vY < 0) this.rotate(vX, vY * -1);
+		if (this.#y > 215 - this.#boxY2) {
+			if (this.#vY > 0) this.rotate(this.#vX, this.#vY * -1);
+		} else if (this.#y < 25 + this.#boxY2) {
+			if (this.#vY < 0) this.rotate(this.#vX, this.#vY * -1);
 		}
 
 		this.slowDown();
-	};
+	}
 
-	/* Slow down */
-	this.slowDown = function () {
-		if (speed > 0.05) speed = speed * 0.985;
-		movX = vX * speed;
-		movY = vY * speed;
-	};
+	slowDown() {
+		if (this.#speed > 0.05) this.#speed = this.#speed * 0.985;
+		this.#movX = this.#vX * this.#speed;
+		this.#movY = this.#vY * this.#speed;
+	}
 
-	/* Speed up */
-	this.speedUp = function () {
-		speed = maxSpeed;
-		movX = vX * speed;
-		movY = vY * speed;
-	};
+	speedUp() {
+		this.#speed = this.#maxSpeed;
+		this.#movX = this.#vX * this.#speed;
+		this.#movY = this.#vY * this.#speed;
+	}
 
-	/* Change direction */
-	this.changeDirection = function () {
+	changeDirection() {
 		if (Math.random() < 0.5) this.rotate(10, parseInt(Math.random() * 11 - 5));
 		else this.rotate(-10, parseInt(Math.random() * 11 - 5));
-	};
-	this.rotate = function (rX, rY) {
-		vX = rX;
-		vY = rY;
-		movX = vX * speed;
-		movY = vY * speed;
-		if (vX === 10) image = fishFrameR[specNum][0];
-		else image = fishFrameL[specNum][0];
-	};
+	}
+
+	rotate(rX, rY) {
+		this.#vX = rX;
+		this.#vY = rY;
+		this.#movX = this.#vX * this.#speed;
+		this.#movY = this.#vY * this.#speed;
+		if (this.#vX === 10) this.#image = fishFrameR[this.#specNum][0];
+		else this.#image = fishFrameL[this.#specNum][0];
+	}
 
 	/*** FISH GROWTH ***/
-	this.grow = function () {
-		if (size < 1) {
-			if (aquarium.getGrowHormone() > 0) size = size + fishSpecies[specNum].growth * 4;
-			else size = size + fishSpecies[specNum].growth;
+	grow() {
+		if (this.#size < 1) {
+			if (aquarium.getGrowHormone() > 0) this.#size = this.#size + this.#spec.growth * 4;
+			else this.#size = this.#size + this.#spec.growth;
 
-			if (size > 1) size = 1;
+			if (this.#size > 1) this.#size = 1;
 
-			sizeX = fishSpecies[specNum].sizeX * size;
-			sizeY = fishSpecies[specNum].sizeY * size;
-			boxX1 = sizeX * -0.5;
-			boxY1 = sizeY * -0.5;
-			boxX2 = sizeX * 0.5;
-			boxY2 = sizeY * 0.5;
+			this.#sizeX = this.#spec.sizeX * this.#size;
+			this.#sizeY = this.#spec.sizeY * this.#size;
+			this.#boxX1 = this.#sizeX * -0.5;
+			this.#boxY1 = this.#sizeY * -0.5;
+			this.#boxX2 = this.#sizeX * 0.5;
+			this.#boxY2 = this.#sizeY * 0.5;
 
-			maxSpeed = size * 0.5;
+			this.#maxSpeed = this.#size * 0.5;
 		}
-	};
+	}
 
 	/*** FISH BREED ***/
-
-	this.breed = function () {
+	breed() {
 		if (aquarium.getFishNum() > 63) return;
 
-		if (aquarium.getFishNum() > fishSpecies[specNum].fishNumOptimal) {
+		if (aquarium.getFishNum() > this.#spec.fishNumOptimal) {
 			if (Math.random() < 0.9) return;
 		}
 
-		if (size === 1) {
-			if (aquarium.getFishNumBySpecies(specNum) > 1) {
+		if (this.#size === 1) {
+			if (aquarium.getFishNumBySpecies(this.#specNum) > 1) {
 				if (aquarium.getBreedHormone() > 0) {
-					if (Math.random() < speciesBreedingRate[specNum] * 2 + 0.01) {
-						aquarium.breedFishSet(specNum);
+					if (Math.random() < speciesBreedingRate[this.#specNum] * 2 + 0.01) {
+						aquarium.breedFishSet(this.#specNum);
 					}
 				} else {
-					if (Math.random() < speciesBreedingRate[specNum]) {
-						aquarium.breedFishSet(specNum);
+					if (Math.random() < speciesBreedingRate[this.#specNum]) {
+						aquarium.breedFishSet(this.#specNum);
 					}
 				}
 			}
 		}
-	};
+	}
 
 	/*** FISH POLLUTION ***/
-
-	this.pollute = function () {
-		aquarium.changePollution(fishSpecies[specNum].pollution);
-	};
+	pollute() {
+		aquarium.changePollution(this.#spec.pollution);
+	}
 
 	/*** FISH DISEASES ***/
-
-	let disease = 0;
-	this.getDisease = function () {
-		return disease;
-	};
-
-	this.diseaseCheck = function () {
+	diseaseCheck() {
 		const illChance = Math.random();
 
-		if (disease > 0) {
+		if (this.#disease > 0) {
 			this.changeCondition(illChance * -0.1);
 			this.changeDisease(illChance * -0.2);
 
@@ -295,8 +317,8 @@ export function fishConstructor(sNum, fSize) {
 			if (illChance < 0.00001) {
 				this.makeSick();
 			} else {
-				if (fishSpecies[specNum].pollutionTol < currentPollution) {
-					if (fishSpecies[specNum].pollutionTol / currentPollution < illChance) {
+				if (this.#spec.pollutionTol < currentPollution) {
+					if (this.#spec.pollutionTol / currentPollution < illChance) {
 						if (Math.random() * 1000 < currentPollution) {
 							this.makeSick();
 						}
@@ -304,33 +326,29 @@ export function fishConstructor(sNum, fSize) {
 				}
 			}
 		}
-	};
+	}
 
-	this.changeDisease = function (disNum) {
-		disease = disease + disNum;
-		if (disease < 0) disease = 0;
-	};
+	changeDisease(disNum) {
+		this.#disease = this.#disease + disNum;
+		if (this.#disease < 0) this.#disease = 0;
+	}
 
-	this.makeSick = function () {
-		disease = Math.random() * fishSpecies[specNum].maxCondition + 0.5;
+	makeSick() {
+		this.#disease = Math.random() * this.#spec.maxCondition + 0.5;
 		uio.changeAlertNum(0);
-	};
+	}
 
 	/*** FISH HUNGER ***/
-	let hunger = 0;
-	this.getHunger = function () {
-		return hunger;
-	};
-	this.hungerCheck = function () {
+	hungerCheck() {
 		const hungerChance = Math.random();
-		if (hungerChance < fishSpecies[specNum].foodNeed) {
-			hunger = hunger + 1;
+		if (hungerChance < this.#spec.foodNeed) {
+			this.#hunger = this.#hunger + 1;
 		}
 
 		// Try to eat food
-		if (hunger > 0) {
+		if (this.#hunger > 0) {
 			if (aquarium.getFood() > 0) {
-				const eatFoodNumber = fishSpecies[specNum].foodNeed * 10;
+				const eatFoodNumber = this.#spec.foodNeed * 10;
 
 				if (eatFoodNumber < aquarium.getFood()) {
 					this.changeHunger(eatFoodNumber * -5);
@@ -343,106 +361,99 @@ export function fishConstructor(sNum, fSize) {
 		}
 
 		// starve
-		if (hunger > 100) {
+		if (this.#hunger > 100) {
 			uio.changeAlertNum(1);
 			this.changeCondition(Math.random() * -0.5);
 		}
-	};
+	}
 
-	this.changeHunger = function (hNum) {
-		hunger = hunger + hNum;
-		if (hunger < 0) hunger = 0;
-		if (hunger > 101) hunger = 101;
-	};
+	changeHunger(hNum) {
+		this.#hunger = this.#hunger + hNum;
+		if (this.#hunger < 0) this.#hunger = 0;
+		if (this.#hunger > 101) this.#hunger = 101;
+	}
 
 	/*** FISH CONDITION / HEALTH ***/
+	setCondition() {
+		this.#condition = this.#spec.maxCondition;
+	}
 
-	let condition;
-	this.getCondition = function () {
-		return condition;
-	};
-	this.setCondition = function () {
-		condition = fishSpecies[specNum].maxCondition;
-	};
-
-	this.changeCondition = function (condValue) {
-		condition = condition + condValue;
-		if (condition < 0) {
-			condition = 0;
-		} else if (condition > fishSpecies[specNum].maxCondition) {
-			condition = fishSpecies[specNum].maxCondition;
+	changeCondition(condValue) {
+		this.#condition = this.#condition + condValue;
+		if (this.#condition < 0) {
+			this.#condition = 0;
+		} else if (this.#condition > this.#spec.maxCondition) {
+			this.#condition = this.#spec.maxCondition;
 		}
-	};
+	}
 
 	/*** FISH FIGHTS ***/
-
-	this.fight = function (me) {
+	fight(me) {
 		if (aquarium.getFishNum() < 2) return;
 
 		if (aquarium.getDistraction() > 0) return;
 
-		if (size >= 1) {
-			if (aquarium.getFishNum() > fishSpecies[specNum].fishNumAttack) {
+		if (this.#size >= 1) {
+			if (aquarium.getFishNum() > this.#spec.fishNumAttack) {
 				const biteRnd1 = Math.random();
-				if (biteRnd1 < fishSpecies[specNum].aggression) {
+				if (biteRnd1 < this.#spec.aggression) {
 					const biteRnd2 = Math.random();
-					if (hunger > 100) {
+					if (this.#hunger > 100) {
 						this.attackEnemy(me);
-					} else if (biteRnd2 > speciesFishNumComfort[specNum]) {
+					} else if (biteRnd2 > speciesFishNumComfort[this.#specNum]) {
 						this.attackEnemy(me);
 					}
 				}
 			}
 		}
-	};
+	}
 
-	this.attackEnemy = function (me) {
+	attackEnemy(me) {
 		const enemy = parseInt(Math.random() * aquarium.getFishNum());
 
 		if (enemy === me) return;
 
-		aquarium.hurtFish(enemy, Math.random() * fishSpecies[specNum].strength * -1);
+		aquarium.hurtFish(enemy, Math.random() * this.#spec.strength * -1);
 		uio.changeAlertNum(4);
-	};
+	}
 
 	/*** FISH GETTING OLD ***/
+	getOld() {
+		if (this.#size < 1) return;
 
-	this.getOld = function () {
-		if (size < 1) return;
-
-		if (Math.random() > fishSpecies[specNum].longevity) {
+		if (Math.random() > this.#spec.longevity) {
 			this.changeCondition(Math.random() * -0.1);
 		}
-	};
+	}
 
 	/*** FISH DATA SERIALIZING ***/
-	this.serialize = function () {
-		return specNum + '|' + size + '|' + disease + '|' + hunger + '|' + condition;
-	};
+	serialize() {
+		return (
+			this.#specNum +
+			'|' +
+			this.#size +
+			'|' +
+			this.#disease +
+			'|' +
+			this.#hunger +
+			'|' +
+			this.#condition
+		);
+	}
 
-	this.changeData = function (s, d, h, c) {
-		size = s;
-		disease = d;
-		hunger = h;
-		condition = c;
+	changeData(s, d, h, c) {
+		this.#size = s;
+		this.#disease = d;
+		this.#hunger = h;
+		this.#condition = c;
 
-		if (size > 1) size = 1;
-		sizeX = fishSpecies[specNum].sizeX * size;
-		sizeY = fishSpecies[specNum].sizeY * size;
-		boxX1 = sizeX * -0.5;
-		boxY1 = sizeY * -0.5;
-		boxX2 = sizeX * 0.5;
-		boxY2 = sizeY * 0.5;
-		maxSpeed = size * 0.5;
-	};
-
-	/*** LET THERE BE A FISH ***/
-
-	size = fSize;
-	this.grow();
-	this.speedUp();
-	x = parseInt(Math.random() * 180 + 90);
-	y = parseInt(Math.random() * 120 + 60);
-	this.changeDirection();
-	this.setCondition();
+		if (this.#size > 1) this.#size = 1;
+		this.#sizeX = this.#spec.sizeX * this.#size;
+		this.#sizeY = this.#spec.sizeY * this.#size;
+		this.#boxX1 = this.#sizeX * -0.5;
+		this.#boxY1 = this.#sizeY * -0.5;
+		this.#boxX2 = this.#sizeX * 0.5;
+		this.#boxY2 = this.#sizeY * 0.5;
+		this.#maxSpeed = this.#size * 0.5;
+	}
 }
