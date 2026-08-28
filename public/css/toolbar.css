@@ -1,12 +1,10 @@
 /*
- * toolbar.css — the control strip (Phase 4b).
+ * toolbar.css — the control strip + all the pixel-art buttons (Phase 4b).
  *
- * Was: elements absolutely positioned against the 457x300 widget bitmap
- * (right: 14px / top: 103px ...). Now: a flex strip that sits under the tank
- * in portrait and to its right in landscape. Button/icon bitmaps are
- * unchanged; only their placement is flow-based now.
- *
- * Touch-sized (>=44px) hit targets are Phase 4b-5.
+ * 4b-1 moved these off their absolute widget-bitmap coordinates into a flex
+ * strip. 4b-2 drops the 3-state sprite frames (buttonMedium/Big/Small.png,
+ * viewMode.png) for CSS chrome so the buttons can be a real >=44px tap target,
+ * and keeps only the icon art as a centred background-image.
  */
 
 #aquariumToolbar {
@@ -15,8 +13,8 @@
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: flex-start;
-	gap: 10px 14px;
-	padding: 6px;
+	gap: 12px 18px;
+	padding: 8px;
 	box-sizing: border-box;
 	background: var(--strip-bg);
 	color: var(--ink);
@@ -26,143 +24,205 @@
 	#aquariumToolbar {
 		flex-direction: column;
 		flex-wrap: nowrap;
-		width: 164px;
+		width: 180px;
 		height: 100%;
+		padding-top: 48px; /* clear the absolute #pageMode in the top-right corner */
 		overflow-y: auto;
 	}
 }
 
-/* ---- status block ------------------------------------------------------- */
+/* ---- shared button chrome -------------------------------------------- */
+
+.buttonTool,
+.buttonView,
+#cameraTool,
+.buttonWidget,
+#pageMode {
+	box-sizing: border-box;
+	flex: none;
+	padding: 0;
+	border: 1px solid #6b5f45;
+	border-radius: 6px;
+	background-color: #cabf92;
+	background-repeat: no-repeat;
+	background-position: center;
+	cursor: pointer;
+}
+
+.buttonTool:active,
+.buttonView:active,
+#cameraTool:active,
+.buttonWidget:active,
+#pageMode:active {
+	background-color: #b3a679;
+	box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+
+@media (hover: hover) {
+	.buttonTool:hover,
+	.buttonView:hover:not(.active),
+	#cameraTool:hover,
+	.buttonWidget:hover,
+	#pageMode:hover {
+		background-color: #e2d7ab;
+	}
+}
+
+.buttonTool,
+.buttonView,
+#cameraTool {
+	width: 44px;
+	height: 44px;
+	background-size: 26px 26px;
+	image-rendering: pixelated;
+}
+
+.buttonView.active {
+	background-color: #9db8cf;
+	border-color: #47698c;
+	cursor: default;
+}
+
+.buttonWidget,
+#pageMode {
+	width: 34px;
+	height: 34px;
+	background-size: 18px 18px;
+	image-rendering: pixelated;
+}
+
+/* ---- tool icons ------------------------------------------------------- */
+
+#buttonTool0 {
+	background-image: url(../gfx/interface/iconTool0.png);
+}
+#buttonTool1 {
+	background-image: url(../gfx/interface/iconTool1.png);
+}
+#buttonTool2 {
+	background-image: url(../gfx/interface/iconTool2.png);
+}
+#buttonTool3 {
+	background-image: url(../gfx/interface/iconTool3.png);
+}
+#buttonTool4 {
+	background-image: url(../gfx/interface/iconTool4.png);
+}
+#buttonTool5 {
+	background-image: url(../gfx/interface/iconTool5.png);
+}
+#buttonTool6 {
+	background-image: url(../gfx/interface/iconTool6.png);
+}
+#buttonTool7 {
+	background-image: url(../gfx/interface/iconTool7.png);
+}
+#cameraTool {
+	background-image: url(../gfx/interface/iconToolCamera.png);
+}
+
+/* ---- status block --------------------------------------------------- */
 
 #toolbarStatus {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
 	position: static;
+	width: 100%;
 }
 
 #statusMoney {
 	position: static;
+	inset: auto;
 	width: auto;
 	min-width: 48px;
 	height: auto;
-	font-size: 13px;
+	font-size: 15px;
 	font-weight: bold;
 	color: var(--ink);
 	text-align: left;
 }
 
-/* the alert lamp + water gauge keep their native bitmap sizes so the
-   game's inline style writes (backgroundPosition, bar height in px) stay
-   meaningful. */
+/* alert lamp + water gauge keep their native bitmap sizes so the game's
+   inline style writes (backgroundPosition, bar height in px) stay valid. */
 #statusEvent {
 	position: relative;
 	inset: auto;
 	flex: none;
+	width: 38px;
+	height: 39px;
+	background: url(../gfx/interface/alertLight.png) no-repeat;
 }
 #statusEventIcon {
+	position: absolute;
 	top: 7px;
 	left: 7px;
+	width: 24px;
+	height: 24px;
+	display: none;
+	background: url(../gfx/interface/alertLightIcon0.png) no-repeat;
 }
 #statusWater {
 	position: relative;
 	inset: auto;
 	flex: none;
+	width: 6px;
+	height: 34px;
+	background: url(../gfx/interface/waterCondition.png) no-repeat;
 }
 #statusWaterBar {
 	position: absolute;
 	bottom: 1px;
 	left: 1px;
+	width: 4px;
+	height: 0;
+	background: url(../gfx/interface/waterConditionBar.png) repeat-x;
 }
 
-/* ---- tools grid ------------------------------------------------------- */
+/* ---- tools grid ---------------------------------------------------- */
 
 #toolbarTools {
 	position: static;
+	width: 100%;
 	display: grid;
-	grid-template-columns: repeat(4, 20px);
-	grid-auto-rows: auto;
-	gap: 2px 14px;
-	align-items: start;
-	max-width: 100%;
+	grid-template-columns: repeat(2, 44px minmax(24px, 1fr));
+	gap: 4px 6px;
+	align-items: center;
+	justify-content: start;
 }
 
 @media (orientation: landscape) {
 	#toolbarTools {
-		grid-template-columns: repeat(2, 20px);
+		grid-template-columns: 44px minmax(24px, 1fr);
 	}
 }
 
-.buttonTool {
-	position: relative;
-	inset: auto;
-	top: auto;
-	right: auto;
-	left: auto;
-	width: 20px;
-	height: 20px;
-	background: url(../gfx/interface/buttonMedium.png);
-	cursor: pointer;
-	grid-row: span 1;
-}
-.buttonTool:hover {
-	background-position: 40px 0;
-}
-.buttonTool:active {
-	background-position: 20px 0;
-}
-#buttonTool0 {
-	content: url(../gfx/interface/iconTool0.png);
-}
-#buttonTool1 {
-	content: url(../gfx/interface/iconTool1.png);
-}
-#buttonTool2 {
-	content: url(../gfx/interface/iconTool2.png);
-}
-#buttonTool3 {
-	content: url(../gfx/interface/iconTool3.png);
-}
-#buttonTool4 {
-	content: url(../gfx/interface/iconTool4.png);
-}
-#buttonTool5 {
-	content: url(../gfx/interface/iconTool5.png);
-}
-#buttonTool6 {
-	content: url(../gfx/interface/iconTool6.png);
-}
-#buttonTool7 {
-	content: url(../gfx/interface/iconTool7.png);
-}
-
-/* price sits directly under its button */
 .toolPrice {
 	position: static;
 	inset: auto;
-	font-size: 9px;
+	width: auto;
+	font-size: 11px;
 	color: var(--ink);
-	text-align: center;
-	width: 20px;
+	text-align: left;
 }
 
-/* ---- speed control --------------------------------------------------- */
+/* ---- speed control ------------------------------------------------- */
 
 #speedLabel {
 	position: static;
 	inset: auto;
 	grid-column: 1 / -1;
 	text-align: left;
-	font-size: 10px;
-	margin-top: 4px;
+	font-size: 11px;
+	margin-top: 6px;
 }
 #speedBar {
 	position: relative;
 	inset: auto;
 	grid-column: 1 / -1;
 	width: 100%;
-	max-width: 160px;
-	height: 14px;
+	max-width: 180px;
+	height: 18px;
 	background: url(../gfx/interface/gameSpeedBar.png) left center / auto 100% repeat-x;
 	touch-action: none;
 }
@@ -171,49 +231,30 @@
 	top: 50%;
 	left: 0;
 	transform: translate(-50%, -50%);
-	width: 13px;
-	height: 13px;
-	background: url(../gfx/interface/gameSpeedHandle.png);
+	width: 16px;
+	height: 16px;
+	background: url(../gfx/interface/gameSpeedHandle.png) center / contain no-repeat;
 	touch-action: none;
 	pointer-events: none;
 }
 
-/* ---- mini / maxi toggle (placed by shell.css) ------------------------- */
+/* ---- minimise / restore toggle (placed by shell.css) --------------- */
 
 #pageMode {
-	width: 14px;
-	height: 14px;
-	background: url(../gfx/interface/viewMode.png);
-	content: url(../gfx/interface/viewIcon0.png);
-	cursor: pointer;
+	background-image: url(../gfx/interface/viewIcon0.png);
 }
-#pageMode:hover {
-	background-position: 28px 0;
-}
-#pageMode:active {
-	background-position: 14px 0;
+#stage.mini #pageMode {
+	background-image: url(../gfx/interface/viewIcon1.png);
 }
 
-/* ---- small widget buttons (base look; shell.css places them) --------- */
+/* ---- small widget icons ------------------------------------------- */
 
-.buttonWidget {
-	width: 14px;
-	height: 14px;
-	background: url(../gfx/interface/buttonSmall.png);
-	cursor: pointer;
-}
-.buttonWidget:hover {
-	background-position: 28px 0;
-}
-.buttonWidget:active {
-	background-position: 14px 0;
-}
 #buttonWidget0 {
-	content: url(../gfx/interface/iconSmall0.png);
+	background-image: url(../gfx/interface/iconSmall0.png);
 }
 #buttonWidget1 {
-	content: url(../gfx/interface/iconSmall1.png);
+	background-image: url(../gfx/interface/iconSmall1.png);
 }
 #buttonWidget2 {
-	content: url(../gfx/interface/iconSmall2.png);
+	background-image: url(../gfx/interface/iconSmall2.png);
 }

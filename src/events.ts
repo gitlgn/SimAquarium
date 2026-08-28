@@ -34,10 +34,8 @@ export function eventsCreate() {
 	on('pageMode', 'click', () => uio.changeFrontPageMode());
 	on('Copyrights', 'click', () => openTab('https://xtrsyz.org/'));
 
-	/*** VIEW BUTTONS (index === view number) ***/
+	/*** VIEW BUTTONS (index === view number) — :hover is CSS now ***/
 	for (let v = 0; v <= 5; v++) {
-		on('buttonView' + v, 'mouseover', () => uio.highlightViewButtonOn(v));
-		on('buttonView' + v, 'mouseout', () => uio.highlightViewButtonOff(v));
 		on('buttonView' + v, 'click', () => {
 			uio.changeView(v);
 			if (v === 5) stats.refreshStatsPage();

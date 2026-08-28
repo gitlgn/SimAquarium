@@ -180,11 +180,27 @@ Staged so every commit boots and is checkable on a real screen.
   no 4xx, no page overflow, view switch / Configuration / Add Money / mini /
   speed-drag all work. `npm run check` green.
 
-#### 4b-2 — toolbar polish + ≥44 px targets
+#### ✅ 4b-2 — ≥44 px targets + CSS button chrome (done)
 
-- Real touch hit areas on the tool buttons, view buttons, speed bar, corner
-  controls (currently still 14–24 px pixel-art sprites).
-- Tidy the strip: status block, tools grid, speed control spacing.
+- Dropped the 3-state sprite frames (`buttonMedium/Big/Small.png`,
+  `viewMode.png`) for CSS button chrome — rounded rect, border, `:active`
+  inset, `:hover` tint. Icons are a centred `background-image` now (was
+  `content: url()`), so size is clean: tools + view buttons **44×44**, the
+  help/config/save + minimise buttons **34×34**.
+- `uio.ts`: `changeView()` no longer pokes `style.backgroundPosition` — the
+  `.active` class drives the look. `highlightViewButtonOn/Off` + their
+  `mouseover`/`mouseout` bindings deleted (`:hover` is pure CSS). `.mini`
+  swaps the minimise icon via CSS, not `style.content`.
+- Regression fixes from 4b-1: the camera button lost its icon (rule dropped in
+  the rewrite) — restored; the alert lamp + water gauge lost their bitmaps +
+  sizes — restored (the water bar's px height is still game-driven).
+- Help/config/save buttons moved into `#viewSwitch` (right-aligned group);
+  minimise (`#pageMode`) stays a `#stage` child so `.mini` can't hide it.
+  Landscape strip gets `padding-top` so the corner minimise button clears the
+  money readout.
+- Verified at 375×812, 768×1024 and 1024×680: no overflow/overlap, buttons
+  ≥34 px, view switch / speed-drag / minimise / Configuration all work,
+  canvas painted, no 4xx. `npm run check` + `vite build` green.
 
 #### 4b-3 — shop panels reflow (fish / scenery / lighting / filters / backgrounds)
 

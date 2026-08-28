@@ -1,43 +1,41 @@
-/*** VIEW SWITCH ROW (Phase 4b: was absolute at top:256px) ***/
+/*** VIEW SWITCH ROW (Phase 4b: was absolute at top:256px; button chrome
+     is shared with the tools — see toolbar.css) ***/
 
 #viewSwitch {
 	flex: none;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 6px;
-	padding: 2px;
+	gap: 8px;
+	padding: 2px 48px 2px 2px; /* room for the absolute #pageMode top-right */
 }
 
 .buttonView {
-	width: 24px;
-	height: 24px;
 	position: relative;
 	inset: auto;
-	background: url(../gfx/interface/buttonBig.png);
-	cursor: pointer !important;
 }
 
 #buttonView0 {
-	content: url(../gfx/interface/iconView0.png);
-	background-position: 24px 0;
+	background-image: url(../gfx/interface/iconView0.png);
 }
 #buttonView1 {
-	content: url(../gfx/interface/iconView1.png);
+	background-image: url(../gfx/interface/iconView1.png);
 }
 #buttonView2 {
-	content: url(../gfx/interface/iconView2.png);
+	background-image: url(../gfx/interface/iconView2.png);
 }
 #buttonView3 {
-	content: url(../gfx/interface/iconView3.png);
+	background-image: url(../gfx/interface/iconView3.png);
 }
 #buttonView4 {
-	content: url(../gfx/interface/iconView4.png);
+	background-image: url(../gfx/interface/iconView4.png);
 }
 #buttonView5 {
-	content: url(../gfx/interface/iconView5.png);
+	background-image: url(../gfx/interface/iconView5.png);
 }
 #viewSwitch #cameraTool {
+	position: relative;
+	inset: auto;
 	margin-left: auto;
 }
 

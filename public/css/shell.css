@@ -122,6 +122,7 @@ body {
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
+	object-position: top center; /* sit at the top, not lost mid-void in tall portrait */
 	image-rendering: pixelated;
 	background: var(--tank-bg);
 }
@@ -136,29 +137,18 @@ body {
 	margin: 0 auto;
 }
 
-/* ---- corner controls (widget buttons + minimise toggle) ----------------- */
+/* ---- minimise / restore toggle -----------------------------------------
+   Lives directly on #stage (not in #viewSwitch) so it stays reachable when
+   .mini hides the rest of the chrome. The help/config/save buttons DO ride
+   in #viewSwitch and are hidden in mini — that's intended (distraction-free). */
 
-#stage > .buttonWidget,
 #stage > #pageMode {
 	position: absolute;
-	top: 4px;
-	z-index: 6;
-}
-#stage > #pageMode {
-	right: 60px;
-}
-#stage > #buttonWidget0 {
-	right: 40px;
-}
-#stage > #buttonWidget1 {
-	right: 22px;
-}
-#stage > #buttonWidget2 {
-	right: 4px;
+	top: 6px;
+	right: 6px;
+	z-index: 7;
 }
 
-/* minimise: distraction-free, tank only. changeFrontPageMode() also forces
-   the aquarium view so #panelBody is showing the tank, not a shop. */
 #stage.mini #aquariumToolbar,
 #stage.mini #viewSwitch {
 	display: none;

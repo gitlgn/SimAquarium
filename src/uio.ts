@@ -26,14 +26,12 @@ class Uio {
 	changeFrontPageMode() {
 		if (this.#frontPageMode === PAGEMODE_MAXI) {
 			this.changeView(VIEW_AQUARIUM); // panel body must be showing the tank, not a shop
-			$('stage').classList.add('mini');
-			$('pageMode').style.content = 'url(gfx/interface/viewIcon1.png)';
+			$('stage').classList.add('mini'); // CSS swaps the pageMode icon + hides the chrome
 			this.#frontPageMode = PAGEMODE_MINI;
 			this.#rememberSpeed = loop.chosenSpeed;
 			this.setSmallInterval(0);
 		} else if (this.#frontPageMode === PAGEMODE_MINI) {
 			$('stage').classList.remove('mini');
-			$('pageMode').style.content = 'url(gfx/interface/viewIcon0.png)';
 			this.#frontPageMode = PAGEMODE_MAXI;
 			this.setSmallInterval(this.#rememberSpeed);
 		}
@@ -52,27 +50,16 @@ class Uio {
 		}
 	}
 
-	// Highlight view button On and Off
-	highlightViewButtonOn(viewNumber) {
-		if (this.#view === viewNumber) return;
-		$('buttonView' + viewNumber).style.backgroundPosition = '48px 0';
-	}
-	highlightViewButtonOff(viewNumber) {
-		if (this.#view === viewNumber) return;
-		$('buttonView' + viewNumber).style.backgroundPosition = '0 0';
-	}
-
-	// Changing the view
+	// Changing the view — the `.active` class drives the button look (toolbar.css),
+	// :hover is pure CSS now.
 	changeView(viewNumber) {
 		if (this.#view === viewNumber) return;
 
 		if (viewNumber === VIEW_AQUARIUM) aquarium.render();
 
-		$('buttonView' + this.#view).style.backgroundPosition = '0 0';
 		$('buttonView' + this.#view).setAttribute('class', 'buttonView');
 		$('view' + this.#view).style.display = 'none';
 
-		$('buttonView' + viewNumber).style.backgroundPosition = '24px 0';
 		$('buttonView' + viewNumber).setAttribute('class', 'buttonView active');
 		$('view' + viewNumber).style.display = 'block';
 
