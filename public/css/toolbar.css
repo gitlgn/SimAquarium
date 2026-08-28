@@ -169,32 +169,38 @@
 
 #toolbarTools {
 	position: static;
-	width: 100%;
 	display: grid;
-	/* phones: 4 tools per row (2 rows). Side-by-side layout: 1 per row. */
-	grid-template-columns: repeat(4, var(--btn-size) minmax(14px, 1fr));
-	gap: 4px 6px;
-	align-items: center;
-	justify-content: start;
-	padding: 4px;
-	box-sizing: border-box;
+	grid-template-columns: repeat(2, var(--btn-size));
+	justify-content: center;
+	align-content: start;
+	gap: 5px;
+	padding: 0;
 }
 
-@media (min-width: 760px) {
-	/* two tools per row so the strip is half as tall (uses the empty space
-	   beside the tank instead of scrolling) */
-	#toolbarTools {
-		grid-template-columns: repeat(2, var(--btn-size) minmax(16px, 1fr));
-	}
+/* each tool = a button with its price as a corner badge, so the tools grid is
+   the same 2×btn width as the view switch — no price column to overflow the
+   strip / drawer. */
+.toolCell {
+	position: relative;
+	width: var(--btn-size);
+	height: var(--btn-size);
 }
-
+.toolCell .buttonTool {
+	width: 100%;
+	height: 100%;
+}
 .toolPrice {
-	position: static;
-	inset: auto;
-	width: auto;
-	font-size: 11px;
+	position: absolute;
+	inset: auto -3px -3px auto;
+	min-width: 12px;
+	padding: 0 3px;
+	font-size: 9px;
+	line-height: 1.5;
+	text-align: center;
 	color: var(--ink);
-	text-align: left;
+	background: #0b3a59;
+	border: 1px solid var(--frame-line);
+	border-radius: 5px;
 }
 
 /* ---- speed control — modern CSS slider (was gameSpeedBar/Handle.png) --- */
