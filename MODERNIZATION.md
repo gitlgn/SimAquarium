@@ -149,19 +149,60 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 - `cursor: hand` → `cursor: pointer` (12×); dead `-apple-dashboard-region`
   declarations removed (7×).
 
-### 4b — fluid re-layout (needs visual iteration)
+### 4b — fluid re-layout
 
-The whole 2014 UI is `position: absolute` + pixel coordinates. Making the
-**tank grow to fill the space** and the **shop panels reflow into a scrollable
-column on a narrow screen** is effectively a new layout (flex/grid), and it
-has to be built while looking at it on real screen sizes — not blind. Do this
-with screenshots / a device in the loop.
+The whole 2014 UI is `position: absolute` on a 457×300 raster, drawn by one
+frame bitmap (`widgetFront.png`), scaled uniformly. Making it fluid means a
+real grid/flex shell and converting each panel off its pixel coordinates.
+Staged so every commit boots and is checkable on a real screen.
 
-- Tank `<canvas>` sizes to its container (keep the 360×240 draw buffer,
-  `object-fit`-style CSS scaling, or raise the buffer + rescale sprites).
-- Toolbar + views stack under the tank in portrait; side-by-side in landscape.
-- Real ≥ 44 px hit targets (not just the scaled pixel buttons).
-- Replace the widget-frame background art with CSS chrome so it can resize.
+#### ✅ 4b-1 — responsive shell + fluid tank (done)
+
+- New `public/css/shell.css`; `stage.css` + `stage.js` (the uniform-scale
+  wrapper) removed. `#pageFront` is now a grid: tank region + toolbar strip —
+  **stacked in portrait, side-by-side in landscape**.
+- Tank `<canvas>` keeps its 360×240 buffer and fills `#panelBody` via
+  `object-fit: contain` (`image-rendering: pixelated`). On a phone it goes from
+  ~360-scaled to near-fullscreen.
+- `#aquariumToolbar` is a flex strip (`toolbar.css` rewritten from absolute
+  coords). Speed bar is now **width-independent**: `uio.speedBarSet()` maps the
+  pointer's x-fraction to one of six speeds; the handle sits at `delay/5 * 100%`
+  inside the bar. `main.ts` boots the fish loop through `setSmallInterval()` so
+  the handle and loop agree from the start.
+- View-switch buttons wrapped in `#viewSwitch` (flex row); the six `.view`
+  panels wrapped in `#panelBody` (scrolls). `#pageMode` moved to the corner
+  next to the widget buttons.
+- Minimise (`#pageMode`) reworked: toggles `.mini` on `#stage` (CSS hides the
+  strip + switcher) and forces the aquarium view → distraction-free tank.
+- Shop/stats panel internals are **still on their 2014 CSS** at a fixed
+  360×240 inside the scroll area — converted next.
+- Verified (functional, at 1280×720 and 375×812): boots, canvas fully painted,
+  no 4xx, no page overflow, view switch / Configuration / Add Money / mini /
+  speed-drag all work. `npm run check` green.
+
+#### 4b-2 — toolbar polish + ≥44 px targets
+
+- Real touch hit areas on the tool buttons, view buttons, speed bar, corner
+  controls (currently still 14–24 px pixel-art sprites).
+- Tidy the strip: status block, tools grid, speed control spacing.
+
+#### 4b-3 — shop panels reflow (fish / scenery / lighting / filters / backgrounds)
+
+- Each `.fooSlot` grid from `position: absolute` at fixed `top/left` to a
+  responsive `grid`/`flex-wrap` of cards (`auto-fill, minmax(...)`), 1–3
+  columns by width, container scrolls. Keep the per-slot art bitmaps.
+- `.tabBar` / tabs become a normal flow row.
+
+#### 4b-4 — statistics + fish-list panel
+
+- `#tabStatistics` (absolute label soup) → a simple two-column definition list.
+- `#fishTableContainer` rows already scroll; make them width-fluid.
+
+#### 4b-5 — drop the frame bitmaps + Configuration page
+
+- Remove `widgetFront.png` / `widgetBack.png` / `viewBackground*.png`; the
+  chrome is CSS now.
+- `#pageBack` (Configuration) from absolute-on-bitmap to a plain centred panel.
 
 ## Phase 5 — Android
 

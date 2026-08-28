@@ -49,9 +49,8 @@ function boot() {
 		config.loadGame();
 	}
 
-	loop.small = window.setInterval(function () {
-		aquarium.moveFish();
-	}, 128);
+	// starts the fish-move interval at the default speed and syncs the speed handle
+	uio.setSmallInterval(loop.chosenSpeed);
 	loop.big = window.setInterval(function () {
 		aquarium.update();
 	}, 2000);

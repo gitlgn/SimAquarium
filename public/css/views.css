@@ -1,38 +1,44 @@
-/*** VIEW BUTTONS ***/
+/*** VIEW SWITCH ROW (Phase 4b: was absolute at top:256px) ***/
+
+#viewSwitch {
+	flex: none;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	padding: 2px;
+}
 
 .buttonView {
 	width: 24px;
 	height: 24px;
-	position: absolute;
-	top: 256px;
+	position: relative;
+	inset: auto;
 	background: url(../gfx/interface/buttonBig.png);
 	cursor: pointer !important;
 }
 
 #buttonView0 {
 	content: url(../gfx/interface/iconView0.png);
-	left: 14px;
 	background-position: 24px 0;
 }
 #buttonView1 {
 	content: url(../gfx/interface/iconView1.png);
-	left: 44px;
 }
 #buttonView2 {
 	content: url(../gfx/interface/iconView2.png);
-	left: 74px;
 }
 #buttonView3 {
 	content: url(../gfx/interface/iconView3.png);
-	left: 104px;
 }
 #buttonView4 {
 	content: url(../gfx/interface/iconView4.png);
-	left: 134px;
 }
 #buttonView5 {
 	content: url(../gfx/interface/iconView5.png);
-	left: 164px;
+}
+#viewSwitch #cameraTool {
+	margin-left: auto;
 }
 
 /*** VIEWS ***/
@@ -40,9 +46,7 @@
 .view {
 	width: 360px;
 	height: 240px;
-	position: absolute;
-	top: 10px;
-	left: 14px;
+	position: relative;
 }
 .view .header {
 	color: rgb( 250, 250, 250 );

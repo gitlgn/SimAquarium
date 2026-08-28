@@ -21,23 +21,19 @@ class Uio {
 		return this.#view;
 	}
 
-	// Minimizing & maximizing front page
+	// Minimizing & maximizing front page — `.mini` on #stage drives the CSS
+	// (shell.css / toolbar.css); the game loop just slows to a crawl.
 	changeFrontPageMode() {
 		if (this.#frontPageMode === PAGEMODE_MAXI) {
-			$('aquariumViews').style.display = 'none';
-			$('toolbarTools').style.display = 'none';
-			$('pageMode').style.bottom = '193px';
+			this.changeView(VIEW_AQUARIUM); // panel body must be showing the tank, not a shop
+			$('stage').classList.add('mini');
 			$('pageMode').style.content = 'url(gfx/interface/viewIcon1.png)';
-			$('pageFront').style.backgroundPosition = '379px 0';
 			this.#frontPageMode = PAGEMODE_MINI;
 			this.#rememberSpeed = loop.chosenSpeed;
 			this.setSmallInterval(0);
 		} else if (this.#frontPageMode === PAGEMODE_MINI) {
-			$('aquariumViews').style.display = 'block';
-			$('toolbarTools').style.display = 'block';
-			$('pageMode').style.bottom = '13px';
+			$('stage').classList.remove('mini');
 			$('pageMode').style.content = 'url(gfx/interface/viewIcon0.png)';
-			$('pageFront').style.backgroundPosition = '-78px 0';
 			this.#frontPageMode = PAGEMODE_MAXI;
 			this.setSmallInterval(this.#rememberSpeed);
 		}
@@ -100,15 +96,13 @@ class Uio {
 		$('tabButton' + tabOn).setAttribute('class', 'tab active');
 	}
 
-	/*** Speed bar — map the x offset within the 50px bar to one of six speeds. */
+	/*** Speed bar — map the pointer's x fraction across the bar to one of the
+	 * six speeds (0 = slowest). Width-independent so the bar can be any size. */
 	speedBarSet(e: MouseEvent) {
-		const x = e.offsetX;
-		if (x < 7) this.setSmallInterval(0);
-		else if (x < 15) this.setSmallInterval(1);
-		else if (x < 25) this.setSmallInterval(2);
-		else if (x < 33) this.setSmallInterval(3);
-		else if (x < 42) this.setSmallInterval(4);
-		else this.setSmallInterval(5);
+		const width = $('speedBar').clientWidth || 1;
+		const frac = e.offsetX / width;
+		const delay = Math.min(5, Math.max(0, Math.floor(frac * 6)));
+		this.setSmallInterval(delay);
 	}
 
 	setSmallInterval(delay: number) {
@@ -116,8 +110,8 @@ class Uio {
 		loop.small = window.setInterval(() => {
 			aquarium.moveFish();
 		}, smallIntervals[delay]);
-		const handleLeft = 389 + delay * 9;
-		$('speedHandle').style.left = handleLeft + 'px';
+		// handle centre sits at delay/5 of the bar width (CSS transl(-50%) centres it)
+		$('speedHandle').style.left = (delay / 5) * 100 + '%';
 		loop.chosenSpeed = delay;
 	}
 

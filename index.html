@@ -20,11 +20,10 @@
 	<link rel="stylesheet" href="/css/viewLighting.css" type="text/css">
 	<link rel="stylesheet" href="/css/viewAccessories.css" type="text/css">
 	<link rel="stylesheet" href="/css/viewStatistics.css" type="text/css">
-	<!-- Scale-to-fit wrapper for the fixed 457x300 widget layout (loaded last to win the cascade). -->
-	<link rel="stylesheet" href="/css/stage.css" type="text/css">
+	<!-- Responsive shell — loaded last to win the cascade over the 2014 layout CSS. -->
+	<link rel="stylesheet" href="/css/shell.css" type="text/css">
 	<link rel="stylesheet" href="/css/mobile.css" type="text/css">
 
-	<script defer src="/stage.js"></script>
 	<script type="module" src="/src/main.ts"></script>
 </head>
 <body>
@@ -52,15 +51,14 @@
 				<div class="buttonTool" id="buttonTool5" title="Change Water"></div><div class="toolPrice money" id="toolPrice5">40</div>
 				<div class="buttonTool" id="buttonTool6" title="Buy Growth Hormone"></div><div class="toolPrice money" id="toolPrice6">100</div>
 				<div class="buttonTool" id="buttonTool7" title="Buy Breed Hormone"></div><div class="toolPrice money" id="toolPrice7">200</div>
-				<div id="speedLabel">Fish Speed</div><div id="speedBar"></div><div id="speedHandle"></div>
+				<div id="speedLabel">Fish Speed</div><div id="speedBar"><div id="speedHandle"></div></div>
 			</div>
-			<!-- VIEW MODE TRIANGLE -->
-			<div id="pageMode"></div>
 		</div>
 
 		<!-- G A M E   V I E W S -->
 		<div id="aquariumViews">
-			<!-- SWICH VIEW BUTTONS -->
+			<!-- SWITCH VIEW BUTTONS -->
+			<div id="viewSwitch">
 			<div class="buttonView active" id="buttonView0" title="Aquarium"></div>
 			<div class="buttonView" id="buttonView1" title="Fish Shop"></div>
 			<div class="buttonView" id="buttonView2" title="Scenery"></div>
@@ -68,8 +66,10 @@
 			<div class="buttonView" id="buttonView4" title="Accessories"></div>
 			<div class="buttonView" id="buttonView5" title="Statistics"></div>
 			<div class="buttonTool" id="cameraTool"></div>
+			</div>
 
 			<!-- VIEWS -->
+			<div id="panelBody">
 
 			<!-- AQUARIUM VIEW -->
 			<div class="view" id="view0">
@@ -341,6 +341,7 @@
 				</div>
 			</div>
 
+			</div><!-- #panelBody -->
 		</div>
 	</div>
 
@@ -362,6 +363,9 @@
 	<div class="buttonWidget" id="buttonWidget0"></div>
 	<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
 	<div class="buttonWidget" id="buttonWidget2" title="Save &amp; Exit"></div>
+
+	<!-- VIEW MODE TRIANGLE (minimise / restore) -->
+	<div id="pageMode" title="Minimise"></div>
 
 </div><!-- #stage -->
 </div><!-- #viewport -->

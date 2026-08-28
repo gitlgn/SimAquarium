@@ -3,15 +3,9 @@ body {
 	font-family: Arial, sans-serif;
 }
 
-#pageFront {
-	width: 457px;
-	height: 300px;
-	background: url(../gfx/interface/widgetFront.png) -78px 0 no-repeat;
-}
-
+/* #pageFront / #pageBack sizing + placement live in shell.css now (Phase 4b).
+   #pageBack keeps its 2014 internals + frame bitmap until 4b-5. */
 #pageBack {
-	width: 457px;
-	height: 300px;
 	background: url(../gfx/interface/widgetBack.png) no-repeat;
 	display: none;
 }

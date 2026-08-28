@@ -1,0 +1,177 @@
+/*
+ * shell.css — responsive shell (Phase 4b).
+ *
+ * Replaces the old approach where the whole 457x300 "widget" was one unit
+ * scaled uniformly with `transform: scale()` (stage.css + stage.js, both
+ * removed). The frame bitmap (widgetFront.png) is dropped; the layout is now
+ * a real grid:
+ *
+ *   #viewport ................ fixed, full screen, safe-area padding
+ *     #stage ................. flex column, capped width
+ *       #pageFront .......... grid: the tank region + a toolbar strip
+ *         #aquariumViews .... grows to fill — view-switch row + panel body
+ *           #viewSwitch .... the 6 view buttons + camera (flex row)
+ *           #panelBody ..... the active .view (tank fills it; shops scroll)
+ *         #aquariumToolbar . fixed-size strip: status + tools + speed
+ *       #pageBack ........... configuration page (still legacy-sized for now)
+ *       .buttonWidget ×3 .... top-right corner controls
+ *
+ * Portrait: toolbar strip sits under the tank. Landscape: to its right.
+ * The per-shop panel internals (slot grids) are still on their 2014 CSS at a
+ * fixed 360x240 inside #panelBody — converted view by view in 4b-2..4b-4.
+ */
+
+:root {
+	--shell-bg: #0e4e7a;
+	--strip-bg: #0c3f63;
+	--tank-bg: #06324f;
+	--ink: #ededed;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--shell-bg);
+	overflow: hidden;
+	font-family: Arial, sans-serif;
+}
+
+#viewport {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+		env(safe-area-inset-left);
+	box-sizing: border-box;
+}
+
+#stage {
+	position: relative;
+	width: 100%;
+	max-width: 1100px;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+/* ---- the game frame ------------------------------------------------------- */
+
+#pageFront {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: auto;
+	height: auto;
+	background: none; /* was widgetFront.png */
+	display: grid;
+	grid-template-rows: 1fr auto;
+	grid-template-columns: 1fr;
+	grid-template-areas:
+		'views'
+		'toolbar';
+	gap: 4px;
+	padding: 4px;
+	box-sizing: border-box;
+}
+
+@media (orientation: landscape) {
+	#pageFront {
+		grid-template-rows: 1fr;
+		grid-template-columns: 1fr auto;
+		grid-template-areas: 'views toolbar';
+	}
+}
+
+#aquariumViews {
+	grid-area: views;
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+#panelBody {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	background: var(--tank-bg);
+}
+
+/* ---- tank view fills the panel body ------------------------------------- */
+
+#view0 {
+	position: absolute;
+	inset: 0;
+	width: auto;
+	height: auto;
+	background: none;
+}
+
+#tank {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	image-rendering: pixelated;
+	background: var(--tank-bg);
+}
+
+/* shop / stats views: keep the 2014 internals at native size for now,
+   just re-home them inside the scrollable panel body (was absolute at
+   top:10 left:14 against the old fixed frame). */
+.view {
+	position: relative;
+	top: auto;
+	left: auto;
+	margin: 0 auto;
+}
+
+/* ---- corner controls (widget buttons + minimise toggle) ----------------- */
+
+#stage > .buttonWidget,
+#stage > #pageMode {
+	position: absolute;
+	top: 4px;
+	z-index: 6;
+}
+#stage > #pageMode {
+	right: 60px;
+}
+#stage > #buttonWidget0 {
+	right: 40px;
+}
+#stage > #buttonWidget1 {
+	right: 22px;
+}
+#stage > #buttonWidget2 {
+	right: 4px;
+}
+
+/* minimise: distraction-free, tank only. changeFrontPageMode() also forces
+   the aquarium view so #panelBody is showing the tank, not a shop. */
+#stage.mini #aquariumToolbar,
+#stage.mini #viewSwitch {
+	display: none;
+}
+
+/* ---- configuration page (legacy size, centred overlay) ------------------ */
+
+#pageBack {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 457px;
+	height: 300px;
+	max-width: 100%;
+	z-index: 10;
+}
