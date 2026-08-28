@@ -149,7 +149,10 @@
 	background: none;
 }
 #fishTableIcons span {
+	width: 24px;
 	height: 10px;
+	justify-self: start;
+	margin-left: -5px; /* nudge onto the bars (which sit ~6px into their box) */
 	background: url(../gfx/view5/icons.png) no-repeat;
 	image-rendering: pixelated;
 }
@@ -159,7 +162,7 @@
 }
 #fishTableIcons span:nth-child(2) {
 	grid-column: 3;
-	background-position: -26px 0;
+	background-position: -25px 0;
 }
 #fishTableIcons span:nth-child(3) {
 	grid-column: 4;
@@ -167,7 +170,7 @@
 }
 #fishTableIcons span:nth-child(4) {
 	grid-column: 5;
-	background-position: -77px 0;
+	background-position: -76px 0;
 }
 
 .fishTableRow {
@@ -198,6 +201,13 @@
 	width: 100%;
 	height: auto;
 	padding: 2px 4px;
+}
+/* the 2014 rule shrank the button on :press — jarring in a grid; just darken */
+.fishTableRow .button:active {
+	width: 100%;
+	height: auto;
+	border-width: 1px;
+	background: #b7a97e;
 }
 
 #tabStatistics {

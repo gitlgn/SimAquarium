@@ -326,9 +326,52 @@ fish-list text":
 - Values from device testing baked into `theme.css`: btn 66 / icon 56, tile
   260, all gaps + padding 0.
 
+#### ✅ 4b-8 — device-feedback fixes (done)
+
+- **Phones downscale.** `@media (max-width: 600px)` drops `--btn-size` to 44,
+  `--tile-min` to 150, `--fishlist-zoom` to 1.15 — the button row is 2 deep
+  instead of 3, and a 9-slot shop fits without scrolling.
+- **Save & Exit button removed.** It called `window.close()` (a no-op in a
+  normal tab). The game already saves on every buy/sell/tool; added a flush on
+  `visibilitychange` (hidden) + `pagehide`. `uio.closeWidget` deleted.
+- Toolbar strip: **two tool columns** side-by-side (was one) — half the height,
+  no scroll, uses the space beside the tank.
+- Fish-list **Sell no longer shrinks on press** (the 2014 `:active` rule);
+  stat icons nudged onto their bars (±3 px now).
+- `--btn-icon` follows `--btn-size` (`calc(size - 10px)`) so one knob scales
+  the button and its glyph together.
+
+Known, deferred to a UI rethink: the alert lamp (`alertLight.png`) only ever
+shows its dim off-state — the 2014 event-notification is a 2-frame sprite
+that's easy to miss; wants a real toast/log. Shops still scroll one row on a
+very short viewport (height-aware tile sizing needs JS).
+
 **Phase 4b complete.** The 2014 fixed-widget UI is gone: one responsive shell,
 CSS chrome throughout, every panel reflows and scales, tuning knobs in
 `theme.css` (+ the dev slider panel).
+
+## Phase 6 — view / state split (proposed)
+
+Phases 4a–4b retrofitted a responsive layer over DOM that the game logic still
+drives imperatively: **~114 `$('id').style.x = …` / `.innerHTML` /
+`setAttribute('class', …)` calls** across `aquarium` (52), `statistics` (21),
+`uio` (15), `fishshop` (14), `filtration` (7). Every layout change fights those
+inline writes (the `hidden`-vs-`style.display`, two-grids-must-align, and
+`refreshStatsPage` guard fixes were all this leaking through).
+
+The canvas game-sim is already clean (a real render loop). The proposal is to
+give the **chrome** the same treatment, panel by panel:
+
+- each game object exposes plain state; a thin per-panel `render(state)` owns
+  its DOM subtree and rebuilds it from data (the shop tables are already
+  data-driven in `species.ts` / `filtration.ts` — they're just not *rendered*
+  from it, they're hand-placed in `index.html` and mutated in place)
+- one `renderStatus(state)` for money / water / alert (+ a real notification
+  surface, replacing the lamp)
+- delete the scattered `$('id').style.*` writes → layout becomes pure CSS
+
+Start with the fish list (worst offender), then status bar, then the shops.
+Incremental, each panel shippable on its own.
 
 ## Phase 5 — Android
 

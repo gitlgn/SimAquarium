@@ -4,7 +4,6 @@
  */
 
 import { aquarium } from './aquarium.js';
-import { config } from './config.js';
 import { loop, smallIntervals } from './loop.js';
 import { PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
 import { $ } from './dom.js';
@@ -57,11 +56,6 @@ class Uio {
 		$('view' + viewNumber).hidden = false;
 
 		this.#view = viewNumber;
-	}
-
-	closeWidget() {
-		config.saveGame();
-		window.close();
 	}
 
 	openHelp() {

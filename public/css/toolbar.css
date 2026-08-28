@@ -109,9 +109,6 @@
 #buttonWidget1 {
 	background-image: url(../gfx/interface/iconSmall1.png);
 }
-#buttonWidget2 {
-	background-image: url(../gfx/interface/iconSmall2.png);
-}
 #pageMode {
 	background-image: url(../gfx/interface/viewIcon0.png);
 }
@@ -194,8 +191,10 @@
 }
 
 @media (min-width: 760px) {
+	/* two tools per row so the strip is half as tall (uses the empty space
+	   beside the tank instead of scrolling) */
 	#toolbarTools {
-		grid-template-columns: var(--btn-size) minmax(20px, 1fr);
+		grid-template-columns: repeat(2, var(--btn-size) minmax(16px, 1fr));
 	}
 }
 

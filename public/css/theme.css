@@ -18,7 +18,7 @@
 
 	/* ---- buttons (one size for everything) ---- */
 	--btn-size: 66px; /* every button: tools, views, widgets, minimise */
-	--btn-icon: 56px; /* icon within the button */
+	--btn-icon: calc(var(--btn-size) - 10px); /* icon within the button */
 
 	/* ---- shop tiles ---- */
 	--tile-min: 260; /* rendered tile width in px (unitless — feeds the calc below) */
@@ -29,6 +29,16 @@
 
 	/* ---- fish list ---- */
 	--fishlist-zoom: 1.6; /* scales the fish-list text, bars and row height */
+}
+
+/* Phones: everything a notch smaller so a shop page fits without scrolling and
+   the button row doesn't wrap three deep. */
+@media (max-width: 600px) {
+	:root {
+		--btn-size: 44px;
+		--tile-min: 150;
+		--fishlist-zoom: 1.15;
+	}
 
 	/* ---- colours ---- */
 	--shell-bg: #0e4e7a; /* water-blue behind everything */
