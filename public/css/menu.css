@@ -105,3 +105,62 @@
 		pointer-events: none;
 	}
 }
+
+/* ============ phone LANDSCAPE: short + wide — a bottom bar, not a drawer ===
+   Plenty of width for every button; a vertical rail or a drawer both waste it.
+   (Wins over the drawer + rail blocks above via source order.) */
+@media (max-height: 560px) and (min-width: 560px) {
+	#menuToggle {
+		display: none;
+	}
+	#stage.menu-open::after {
+		content: none;
+	}
+
+	#pageFront {
+		grid-template-rows: 1fr auto;
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			'views'
+			'toolbar';
+	}
+
+	#aquariumToolbar {
+		position: static;
+		transform: none;
+		width: auto;
+		height: auto;
+		max-height: 48vh;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 5px 8px;
+		padding: 5px;
+		border-radius: 6px;
+		box-shadow: none;
+		z-index: auto;
+	}
+	#toolbarStatus {
+		order: -1;
+		align-self: center;
+		width: auto;
+	}
+
+	/* both button groups take a full row and flow as many columns as fit */
+	#viewSwitch,
+	#toolbarTools {
+		width: 100%;
+		grid-template-columns: repeat(auto-fill, var(--btn-size));
+		justify-content: center;
+	}
+	#speedLabel {
+		grid-column: 1 / -1;
+	}
+	#speedBar {
+		grid-column: 1 / -1;
+		width: 100%;
+		max-width: 260px;
+		justify-self: center;
+	}
+}

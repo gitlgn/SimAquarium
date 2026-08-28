@@ -58,12 +58,25 @@
 	--speed-frac: 0.6; /* 0..1, set live on #speedBar by uio.ts */
 }
 
-/* Phones: everything a notch smaller so a shop page fits without scrolling and
-   the button row doesn't wrap three deep. */
-@media (max-width: 600px) {
+/* Phones (either orientation): flat 44 px buttons, and shop tiles close to
+   their native 110 px so a page shows more per screen and scrolls less. */
+@media (max-width: 759px) {
 	:root {
 		--btn-size: 44px;
-		--tile-min: 150;
-		--fishlist-zoom: 1.15;
+		--tile-min: 120;
+		--fishlist-zoom: 1.1;
+	}
+}
+@media (max-width: 420px) {
+	:root {
+		--tile-min: 112;
+	}
+}
+/* short viewport (phone landscape): the shop panel only gets ~200 px tall, so
+   drop tiles to native size + no list zoom — more columns, far less scroll. */
+@media (max-height: 560px) {
+	:root {
+		--tile-min: 110;
+		--fishlist-zoom: 1;
 	}
 }
