@@ -72,14 +72,15 @@
 #tabFilterShop,
 #tabBackgroundShop {
 	display: grid;
-	/* tiles grow to fill the row — reflow by width */
-	grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
+	/* one column per rendered tile width (native 110 * the zoom factor) */
+	grid-template-columns: repeat(auto-fill, calc(110px * var(--tile-zoom)));
+	justify-content: start;
 	align-content: start;
 	gap: var(--tile-gap);
 }
 #tabBackgroundShop {
-	/* background swatches are smaller art */
-	grid-template-columns: repeat(auto-fill, minmax(calc(var(--tile-min) * 0.6), 1fr));
+	/* background swatches are 64px native */
+	grid-template-columns: repeat(auto-fill, calc(64px * var(--tile-zoom)));
 }
 
 /* view1 holds its tab bar + "new fish in" line as grid items */
@@ -89,8 +90,9 @@
 }
 
 /* tiles: out of absolute positioning (per-#id top/left rules are more specific
-   than a bare .fooSlot, so scope by ancestor to beat them) and stretched to
-   fill the grid cell; the per-slot art scales with them. */
+   than a bare .fooSlot, so scope by ancestor to beat them), kept at their
+   native design size, then `zoom`ed as one unit — art, labels and the
+   buy/sell buttons all scale together and stay clickable. */
 #view1 .fishSlot,
 #tabSceneries .scenerySlot,
 #tabLightingShop .lightSlot,
@@ -101,50 +103,101 @@
 	top: auto;
 	left: auto;
 	margin: 0;
-	width: auto;
+	zoom: var(--tile-zoom);
 	background-repeat: no-repeat;
 	background-position: left top;
-	background-size: 100% 100%; /* art scales with the (proportional) tile */
-}
-/* keep each tile's native proportions as it stretches */
-#view1 .fishSlot,
-#tabSceneries .scenerySlot,
-#tabLightingShop .lightSlot {
-	aspect-ratio: 110 / 61;
-	height: auto;
-}
-#tabFilterShop .filterSlot {
-	aspect-ratio: 110 / 94;
-	height: auto;
-}
-#tabBackgroundShop .backgroundSlot {
-	aspect-ratio: 64 / 46;
-	height: auto;
+	background-size: 100% 100%;
 }
 
-/* ---- statistics view (view5) ---- */
+/* ---- statistics view (view5) ----
+   `zoom` on the container scales the whole table (text, bars, row height).
+   Rows + the icon header share one grid so the stat columns line up. */
 
 #tabFishList {
 	display: block;
+	zoom: var(--fishlist-zoom); /* scales the header + rows together, so their grids align */
 }
 #fishTableInfo {
 	position: static;
 	margin: 6px 0;
 	font-size: 12px;
 }
-#fishTableIcons {
-	position: static;
-	margin: 0 0 4px auto;
-}
 #fishTableContainer {
 	position: static;
 	width: 100%;
 	height: auto;
 	max-height: none;
+	overflow-x: auto; /* narrow screens: rows scroll sideways instead of clipping */
 }
+
+/* both share one fixed-column grid so the stat icons line up with the bars.
+   every non-1fr track is a fixed width (no `auto`) or the two grids, having
+   different cell content, would resolve them differently. */
+#fishTableIcons,
+.fishTableRow {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 34px 34px 40px 40px 64px 48px;
+	gap: 4px;
+	align-items: center;
+}
+
+#fishTableIcons {
+	position: static;
+	width: auto;
+	height: 12px;
+	margin: 4px 0;
+	background: none;
+}
+#fishTableIcons span {
+	height: 10px;
+	background: url(../gfx/view5/icons.png) no-repeat;
+	image-rendering: pixelated;
+}
+#fishTableIcons span:nth-child(1) {
+	grid-column: 2;
+	background-position: 0 0;
+}
+#fishTableIcons span:nth-child(2) {
+	grid-column: 3;
+	background-position: -26px 0;
+}
+#fishTableIcons span:nth-child(3) {
+	grid-column: 4;
+	background-position: -51px 0;
+}
+#fishTableIcons span:nth-child(4) {
+	grid-column: 5;
+	background-position: -77px 0;
+}
+
 .fishTableRow {
 	width: auto;
-	overflow: hidden; /* contain the floated cells without touching display */
+	height: auto;
+	padding: 2px 4px;
+	box-sizing: border-box;
+}
+.fishTableRow > * {
+	float: none;
+	margin: 0;
+	min-width: 0;
+}
+.fishTableRow .fishTableSpeciesName {
+	width: auto;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.fishTableRow .fishTableHealthBox,
+.fishTableRow .fishTableHungerBox,
+.fishTableRow .fishTableSickBox,
+.fishTableRow .fishTableSizeBox {
+	width: auto;
+}
+.fishTableRow .button {
+	box-sizing: border-box;
+	width: 100%;
+	height: auto;
+	padding: 2px 4px;
 }
 
 #tabStatistics {

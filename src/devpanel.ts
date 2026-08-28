@@ -8,20 +8,25 @@
  * and make them permanent. "Reset" drops the overrides.
  */
 
-/** name, label, min, max, step — all values are px. */
-type Knob = readonly [string, string, number, number, number];
+/** name, label, min, max, step, unit ('px' unless given). */
+type Knob = readonly [string, string, number, number, number, string?];
 
 const KNOBS: readonly Knob[] = [
 	['--frame-gap', 'frame gap', 0, 24, 1],
 	['--strip-pad', 'strip padding', 0, 24, 1],
 	['--panel-pad', 'panel padding', 0, 32, 1],
-	['--btn-size', 'button size', 24, 72, 2],
-	['--btn-icon', 'button icon', 12, 56, 1],
-	['--tile-min', 'shop tile min width', 72, 260, 2],
+	['--btn-size', 'button size', 24, 96, 2],
+	['--btn-icon', 'button icon', 12, 80, 1],
+	['--tile-min', 'shop tile width', 72, 420, 2, ''],
 	['--tile-gap', 'shop tile gap', 0, 32, 1],
+	['--fishlist-zoom', 'fish-list zoom', 1, 3, 0.1, ''],
 ];
 
-function readPx(name: string): number {
+function unitOf(knob: Knob): string {
+	return knob[5] ?? 'px';
+}
+
+function readNum(name: string): number {
 	const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 	return parseFloat(raw) || 0;
 }
@@ -52,7 +57,10 @@ export function mountDevPanel() {
 	summary.style.cssText = 'cursor:pointer;user-select:none;padding:2px 0';
 	panel.append(summary);
 
-	for (const [name, label, min, max, step] of KNOBS) {
+	for (const knob of KNOBS) {
+		const [name, label, min, max, step] = knob;
+		const unit = unitOf(knob);
+
 		const row = document.createElement('label');
 		row.style.cssText =
 			'display:grid;grid-template-columns:1fr auto;gap:2px 6px;margin-top:8px';
@@ -68,13 +76,13 @@ export function mountDevPanel() {
 		range.min = String(min);
 		range.max = String(max);
 		range.step = String(step);
-		range.value = String(readPx(name));
+		range.value = String(readNum(name));
 		range.style.cssText = 'grid-column:1 / -1;width:100%';
-		out.textContent = range.value + 'px';
+		out.textContent = range.value + unit;
 
 		range.addEventListener('input', () => {
-			document.documentElement.style.setProperty(name, range.value + 'px');
-			out.textContent = range.value + 'px';
+			document.documentElement.style.setProperty(name, range.value + unit);
+			out.textContent = range.value + unit;
 		});
 
 		row.append(cap, out, range);
@@ -88,7 +96,7 @@ export function mountDevPanel() {
 	copy.type = 'button';
 	copy.textContent = 'Copy CSS';
 	copy.addEventListener('click', () => {
-		const body = KNOBS.map(([name]) => `\t${name}: ${readPx(name)}px;`).join('\n');
+		const body = KNOBS.map((k) => `\t${k[0]}: ${readNum(k[0])}${unitOf(k)};`).join('\n');
 		const css = `:root {\n${body}\n}`;
 		void navigator.clipboard?.writeText(css);
 		console.log(css);

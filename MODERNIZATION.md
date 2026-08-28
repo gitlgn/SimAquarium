@@ -305,8 +305,30 @@ Applied after eyeballing 4b-4 on Chrome/Brave/phone:
   bounds, no 4xx, no requests for the deleted files. `npm run check` +
   `vite build` green.
 
+#### ✅ 4b-7 — scale the tile + list contents (done)
+
+Second knob round — "make the shop tile *and its buttons/text* bigger, and the
+fish-list text":
+
+- Shop tiles are kept at their native design size and `zoom`ed as one unit
+  (`--tile-zoom`, derived from `--tile-min`), so the art, labels **and the
+  buy/sell buttons** scale together and stay clickable (`zoom` scales the hit
+  area, unlike `transform`). Grid columns are `calc(110px * var(--tile-zoom))`.
+- Fish list: `#tabFishList` is `zoom`ed by `--fishlist-zoom`; the row and the
+  `#fishTableIcons` header share **one fixed-column grid** so the stat icons
+  line up with the health/hunger/sick/size bars. `#fishTableIcons` gained four
+  `<span>` slices of `icons.png`, one per stat column.
+- `statistics.ts` show/hide moved off inline `style.display` (`.hidden` for
+  the header/info, `''` for shown rows) so the grid CSS applies;
+  `overflow` → `overflowY` so narrow screens scroll rows sideways.
+- Dev tuner: knobs support non-px units now; added `--tile-min` (unitless) +
+  `--fishlist-zoom`.
+- Values from device testing baked into `theme.css`: btn 66 / icon 56, tile
+  260, all gaps + padding 0.
+
 **Phase 4b complete.** The 2014 fixed-widget UI is gone: one responsive shell,
-CSS chrome throughout, every panel reflows, tuning knobs in `theme.css`.
+CSS chrome throughout, every panel reflows and scales, tuning knobs in
+`theme.css` (+ the dev slider panel).
 
 ## Phase 5 — Android
 
