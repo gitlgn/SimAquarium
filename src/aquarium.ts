@@ -970,11 +970,8 @@ class Aquarium {
 			config.saveGame();
 		}
 
-		// animate icon
-		if (uio.getAlertNum() > -1) {
-			uio.blikStatusWidgetIcon();
-			uio.changeAlertNum(-1);
-		}
+		// surface any pending game event (sick / hungry / breed / death / attack)
+		uio.flushAlert();
 
 		stats.refreshStatsPage();
 	}

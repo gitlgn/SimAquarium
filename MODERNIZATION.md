@@ -392,11 +392,38 @@ share one `--fishrow-cols` grid so the stat icons line up exactly.
   and the bars stay aligned (delta 0).
 - Precache 199 → 195.
 
-### 6c — status bar object + notification surface (next)
+### ✅ 6c — notification surface: alert lamp → toasts (done)
 
-Fold money / water / event into one `renderStatus(state)`; replace the
-`alertLight.png` 2-frame lamp (only ever shows its off-state) with a real
-transient toast / event log.
+- `src/toast.ts` + `public/css/toast.css`: transient messages slide in over the
+  top of the tank, hold 4 s, fade (fallback timeout in case `animationend`
+  doesn't fire); at most 3 stack.
+- `uio`: `blikStatusWidgetIcon` / `hideStatusWidgetIcon` / `getAlertNum` /
+  `#hideStatusTimer` gone. `flushAlert()` (called once per `update()` tick)
+  turns a pending `#alertNumber` (0-4) into `toast.event(n)`.
+- `config` relax mode: toast on toggle + a persistent `#relaxBadge` shown via
+  `#stage.relax` (was the `alertLightIcon5` lamp state).
+- `#statusEvent` / `#statusEventIcon` removed from the markup; `alertLight.png`
+  + `alertLightIcon0-5.png` deleted. Precache 195 → 189.
+
+### ✅ 6d — background wall — verified
+
+The 4b-6 on-canvas wall render is on this branch and works (white → red → blue
+change the tank and persist). The "background gone" report was the wall simply
+not being visible while a shop / stats panel covers the tank — expected.
+
+### 6e — flexible menu bar / mobile burger (proposed)
+
+The icons *around* the tank (6 view buttons + camera + help + config in
+`#viewSwitch`, 8 tools + speed in `#aquariumToolbar`, minimise in the corner)
+are hand-placed in `index.html` and eat space on a phone. Proposal:
+
+- describe the chrome as **data** — `[{ id, icon, label, action, group }]` —
+  and render `#viewSwitch` / `#aquariumToolbar` from it (finishes the
+  view/state split for the chrome)
+- **≥ 760px**: today's layout (row of view buttons on top, tool strip beside)
+- **< 760px**: a single **☰** button; tap → a slide-in drawer with the view
+  switch + tools as a list; the tank keeps the full screen otherwise
+- speed control + money/water move into a slim always-visible bar
 
 ## Phase 5 — Android
 

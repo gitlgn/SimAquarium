@@ -139,25 +139,6 @@
 	text-align: left;
 }
 
-/* alert lamp + water gauge keep their native bitmap sizes so the game's
-   inline style writes (backgroundPosition, bar height in px) stay valid. */
-#statusEvent {
-	position: relative;
-	inset: auto;
-	flex: none;
-	width: 38px;
-	height: 39px;
-	background: url(../gfx/interface/alertLight.png) no-repeat;
-}
-#statusEventIcon {
-	position: absolute;
-	top: 7px;
-	left: 7px;
-	width: 24px;
-	height: 24px;
-	display: none;
-	background: url(../gfx/interface/alertLightIcon0.png) no-repeat;
-}
 /* water-condition gauge — a CSS bar (no bitmaps). aquarium.updatePollutionBar()
    sets the fill's height% + colour from the pollution value; the frame is CSS.
    Fills from the bottom, green → red as it rises. */

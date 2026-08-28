@@ -7,13 +7,13 @@ import { aquarium } from './aquarium.js';
 import { loop, smallIntervals } from './loop.js';
 import { PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
 import { $ } from './dom.js';
+import { toast } from './toast.js';
 
 class Uio {
 	#frontPageMode = PAGEMODE_MAXI;
 	#view = VIEW_AQUARIUM;
 	#rememberSpeed;
 	#alertNumber = -1; // 0 sick, 1 hungry/starving, 2 breeds, 3 dies, 4 attacks
-	#hideStatusTimer;
 
 	getView() {
 		return this.#view;
@@ -89,27 +89,15 @@ class Uio {
 		loop.chosenSpeed = delay;
 	}
 
-	getAlertNum() {
-		return this.#alertNumber;
-	}
 	changeAlertNum(alertNum) {
 		this.#alertNumber = alertNum;
 	}
 
-	blikStatusWidgetIcon() {
-		window.clearTimeout(this.#hideStatusTimer);
-		$('statusEvent').style.backgroundPosition = '38px';
-		$('statusEventIcon').style.background =
-			'url(gfx/interface/alertLightIcon' + this.#alertNumber + '.png)';
-		$('statusEventIcon').style.display = 'block';
-		this.#hideStatusTimer = window.setTimeout(() => {
-			this.hideStatusWidgetIcon();
-		}, 4000);
-	}
-
-	hideStatusWidgetIcon() {
-		$('statusEvent').style.backgroundPosition = '0';
-		$('statusEventIcon').style.display = 'none';
+	/** Called once per update() tick — surface any pending game event as a toast. */
+	flushAlert() {
+		if (this.#alertNumber < 0) return;
+		toast.event(this.#alertNumber);
+		this.#alertNumber = -1;
 	}
 }
 
