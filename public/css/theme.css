@@ -2,8 +2,6 @@
  * theme.css — the layout & colour knobs, all in one place.
  *
  * Change a value, save, the dev server hot-reloads and you see it. No build.
- * In dev there's also a slider panel — the ⚙ button bottom-left — that writes
- * these live; "Copy CSS" there dumps the values to paste back in here.
  *
  * The layout switch point (stacked vs side-by-side) is the literal `760px` in
  * shell.css + toolbar.css (`@media (min-width: 760px)`) — @media can't read a
@@ -12,7 +10,7 @@
 
 :root {
 	/* ---- spacing ---- */
-	--frame-gap: 6px; /* blue frame between the tank, the strip and the edges */
+	--frame-gap: 0px; /* gap between the tank, the strip and the screen edges */
 	--strip-pad: 5px; /* padding inside the toolbar strip */
 	--panel-pad: 0px; /* padding inside a shop / stats panel */
 
@@ -20,7 +18,7 @@
 	   shrinks with viewport height so the vertical strip (10 chrome + 8 tool
 	   buttons + status + speed) fits without a scrollbar on short screens. */
 	--btn-size: clamp(38px, 7vh, 64px);
-	--btn-icon: calc(var(--btn-size) - 12px); /* icon within the button */
+	--btn-icon: var(--btn-size); /* icon fills the button edge to edge */
 
 	/* the control strip on >=760px: two button columns + padding */
 	--strip-width: calc(var(--btn-size) * 2 + 24px);

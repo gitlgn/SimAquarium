@@ -24,7 +24,7 @@ set up as an installable **PWA**.
 | Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
 | Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
-| Mobile layout   | 🟢 responsive shell (Phase 4b): CSS grid, tank fills the space, every panel reflows, ≥44 px touch targets, safe-area aware; layout knobs in `public/css/theme.css` (+ a dev slider panel)                             |
+| Mobile layout   | 🟢 responsive shell: CSS grid; desktop = tank + right rail, phone portrait = burger drawer, phone landscape = tank between two button rails; every panel reflows, safe-area aware; layout knobs in `public/css/theme.css`   |
 | Android         | 🟡 TWA packaging groundwork in place (`twa-manifest.json`, Digital Asset Links, [docs/ANDROID.md](docs/ANDROID.md)); building the `.aab` needs a deployed HTTPS origin + a Play Console account                        |
 
 ## Requirements
