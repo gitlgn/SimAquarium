@@ -29,21 +29,6 @@ export function eventsCreate() {
 	on('buttonWidget1', 'click', () => uio.flipWidget());
 	on('pageMode', 'click', () => uio.changeFrontPageMode());
 
-	/*** BURGER DRAWER (phones) ***/
-	const stage = $('stage');
-	on('menuToggle', 'click', () => stage.classList.toggle('menu-open'));
-	// any tap outside the open drawer (and not on the burger) closes it
-	document.addEventListener(
-		'click',
-		(e) => {
-			if (!stage.classList.contains('menu-open')) return;
-			const t = e.target as HTMLElement;
-			if (t.closest('#aquariumToolbar') || t.closest('#menuToggle')) return;
-			stage.classList.remove('menu-open');
-		},
-		true
-	);
-
 	// Autosave — the game already saves on every buy/sell/tool; also flush when
 	// the tab is hidden or unloaded (there's no "Save & Exit" button any more).
 	const flush = () => config.saveGame();
@@ -61,7 +46,6 @@ export function eventsCreate() {
 				$('view5').classList.remove('show-tankinfo'); // stats button = fish list
 				stats.refreshStatsPage();
 			}
-			stage.classList.remove('menu-open'); // picking a view closes the drawer
 		});
 	}
 
@@ -72,7 +56,6 @@ export function eventsCreate() {
 		$('view5').classList.toggle('show-tankinfo', wantTankInfo);
 		uio.changeView(5); // no-op if already there
 		stats.refreshStatsPage();
-		stage.classList.remove('menu-open');
 	});
 
 	/*** SCENERY / LIGHTING / FILTER / BACKGROUND SHOPS ***/

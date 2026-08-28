@@ -1,28 +1,36 @@
 /*
- * menu.css — the control strip's two faces (Phase 6e). Loaded last.
+ * menu.css — the control strip's three faces. Loaded last.
  *
- * The strip = #toolbarStatus (water + money) at the top, #viewSwitch (view nav
- * + camera + help + config + minimise, a 2-col grid), #toolbarTools, speed.
+ * The strip has #toolbarStatus (water + money), #viewSwitch (view nav + camera
+ * + help + config + minimise) and #toolbarTools (8 tools + speed).
  *
- * >= 760px : the strip is a rail on the right of the tank. Burger hidden.
- * <  760px : the strip is a left slide-in DRAWER opened by the ☰ (#menuToggle);
- *            the tank keeps the whole screen otherwise.
+ *  >= 760px wide ............ vertical rail to the right of the tank (toolbar.css)
+ *  portrait phone ........... tank on top, all buttons in a bar below
+ *  landscape phone (short) .. tank in the middle, buttons in two rails L / R
+ *
+ * No burger — every button is always on screen.
  */
 
-/* ---- strip layout ------------------------------------------------------- */
+/* ---- portrait phone: buttons fill the space under the tank --------------- */
 
 #aquariumToolbar {
-	align-items: center; /* centre the button grids in the rail */
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+}
+/* portrait phone: cap the button area so the tank keeps the upper half */
+@media (max-width: 759px) and (min-height: 561px) {
+	#aquariumToolbar {
+		max-height: 52vh;
+		overflow-y: auto;
+	}
 }
 
-/* status row — sits at the top of the strip, full width */
 #toolbarStatus {
-	position: static;
-	inset: auto;
-	order: -1;
-	align-self: stretch;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 8px;
 	padding: 4px 6px;
 	border: 1px solid var(--frame-line);
@@ -31,102 +39,37 @@
 	color: var(--ink);
 }
 
-/* ---- the burger (phones only) ----------------------------------------- */
-
-#menuToggle {
-	display: none;
-	position: absolute;
-	top: 6px;
-	left: 6px;
-	z-index: 62;
-	width: var(--btn-size);
-	height: var(--btn-size);
-	padding: 0;
-	border: 1px solid var(--btn-border);
-	border-radius: 7px;
-	background: var(--btn-bg);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.55),
-		0 1px 2px rgba(0, 0, 0, 0.3);
-	cursor: pointer;
+#viewSwitch,
+#toolbarTools {
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(auto-fill, var(--btn-size));
+	justify-content: center;
+	align-content: start;
+	gap: 5px;
 }
-#menuToggle::before {
-	content: '';
-	display: block;
-	width: 46%;
-	height: 3px;
-	margin: 0 auto;
-	background: #3a3222;
-	box-shadow:
-		0 -6px 0 #3a3222,
-		0 6px 0 #3a3222;
+#speedLabel,
+#speedBar {
+	grid-column: 1 / -1;
 }
-#menuToggle:active {
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+#speedBar {
+	width: 100%;
+	max-width: 320px;
+	justify-self: center;
 }
 
-/* ================= phones: strip becomes a drawer ======================== */
-
-@media (max-width: 759px) {
-	#menuToggle {
-		display: block;
-	}
-
-	#aquariumToolbar {
-		position: fixed;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		width: min(300px, 84vw);
-		flex-direction: column;
-		flex-wrap: nowrap;
-		align-items: stretch;
-		gap: 14px;
-		padding: calc(var(--btn-size) + 18px) 14px 18px;
-		overflow-y: auto;
-		border-radius: 0;
-		transform: translateX(-100%);
-		transition: transform 0.25s ease;
-		z-index: 60;
-		box-shadow: 4px 0 22px rgba(0, 0, 0, 0.55);
-	}
-	#stage.menu-open #aquariumToolbar {
-		transform: translateX(0);
-	}
-
-	/* dim scrim behind the open drawer (clicks pass through — a document
-	   listener in events.ts closes the menu on any outside tap) */
-	#stage.menu-open::after {
-		content: '';
-		position: fixed;
-		inset: 0;
-		z-index: 58;
-		background: rgba(0, 0, 0, 0.45);
-		pointer-events: none;
-	}
-}
-
-/* ============ phone LANDSCAPE: short + wide ==============================
-   Split the two button blocks to either side of the tank so the tank gets
-   the full height and most of the width. #aquariumToolbar is `display:
-   contents` so #viewSwitch / #toolbarTools become #pageFront grid items.
-   (Wins over the rail + drawer blocks above via source order.) */
+/* ---- landscape phone: split the two blocks around the tank ==============
+   #aquariumToolbar is `display: contents` so its blocks become #pageFront
+   grid items. #toolbarStatus gets its own cell above the left rail — it can
+   never overlap the buttons however short the viewport (URL bar) gets. */
 @media (max-height: 560px) and (min-width: 560px) {
-	#menuToggle {
-		display: none;
-	}
-	#stage.menu-open::after {
-		content: none;
-	}
-
-	/* status gets its own cell above the left rail — it can't overlap the
-	   buttons no matter how short the viewport (browser bar) gets. */
 	#pageFront {
 		grid-template-columns: auto 1fr auto;
 		grid-template-rows: auto 1fr;
 		grid-template-areas:
 			'status views tools'
 			'nav    views tools';
+		gap: 3px; /* hair of space so status / rails / tank read as separate */
 	}
 
 	#aquariumToolbar {
@@ -136,15 +79,8 @@
 	#toolbarStatus {
 		grid-area: status;
 		align-self: stretch;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		padding: 4px 6px;
-		border: 2px solid var(--frame-line);
-		border-radius: 6px;
+		border-width: 2px;
 		background: var(--strip-bg);
-		color: var(--ink);
 	}
 
 	#viewSwitch,
@@ -153,8 +89,6 @@
 		min-height: 0;
 		overflow-y: auto;
 		grid-template-columns: repeat(2, var(--btn-size));
-		justify-content: center;
-		gap: 5px;
 		padding: var(--strip-pad);
 		box-sizing: border-box;
 		background: var(--strip-bg);
@@ -166,13 +100,5 @@
 	}
 	#toolbarTools {
 		grid-area: tools;
-	}
-
-	#speedLabel,
-	#speedBar {
-		grid-column: 1 / -1;
-	}
-	#speedBar {
-		width: 100%;
 	}
 }
