@@ -146,12 +146,16 @@
 	position: relative;
 	inset: auto;
 	flex: none;
-	width: 9px;
+	width: 18px;
 	height: 34px;
 	border: 1px solid #0a3550;
-	border-radius: 3px;
+	border-radius: 4px;
 	background: #0b3a59;
 	overflow: hidden;
+	cursor: pointer;
+}
+#statusWater:hover {
+	border-color: #6fc7f5;
 }
 #statusWaterBar {
 	position: absolute;

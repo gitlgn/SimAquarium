@@ -62,14 +62,6 @@ class Uio {
 		// widget.openURL( "http://xtrsyz.org/" );
 	}
 
-	changeTab(tabOff, tabOn) {
-		$('tab' + tabOff).hidden = true;
-		$('tab' + tabOn).hidden = false;
-
-		$('tabButton' + tabOff).setAttribute('class', 'tab');
-		$('tabButton' + tabOn).setAttribute('class', 'tab active');
-	}
-
 	/*** Speed bar — map the pointer's x fraction across the bar to one of the
 	 * six speeds (0 = slowest). Width-independent so the bar can be any size. */
 	speedBarSet(e: MouseEvent) {

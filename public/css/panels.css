@@ -40,28 +40,21 @@
 	overflow: visible;
 }
 
-/* headers / tab bar back into normal flow */
-.view .tabBar {
-	position: static;
-	float: none;
-	width: auto;
-	height: auto;
-	margin: 0 0 8px;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
+/* second section heading in Accessories (Backgrounds, after the Filters grid) */
+#view4 > div + .panelHead {
+	margin-top: 18px;
 }
-.view .tabBar .tab {
-	float: none;
-	margin: 0;
+
+/* Statistics: Fish List by default; Tank Info shown by clicking the water gauge
+   (#view5.show-tankinfo, set in events.ts) */
+#view5 #tabStatistics {
+	display: none;
 }
-.view .headerInfo {
-	position: static;
-	float: none;
-	width: auto;
-	height: auto;
-	margin: 0 0 8px;
-	color: #dddddd;
+#view5.show-tankinfo #tabStatistics {
+	display: block;
+}
+#view5.show-tankinfo #tabFishList {
+	display: none;
 }
 
 /* ---- shop slot grids (fish / scenery / lighting / filters / backgrounds) ---- */
@@ -83,9 +76,9 @@
 	grid-template-columns: repeat(auto-fill, calc(64px * var(--tile-zoom)));
 }
 
-/* view1 holds its tab bar + "new fish in" line as grid items */
-#view1 > .tabBar,
-#view1 > .headerInfo {
+/* view1 holds its heading + "new fish in" line as grid items */
+#view1 > .panelHead,
+#view1 > .panelInfo {
 	grid-column: 1 / -1;
 }
 

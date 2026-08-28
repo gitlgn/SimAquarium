@@ -41,7 +41,7 @@
 		<div id="aquariumToolbar">
 			<!-- STATUS: water + money + relax badge -->
 			<div id="toolbarStatus">
-				<div id="statusWater"><div id="statusWaterBar"></div></div>
+				<div id="statusWater" title="Water quality — tap for Tank Info"><div id="statusWaterBar"></div></div>
 				<div id="statusMoney" class="money">102400</div>
 				<div id="relaxBadge">PAUSED</div>
 			</div>
@@ -83,10 +83,8 @@
 			</div>
 			<!-- FISH SHOP VIEW -->
 			<div class="view" id="view1" hidden>
-				<div class="tabBar">
-					<div class="tab active">Fish Shop</div>
-				</div>
-				<div class="headerInfo">New fish in: <span id="newFishTime">60</span> minutes</div>
+				<h2 class="panelHead">Fish Shop</h2>
+				<p class="panelInfo">New fish in: <span id="newFishTime">60</span> minutes</p>
 
 				<div class="fishSlot" id="fishSlot0">
 					<div class="title"></div>
@@ -136,9 +134,7 @@
 			</div>
 			<!-- SCENERY VIEW -->
 			<div class="view" id="view2" hidden>
-				<div class="tabBar">
-					<div class="tab active">Scenery Shop</div>
-				</div>
+				<h2 class="panelHead">Scenery</h2>
 				<div id="tabSceneries">
 
 					<div class="scenerySlot" id="scenerySlot0">
@@ -198,9 +194,7 @@
 			</div>
 			<!-- LIGHTING VIEW -->
 			<div class="view" id="view3" hidden>
-				<div class="tabBar">
-					<div class="tab active">Lighting Shop</div>
-				</div>
+				<h2 class="panelHead">Lighting</h2>
 					<div id="tabLightingShop">
 
 						<div class="lightSlot" id="lightSlot0">
@@ -261,10 +255,7 @@
 			</div>
 			<!-- ACCESSORIES VIEW -->
 			<div class="view" id="view4" hidden>
-				<div class="tabBar">
-					<div class="tab active" id="tabButtonFilterShop">Filters Shop</div>
-					<div class="tab" id="tabButtonBackgroundShop">Backgrounds Shop</div>
-				</div>
+				<h2 class="panelHead">Filters</h2>
 
 				<div id="tabFilterShop">
 
@@ -305,7 +296,9 @@
 						</div>
 
 				</div>
-				<div id="tabBackgroundShop" hidden>
+
+				<h2 class="panelHead">Backgrounds</h2>
+				<div id="tabBackgroundShop">
 
 
 				</div>
@@ -313,11 +306,8 @@
 			</div>
 			<!-- STATISTICS VIEW -->
 			<div class="view" id="view5" hidden>
-				<div class="tabBar">
-					<div class="tab active" id="tabButtonFishList">Fish List</div>
-					<div class="tab" id="tabButtonStatistics">Tank Info</div>
-				</div>
 				<div id="tabFishList">
+					<h2 class="panelHead">Fish List</h2>
 
 					<div id="fishTableIcons"><span></span><span></span><span></span><span></span></div>
 					<div id="fishTableInfo">No fish in the tank.</div>
@@ -326,8 +316,9 @@
 					</div>
 
 				</div>
-				<!-- filled by statistics.ts #renderTankInfo() -->
-				<div id="tabStatistics" hidden></div>
+				<!-- filled by statistics.ts #renderTankInfo(); shown via #view5.show-tankinfo
+				     (click the water gauge) -->
+				<div id="tabStatistics"></div>
 			</div>
 
 			</div><!-- #panelBody -->
