@@ -133,15 +133,10 @@ body {
    Lives directly on #stage (not in #viewSwitch) so it stays reachable when
    .mini hides the rest of the chrome. */
 
-#stage > #pageMode {
-	position: absolute;
-	top: 6px;
-	right: 6px;
-	z-index: 7;
-}
-
-#stage.mini #aquariumToolbar,
-#stage.mini #viewSwitch {
+/* minimise: collapse the strip to just the minimise/restore button so the
+   tank gets almost the whole screen; #pageMode stays reachable. */
+#stage.mini #aquariumToolbar > :not(#viewSwitch),
+#stage.mini #viewSwitch > :not(#pageMode) {
 	display: none;
 }
 

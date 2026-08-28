@@ -39,7 +39,13 @@
 
 		<!-- C O N T R O L   S T R I P  (a left drawer on phones) -->
 		<div id="aquariumToolbar">
-			<!-- VIEW SWITCH -->
+			<!-- STATUS: water + money + relax badge -->
+			<div id="toolbarStatus">
+				<div id="statusWater"><div id="statusWaterBar"></div></div>
+				<div id="statusMoney" class="money">102400</div>
+				<div id="relaxBadge">PAUSED</div>
+			</div>
+			<!-- VIEW SWITCH + chrome buttons (2-column grid) -->
 			<div id="viewSwitch">
 			<div class="buttonView active" id="buttonView0" title="Aquarium"></div>
 			<div class="buttonView" id="buttonView1" title="Fish Shop"></div>
@@ -48,8 +54,9 @@
 			<div class="buttonView" id="buttonView4" title="Accessories"></div>
 			<div class="buttonView" id="buttonView5" title="Statistics"></div>
 			<div class="buttonTool" id="cameraTool" title="Screenshot"></div>
-			<div class="buttonWidget" id="buttonWidget0"></div>
+			<div class="buttonWidget" id="buttonWidget0" title="Extensions"></div>
 			<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
+			<div id="pageMode" title="Minimise"></div>
 			</div>
 			<!-- AQUARIUM TOOLS -->
 			<div id="toolbarTools">
@@ -344,18 +351,8 @@
 		</div>
 	</div>
 
-	<!-- MINIMISE / RESTORE -->
-	<div id="pageMode" title="Minimise"></div>
-
 	<!-- BURGER (phones only) — toggles the control strip as a left drawer -->
 	<button id="menuToggle" type="button" title="Menu" aria-label="Menu"></button>
-
-	<!-- ALWAYS-VISIBLE STATUS: water + money + relax badge -->
-	<div id="toolbarStatus">
-		<div id="statusWater"><div id="statusWaterBar"></div></div>
-		<div id="statusMoney" class="money">102400</div>
-		<div id="relaxBadge">PAUSED</div>
-	</div>
 
 </div><!-- #stage -->
 </div><!-- #viewport -->

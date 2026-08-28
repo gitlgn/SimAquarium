@@ -3,11 +3,11 @@
 
 #viewSwitch {
 	flex: none;
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px;
-	padding: 2px;
+	display: grid;
+	grid-template-columns: repeat(2, var(--btn-size));
+	justify-content: center;
+	gap: 5px;
+	padding: 0;
 }
 
 .buttonView {

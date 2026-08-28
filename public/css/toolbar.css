@@ -24,7 +24,7 @@
 		flex-wrap: nowrap;
 		width: var(--strip-width);
 		height: 100%;
-		padding-top: calc(var(--btn-size) + 12px); /* clear the corner minimise button */
+		gap: 6px;
 		overflow-y: auto;
 	}
 }
@@ -203,9 +203,9 @@
 	position: static;
 	inset: auto;
 	grid-column: 1 / -1;
-	text-align: left;
-	font-size: 11px;
-	margin: 8px 0 4px;
+	text-align: center;
+	font-size: 10px;
+	margin: 4px 0 2px;
 }
 #speedBar {
 	position: relative;

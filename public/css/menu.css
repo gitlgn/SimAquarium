@@ -1,35 +1,40 @@
 /*
  * menu.css — the control strip's two faces (Phase 6e). Loaded last.
  *
- * >= 760px : #aquariumToolbar is the strip beside the tank (view switch on top,
- *            tools, speed). Burger hidden.
- * <  760px : #aquariumToolbar is a left slide-in DRAWER, opened by the ☰
- *            (#menuToggle). The tank keeps the whole screen otherwise.
+ * The strip = #toolbarStatus (water + money) at the top, #viewSwitch (view nav
+ * + camera + help + config + minimise, a 2-col grid), #toolbarTools, speed.
  *
- * #toolbarStatus (water + money + relax badge) is always visible, top-left.
+ * >= 760px : the strip is a rail on the right of the tank. Burger hidden.
+ * <  760px : the strip is a left slide-in DRAWER opened by the ☰ (#menuToggle);
+ *            the tank keeps the whole screen otherwise.
  */
 
-/* ---- always-visible status ------------------------------------------------ */
+/* ---- strip layout ------------------------------------------------------- */
 
+#aquariumToolbar {
+	align-items: center; /* centre the button grids in the rail */
+}
+
+/* status row — sits at the top of the strip, full width */
 #toolbarStatus {
-	position: absolute;
-	top: 6px;
-	left: 6px;
-	z-index: 8;
+	position: static;
+	inset: auto;
+	order: -1;
+	align-self: stretch;
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 3px 8px;
+	padding: 4px 6px;
 	border: 1px solid var(--frame-line);
-	border-radius: 7px;
-	background: rgba(11, 58, 89, 0.82);
+	border-radius: 6px;
+	background: rgba(0, 0, 0, 0.18);
 	color: var(--ink);
 }
 
-/* ---- the burger ---- */
+/* ---- the burger (phones only) ----------------------------------------- */
 
 #menuToggle {
-	display: none; /* shown only < 760px */
+	display: none;
 	position: absolute;
 	top: 6px;
 	left: 6px;
@@ -63,10 +68,6 @@
 /* ================= phones: strip becomes a drawer ======================== */
 
 @media (max-width: 759px) {
-	#toolbarStatus {
-		left: calc(var(--btn-size) + 14px); /* clear the burger */
-	}
-
 	#menuToggle {
 		display: block;
 	}
@@ -102,16 +103,5 @@
 		z-index: 58;
 		background: rgba(0, 0, 0, 0.45);
 		pointer-events: none;
-	}
-
-	/* in the drawer the view switch is a wrap-row at comfortable size */
-	#viewSwitch {
-		padding: 0;
-		justify-content: flex-start;
-	}
-
-	/* tools: 3 per row in the drawer */
-	#toolbarTools {
-		grid-template-columns: repeat(3, var(--btn-size) minmax(14px, 1fr));
 	}
 }

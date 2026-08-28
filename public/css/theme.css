@@ -13,13 +13,17 @@
 :root {
 	/* ---- spacing ---- */
 	--frame-gap: 6px; /* blue frame between the tank, the strip and the edges */
-	--strip-pad: 4px; /* padding inside the toolbar strip */
-	--strip-width: 176px; /* the control strip on >=760px (fits 2 buttons/row) */
+	--strip-pad: 5px; /* padding inside the toolbar strip */
 	--panel-pad: 0px; /* padding inside a shop / stats panel */
 
-	/* ---- buttons (one size for everything) ---- */
-	--btn-size: 66px; /* every button: tools, views, widgets, minimise */
+	/* ---- buttons (one size for everything) ----
+	   shrinks with viewport height so the vertical strip (10 chrome + 8 tool
+	   buttons + status + speed) fits without a scrollbar on short screens. */
+	--btn-size: clamp(38px, 7vh, 64px);
 	--btn-icon: calc(var(--btn-size) - 12px); /* icon within the button */
+
+	/* the control strip on >=760px: two button columns + padding */
+	--strip-width: calc(var(--btn-size) * 2 + 24px);
 
 	/* ---- shop tiles ---- */
 	--tile-min: 260; /* rendered tile width in px (unitless — feeds the calc below) */
