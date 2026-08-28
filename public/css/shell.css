@@ -1,32 +1,20 @@
 /*
- * shell.css — responsive shell (Phase 4b).
- *
- * Replaces the old approach where the whole 457x300 "widget" was one unit
- * scaled uniformly with `transform: scale()` (stage.css + stage.js, both
- * removed). The frame bitmap (widgetFront.png) is dropped; the layout is now
- * a real grid:
+ * shell.css — responsive shell (Phase 4b). Knobs live in theme.css.
  *
  *   #viewport ................ fixed, full screen, safe-area padding
  *     #stage ................. flex column, capped width
- *       #pageFront .......... grid: the tank region + a toolbar strip
+ *       #pageFront .......... grid: tank region + toolbar strip
  *         #aquariumViews .... grows to fill — view-switch row + panel body
- *           #viewSwitch .... the 6 view buttons + camera (flex row)
+ *           #viewSwitch .... the 6 view buttons + camera + help/config/save
  *           #panelBody ..... the active .view (tank fills it; shops scroll)
  *         #aquariumToolbar . fixed-size strip: status + tools + speed
  *       #pageBack ........... configuration page (still legacy-sized for now)
- *       .buttonWidget ×3 .... top-right corner controls
+ *       #pageMode .......... minimise / restore, top-right corner
  *
- * Portrait: toolbar strip sits under the tank. Landscape: to its right.
- * The per-shop panel internals (slot grids) are still on their 2014 CSS at a
- * fixed 360x240 inside #panelBody — converted view by view in 4b-2..4b-4.
+ * < 760px wide: toolbar strip sits under the tank (stacked).
+ * >= 760px wide: strip to the right (side-by-side). Change 760 here AND in
+ * toolbar.css to move that switch.
  */
-
-:root {
-	--shell-bg: #0e4e7a;
-	--strip-bg: #0c3f63;
-	--tank-bg: #06324f;
-	--ink: #ededed;
-}
 
 html,
 body {
@@ -54,7 +42,7 @@ body {
 #stage {
 	position: relative;
 	width: 100%;
-	max-width: 1100px;
+	max-width: var(--app-max-width);
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
@@ -75,12 +63,12 @@ body {
 	grid-template-areas:
 		'views'
 		'toolbar';
-	gap: 4px;
-	padding: 4px;
+	gap: var(--frame-gap);
+	padding: var(--frame-gap);
 	box-sizing: border-box;
 }
 
-@media (orientation: landscape) {
+@media (min-width: 760px) {
 	#pageFront {
 		grid-template-rows: 1fr;
 		grid-template-columns: 1fr auto;
@@ -95,7 +83,7 @@ body {
 	min-height: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: var(--frame-gap);
 }
 
 #panelBody {
@@ -127,9 +115,8 @@ body {
 	background: var(--tank-bg);
 }
 
-/* shop / stats views: keep the 2014 internals at native size for now,
-   just re-home them inside the scrollable panel body (was absolute at
-   top:10 left:14 against the old fixed frame). */
+/* shop / stats views keep their 2014 internals for now — panels.css sizes
+   them; .view here just neutralises the old absolute top/left. */
 .view {
 	position: relative;
 	top: auto;
@@ -139,8 +126,7 @@ body {
 
 /* ---- minimise / restore toggle -----------------------------------------
    Lives directly on #stage (not in #viewSwitch) so it stays reachable when
-   .mini hides the rest of the chrome. The help/config/save buttons DO ride
-   in #viewSwitch and are hidden in mini — that's intended (distraction-free). */
+   .mini hides the rest of the chrome. */
 
 #stage > #pageMode {
 	position: absolute;

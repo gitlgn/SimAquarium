@@ -83,7 +83,7 @@ class Stats {
 	refreshStatsPage() {
 		if (uio.getView() !== VIEW_STATISTICS) return;
 
-		if ($('tabFishList').style.display === 'block') {
+		if (!($('tabFishList') as HTMLElement).hidden) {
 			this.updateFishListTable();
 		} else {
 			$('statFishNumber').innerHTML = String(aquarium.getFishNum());

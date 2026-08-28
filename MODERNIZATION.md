@@ -221,12 +221,33 @@ Staged so every commit boots and is checkable on a real screen.
   bounds and clickable (buy/info/sell fire), tank + other views unaffected,
   no 4xx. `npm run check` + `vite build` green.
 
-#### 4b-4 — accessories (inner tabs) + statistics / fish-list panel
+#### ✅ 4b-4 — accessories + statistics panels + the knob file (done)
 
-- `uio.changeTab` off inline `style.display` (→ `hidden`) so `#tabFilterShop`
-  / `#tabBackgroundShop` can be grids; reflow both like 4b-3.
-- `#tabStatistics` absolute-label soup → a flow list; `#fishTableContainer`
-  rows width-fluid.
+- `uio.changeTab` off inline `style.display` → the `hidden` attribute, so
+  `#tabFilterShop` / `#tabBackgroundShop` reflow as grids (filters on the
+  110 px column, backgrounds on a 64 px column). `#tabStatistics` /
+  `#tabFishList` markup lost their inline `display`; `statistics.ts`'s
+  `refreshStatsPage` guard changed from `style.display === 'block'` to
+  `!hidden` to match.
+- `#tabStatistics` absolute-label soup → a plain stacked flow list.
+  `#fishTableContainer` goes full-width (was 342 px) and grows with the
+  panel's scroll instead of its own fixed 180 px box.
+- **`public/css/theme.css`** — every layout number the shell uses is now a
+  `:root` custom property (widths, gaps, button + tile sizes, colours). One
+  place to tune. The layout switch point stays a literal `760px` in two
+  `@media (min-width: …)` lines (shell.css + toolbar.css) since `@media`
+  can't read a variable — the orientation query it replaced was fragile on
+  wide phones.
+- **`src/devpanel.ts`** — dev-only (`import.meta.env.DEV`, dynamically
+  imported, absent from the production bundle). A `⚙ layout` panel bottom-left
+  with a slider per numeric knob that writes it live onto `<html>`; "Copy CSS"
+  emits the matching `:root { … }` block to paste into theme.css, "Reset"
+  drops the overrides.
+- Verified at 375×812 / 1024×680: all six views reflow + stay in bounds,
+  tab switches (filters/backgrounds, fish-list/tank-info) work, buy / sell /
+  info fire, stats populate, dev panel mounts + Copy/Reset work, canvas
+  painted, no 4xx. `npm run check` + `vite build` green; devpanel confirmed
+  tree-shaken from prod.
 
 #### 4b-4 — statistics + fish-list panel
 

@@ -76,8 +76,8 @@ class Uio {
 	}
 
 	changeTab(tabOff, tabOn) {
-		$('tab' + tabOff).style.display = 'none';
-		$('tab' + tabOn).style.display = 'block';
+		$('tab' + tabOff).hidden = true;
+		$('tab' + tabOn).hidden = false;
 
 		$('tabButton' + tabOff).setAttribute('class', 'tab');
 		$('tabButton' + tabOn).setAttribute('class', 'tab active');

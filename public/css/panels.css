@@ -1,18 +1,14 @@
 /*
- * panels.css — shop panels reflow (Phase 4b-3). Loaded last.
+ * panels.css — shop / stats panels reflow (Phase 4b-3 / 4b-4). Loaded last.
+ * Knobs live in theme.css.
  *
- * The 2014 shop slots are pixel-art tiles with position: absolute internals.
- * We don't resize a tile — we turn the fixed 3-column absolute layout into an
- * auto-fill grid so the panel fills its width, reflows to fewer columns when
- * narrow, and scrolls. Tile internals (.title/.image/.money/.button) are
- * untouched.
+ * The 2014 slots are pixel-art tiles with position: absolute internals. We
+ * don't resize a tile — we turn the fixed absolute layout into an auto-fill
+ * grid so the panel fills its width, reflows to fewer columns when narrow, and
+ * scrolls. Tile internals (.title/.image/.money/.button) are untouched.
  *
- * Covers the three simple single-grid shops: fish (view1), scenery (view2),
- * lighting (view3). Accessories (view4, has inner tabs) and Statistics (view5)
- * keep the 2014 layout at native size until 4b-4.
- *
- * Show/hide is the `hidden` attribute now (uio.changeView), not inline
- * style.display — so these `display: grid` rules actually take effect.
+ * Show/hide is the `hidden` attribute now (uio.changeView / uio.changeTab),
+ * not inline style.display — so these `display: grid` rules take effect.
  */
 
 [hidden] {
@@ -26,30 +22,22 @@
 	height: 100%;
 	box-sizing: border-box;
 	margin: 0;
-	padding: 10px;
+	padding: var(--panel-pad);
 	overflow-y: auto;
-	color: #ededed;
+	color: var(--ink);
 }
 #view1,
 #view2,
-#view3 {
-	background: #5f5f5f;
+#view3,
+#view4,
+#view5 {
+	background: var(--panel-bg);
 }
 
 #view0 {
 	background: none;
 	padding: 0;
 	overflow: visible;
-}
-
-/* not converted yet — pin back to native size, centred in the scroll area */
-#view4,
-#view5 {
-	width: 360px;
-	height: 240px;
-	padding: 0;
-	overflow: visible;
-	margin: 0 auto;
 }
 
 /* headers / tab bar back into normal flow */
@@ -67,9 +55,7 @@
 	float: none;
 	margin: 0;
 }
-#view1 .headerInfo,
-#view2 .headerInfo,
-#view3 .headerInfo {
+.view .headerInfo {
 	position: static;
 	float: none;
 	width: auto;
@@ -78,15 +64,24 @@
 	color: #dddddd;
 }
 
-/* the slot grids */
+/* ---- shop slot grids (fish / scenery / lighting / filters / backgrounds) ---- */
+
 #view1,
 #tabSceneries,
-#tabLightingShop {
+#tabLightingShop,
+#tabFilterShop {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 110px);
+	grid-template-columns: repeat(auto-fill, var(--tile-col));
 	justify-content: center;
 	align-content: start;
-	gap: 10px;
+	gap: var(--tile-gap);
+}
+#tabBackgroundShop {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 64px);
+	justify-content: center;
+	align-content: start;
+	gap: var(--tile-gap);
 }
 
 /* view1 holds its tab bar + "new fish in" line as grid items */
@@ -95,14 +90,58 @@
 	grid-column: 1 / -1;
 }
 
-/* tiles: out of absolute positioning (the per-#id top/left rules are more
-   specific than a bare .fooSlot, so scope by ancestor to beat them). */
+/* tiles: out of absolute positioning (per-#id top/left rules are more specific
+   than a bare .fooSlot, so scope by ancestor to beat them). */
 #view1 .fishSlot,
 #tabSceneries .scenerySlot,
-#tabLightingShop .lightSlot {
+#tabLightingShop .lightSlot,
+#tabFilterShop .filterSlot,
+#tabBackgroundShop .backgroundSlot {
 	position: relative;
 	inset: auto;
 	top: auto;
 	left: auto;
 	margin: 0;
+}
+
+/* ---- statistics view (view5) ---- */
+
+#tabFishList {
+	display: block;
+}
+#fishTableInfo {
+	position: static;
+	margin: 6px 0;
+	font-size: 12px;
+}
+#fishTableIcons {
+	position: static;
+	margin: 0 0 4px auto;
+}
+#fishTableContainer {
+	position: static;
+	width: 100%;
+	height: auto;
+	max-height: none;
+}
+.fishTableRow {
+	width: auto;
+	overflow: hidden; /* contain the floated cells without touching display */
+}
+
+#tabStatistics {
+	display: block;
+	font-size: 13px;
+	line-height: 1.7;
+}
+#tabStatistics div {
+	position: static;
+}
+#tabStatistics #fishStats,
+#tabStatistics #waterProperties {
+	margin-top: 10px;
+	font-weight: bold;
+}
+#tabStatistics #fishStats {
+	margin-top: 0;
 }
