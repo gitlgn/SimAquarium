@@ -65,19 +65,14 @@ export function eventsCreate() {
 		});
 	}
 
-	/*** WATER GAUGE — tap it for Tank Info ***/
+	/*** WATER GAUGE — tap to toggle the Statistics view between Fish List and
+	     Tank Info (tap again, or the Statistics button, to go back). ***/
 	on('statusWater', 'click', () => {
-		$('view5').classList.add('show-tankinfo');
+		const wantTankInfo = !$('view5').classList.contains('show-tankinfo');
+		$('view5').classList.toggle('show-tankinfo', wantTankInfo);
 		uio.changeView(5); // no-op if already there
 		stats.refreshStatsPage();
 		stage.classList.remove('menu-open');
-	});
-	// delegated: the "Fish list ›" link statistics.ts renders in Tank Info
-	on('view5', 'click', (e) => {
-		if ((e.target as HTMLElement).closest('.panelBack')) {
-			$('view5').classList.remove('show-tankinfo');
-			stats.refreshStatsPage();
-		}
 	});
 
 	/*** SCENERY / LIGHTING / FILTER / BACKGROUND SHOPS ***/

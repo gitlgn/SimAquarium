@@ -77,8 +77,7 @@ class Stats {
 			`<div class="statList-row"><dt>${label}</dt><dd>${value}</dd></div>`;
 
 		$('tabStatistics').innerHTML =
-			'<h2 class="panelHead">Tank Info' +
-			'<button type="button" class="panelBack">Fish list &rsaquo;</button></h2>' +
+			'<h2 class="panelHead">Tank Info</h2>' +
 			'<h3 class="statList-head">Fish</h3>' +
 			'<dl class="statList">' +
 			line('Number', aquarium.getFishNum()) +

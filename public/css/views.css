@@ -62,19 +62,4 @@
 	font-size: 14px;
 	color: #dcdcdc;
 }
-.panelBack {
-	margin-left: auto;
-	font: inherit;
-	font-size: 13px;
-	font-weight: normal;
-	padding: 3px 10px;
-	border: 1px solid var(--frame-line);
-	border-radius: 6px;
-	background: rgba(0, 0, 0, 0.2);
-	color: var(--ink);
-	cursor: pointer;
-}
-.panelBack:hover {
-	background: rgba(0, 0, 0, 0.35);
-}
 
