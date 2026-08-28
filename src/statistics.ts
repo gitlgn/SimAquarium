@@ -1,6 +1,9 @@
 /*
  **	STATISTICS OBJECT
  **
+ **	Phase 6: the fish list and Tank Info panels are rendered from game state
+ **	each refresh — no pre-built hidden rows, no per-cell `$('id').style.*`
+ **	writes. Sell is one delegated listener on the container.
  */
 
 import { aquarium } from './aquarium.js';
@@ -9,89 +12,77 @@ import { fishSpecies } from './species.js';
 import { VIEW_STATISTICS } from './constants.js';
 import { $ } from './dom.js';
 
-const FISH_LIST_ROWS = 64;
-
-function makeDiv(className, id) {
-	const div = document.createElement('div');
-	div.setAttribute('class', className);
-	if (id) div.setAttribute('id', id);
-	return div;
-}
+const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]);
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+const pct = (n: number) => Math.trunc(n) + '%';
 
 class Stats {
-	createFishListTable() {
-		const container = $('fishTableContainer');
-
-		for (let i = 0; i < FISH_LIST_ROWS; i++) {
-			const row = makeDiv('fishTableRow', 'fishTableRow' + i);
-			row.setAttribute('style', 'display: none;');
-
-			const name = makeDiv('fishTableSpeciesName', 'fishTableSpeciesName' + i);
-			const health = makeDiv('fishTableHealthBox', 'fishTableHealthBox' + i);
-			const healthBar = makeDiv('fishTableHealthBoxBar', 'fishTableHealthBoxBar' + i);
-			const hunger = makeDiv('fishTableHungerBox', 'fishTableHungerBox' + i);
-			const hungerBar = makeDiv('fishTableHungerBoxBar', 'fishTableHungerBoxBar' + i);
-			const sick = makeDiv('fishTableSickBox', 'fishTableSickBox' + i);
-			const size = makeDiv('fishTableSizeBox', 'fishTableSizeBox' + i);
-			const sell = makeDiv('button sell on', 'fishTableSellFish' + i);
-			const price = makeDiv('money', 'fishTablePrice' + i);
-
-			container.appendChild(row);
-			row.append(name, health, hunger, sick, size, sell, price);
-			health.appendChild(healthBar);
-			hunger.appendChild(hungerBar);
-
-			sell.addEventListener('click', () => aquarium.sellFish(i), false);
-		}
-	}
-
-	updateFishListTable() {
-		const fishNum = aquarium.getFishNum();
-
-		$('fishTableContainer').style.overflowY = fishNum < 10 ? 'hidden' : 'auto';
-
-		// toggle via `hidden` / empty inline display so panels.css's grid rules win
-		($('fishTableIcons') as HTMLElement).hidden = fishNum === 0;
-		($('fishTableInfo') as HTMLElement).hidden = fishNum !== 0;
-
-		for (let i = 0; i < fishNum; i++) {
-			$('fishTableRow' + i).style.display = '';
-			$('fishTableSpeciesName' + i).innerHTML = aquarium.returnSpecName(i);
-			$('fishTableHealthBoxBar' + i).style.width =
-				(aquarium.returnFishCondition(i) /
-					fishSpecies[aquarium.returnSpecNum(i)].maxCondition) *
-					25 +
-				'px';
-			$('fishTableHungerBoxBar' + i).style.width = aquarium.returnFishHunger(i) / 4 + 'px';
-			$('fishTableSickBox' + i).innerHTML = aquarium.returnFishDisease(i) > 0 ? 'SICK' : '';
-			const sizePercent = Math.round(aquarium.returnFishSize(i) * 100);
-			$('fishTableSizeBox' + i).innerHTML = sizePercent + '%';
-			$('fishTablePrice' + i).innerHTML = String(
-				fishSpecies[aquarium.returnSpecNum(i)].price / 2
-			);
-		}
-
-		for (let i = fishNum; i < FISH_LIST_ROWS; i++) {
-			$('fishTableRow' + i).style.display = 'none';
-		}
+	/** Wire the delegated Sell handler once (called from boot). */
+	init() {
+		$('fishTableContainer').addEventListener('click', (e) => {
+			const target = e.target as HTMLElement;
+			const btn = target.closest<HTMLElement>('[data-sell]');
+			if (btn) aquarium.sellFish(Number(btn.dataset.sell));
+		});
 	}
 
 	refreshStatsPage() {
 		if (uio.getView() !== VIEW_STATISTICS) return;
+		if (($('tabFishList') as HTMLElement).hidden) this.#renderTankInfo();
+		else this.#renderFishList();
+	}
 
-		if (!($('tabFishList') as HTMLElement).hidden) {
-			this.updateFishListTable();
-		} else {
-			$('statFishNumber').innerHTML = String(aquarium.getFishNum());
-			$('statFishBirths').innerHTML = String(aquarium.getFishBirths());
-			$('statFishDeaths').innerHTML = String(aquarium.getFishDeaths());
-			$('statPollution').innerHTML = Math.trunc(aquarium.getPollution() * 3.15) + '%';
-			$('statFood').innerHTML = Math.trunc(aquarium.getFood()) + '%';
-			$('statMedicine').innerHTML = Math.trunc(aquarium.getMedicine()) + '%';
-			$('statGrowH').innerHTML = Math.trunc(aquarium.getGrowHormone()) + '%';
-			$('statBreedH').innerHTML = Math.trunc(aquarium.getBreedHormone()) + '%';
-			$('statDistraction').innerHTML = Math.trunc(aquarium.getDistraction()) + '%';
+	#renderFishList() {
+		const n = aquarium.getFishNum();
+		($('fishTableIcons') as HTMLElement).hidden = n === 0;
+		($('fishTableInfo') as HTMLElement).hidden = n !== 0;
+
+		let html = '';
+		for (let i = 0; i < n; i++) {
+			const specNum = aquarium.returnSpecNum(i);
+			const health = clamp01(
+				aquarium.returnFishCondition(i) / fishSpecies[specNum].maxCondition
+			);
+			const hunger = clamp01(aquarium.returnFishHunger(i) / 100);
+			const sick = aquarium.returnFishDisease(i) > 0;
+			const size = Math.round(aquarium.returnFishSize(i) * 100);
+			const price = fishSpecies[specNum].price / 2;
+
+			html +=
+				'<div class="fishRow">' +
+				`<span class="fishRow-name">${esc(aquarium.returnSpecName(i))}</span>` +
+				`<span class="fishRow-meter"><i style="width:${Math.round(health * 100)}%"></i></span>` +
+				`<span class="fishRow-meter fishRow-meter--hunger"><i style="width:${Math.round(hunger * 100)}%"></i></span>` +
+				`<span class="fishRow-flag${sick ? ' is-sick' : ''}">${sick ? 'SICK' : ''}</span>` +
+				`<span class="fishRow-size">${size}%</span>` +
+				`<button type="button" class="fishRow-sell" data-sell="${i}">Sell</button>` +
+				`<span class="fishRow-price money">${price}</span>` +
+				'</div>';
 		}
+		$('fishTableContainer').innerHTML = html;
+	}
+
+	#renderTankInfo() {
+		const line = (label: string, value: string | number) =>
+			`<div class="statList-row"><dt>${label}</dt><dd>${value}</dd></div>`;
+
+		$('tabStatistics').innerHTML =
+			'<h3 class="statList-head">Fish</h3>' +
+			'<dl class="statList">' +
+			line('Number', aquarium.getFishNum()) +
+			line('Births', aquarium.getFishBirths()) +
+			line('Deaths', aquarium.getFishDeaths()) +
+			'</dl>' +
+			'<h3 class="statList-head">Water</h3>' +
+			'<dl class="statList">' +
+			line('Pollution', pct(aquarium.getPollution() * 3.15)) +
+			line('Food', pct(aquarium.getFood())) +
+			line('Medicine', pct(aquarium.getMedicine())) +
+			line('Growth hormone', pct(aquarium.getGrowHormone())) +
+			line('Breed hormone', pct(aquarium.getBreedHormone())) +
+			line('Distraction', pct(aquarium.getDistraction())) +
+			'</dl>';
 	}
 }
 

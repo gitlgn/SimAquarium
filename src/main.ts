@@ -40,7 +40,7 @@ function boot() {
 	eventsCreate();
 	aquarium.create();
 	fishShop.init();
-	stats.createFishListTable();
+	stats.init();
 
 	if (config.checkFirstTime()) {
 		aquarium.addFish(1, 0.9999);

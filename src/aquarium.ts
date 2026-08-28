@@ -1076,7 +1076,7 @@ class Aquarium {
 		this.changeMoney(fishSpecies[this.#fish[fNum].getSpecNum()].price / 2);
 		this.removeFish(fNum);
 		this.#updateBuyButtons();
-		stats.updateFishListTable();
+		stats.refreshStatsPage();
 	}
 }
 
