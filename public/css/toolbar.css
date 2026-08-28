@@ -14,6 +14,8 @@
 	box-sizing: border-box;
 	background: var(--strip-bg);
 	color: var(--ink);
+	border: 2px solid var(--frame-line);
+	border-radius: 6px;
 }
 
 @media (min-width: 760px) {
@@ -40,13 +42,18 @@
 	height: var(--btn-size);
 	padding: 0;
 	border: 1px solid var(--btn-border);
-	border-radius: 6px;
+	border-radius: 7px;
 	background-color: var(--btn-bg);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: var(--btn-icon) var(--btn-icon);
 	image-rendering: pixelated;
 	cursor: pointer;
+	/* raised bevel — stands in for the 2014 buttonMedium.png texture */
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.55),
+		inset 0 -3px 4px rgba(0, 0, 0, 0.16),
+		0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .buttonTool:active,
@@ -55,7 +62,9 @@
 .buttonWidget:active,
 #pageMode:active {
 	background-color: var(--btn-bg-active);
-	box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+	box-shadow:
+		inset 0 2px 4px rgba(0, 0, 0, 0.4),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.25);
 }
 
 @media (hover: hover) {
@@ -212,30 +221,25 @@
 	inset: auto;
 	grid-column: 1 / -1;
 	width: 100%; /* = strip width */
-	height: 10px;
+	height: 12px;
+	border: 1px solid var(--frame-line);
 	border-radius: 999px;
-	background: linear-gradient(
-		to right,
-		var(--speed-fill) 0,
-		var(--speed-fill) calc(var(--speed-frac, 0.6) * 100%),
-		var(--speed-track) calc(var(--speed-frac, 0.6) * 100%),
-		var(--speed-track) 100%
-	);
+	/* fill/track split is repainted by uio.setSmallInterval(); this is the
+	   default (60%) so the bar is never blank */
+	background: linear-gradient(to right, var(--speed-fill) 60%, var(--speed-track) 60%);
 	touch-action: none;
 	cursor: pointer;
 }
 #speedHandle {
 	position: absolute;
 	top: 50%;
-	/* travel inset by the full thumb (incl. its 2px border each side) so it
-	   never overflows the track at frac 0 or 1 */
-	left: calc(var(--speed-frac, 0.6) * (100% - var(--speed-thumb-size) - 4px));
+	left: calc(60% - 9.6px); /* repainted by uio.setSmallInterval() */
 	width: var(--speed-thumb-size);
 	height: var(--speed-thumb-size);
 	border-radius: 50%;
 	background: var(--speed-thumb);
 	border: 2px solid var(--speed-track);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 	transform: translateY(-50%);
 	touch-action: none;
 	pointer-events: none;

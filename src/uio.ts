@@ -84,8 +84,19 @@ class Uio {
 		loop.small = window.setInterval(() => {
 			aquarium.moveFish();
 		}, smallIntervals[delay]);
-		// CSS turns --speed-frac into the fill width + thumb position
-		$('speedBar').style.setProperty('--speed-frac', String(delay / 5));
+
+		// paint the slider fill + thumb from the value (calc(var()*%) is flaky
+		// with plain-number custom props, so compute it here)
+		const frac = delay / 5;
+		const stop = (frac * 100).toFixed(1) + '%';
+		$('speedBar').style.background =
+			'linear-gradient(to right, var(--speed-fill) ' +
+			stop +
+			', var(--speed-track) ' +
+			stop +
+			')';
+		$('speedHandle').style.left = 'calc(' + stop + ' - ' + (frac * 16).toFixed(1) + 'px)';
+
 		loop.chosenSpeed = delay;
 	}
 
