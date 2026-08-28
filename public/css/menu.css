@@ -106,9 +106,11 @@
 	}
 }
 
-/* ============ phone LANDSCAPE: short + wide — a bottom bar, not a drawer ===
-   Plenty of width for every button; a vertical rail or a drawer both waste it.
-   (Wins over the drawer + rail blocks above via source order.) */
+/* ============ phone LANDSCAPE: short + wide ==============================
+   Split the two button blocks to either side of the tank so the tank gets
+   the full height and most of the width. #aquariumToolbar is `display:
+   contents` so #viewSwitch / #toolbarTools become #pageFront grid items.
+   (Wins over the rail + drawer blocks above via source order.) */
 @media (max-height: 560px) and (min-width: 560px) {
 	#menuToggle {
 		display: none;
@@ -118,49 +120,56 @@
 	}
 
 	#pageFront {
-		grid-template-rows: 1fr auto;
-		grid-template-columns: 1fr;
-		grid-template-areas:
-			'views'
-			'toolbar';
+		grid-template-columns: auto 1fr auto;
+		grid-template-rows: 1fr;
+		grid-template-areas: 'nav views tools';
 	}
 
 	#aquariumToolbar {
-		position: static;
-		transform: none;
-		width: auto;
-		height: auto;
-		max-height: 48vh;
-		flex-direction: row;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: center;
-		gap: 5px 8px;
-		padding: 5px;
-		border-radius: 6px;
-		box-shadow: none;
-		z-index: auto;
-	}
-	#toolbarStatus {
-		order: -1;
-		align-self: center;
-		width: auto;
+		display: contents;
 	}
 
-	/* both button groups take a full row and flow as many columns as fit */
 	#viewSwitch,
 	#toolbarTools {
-		width: 100%;
-		grid-template-columns: repeat(auto-fill, var(--btn-size));
+		align-self: stretch;
+		overflow-y: auto;
+		grid-template-columns: repeat(2, var(--btn-size));
 		justify-content: center;
+		gap: 5px;
+		padding: var(--strip-pad);
+		box-sizing: border-box;
+		background: var(--strip-bg);
+		border: 2px solid var(--frame-line);
+		border-radius: 6px;
 	}
-	#speedLabel {
+	#viewSwitch {
+		grid-area: nav;
+		padding-top: 40px; /* clear the floating status chip */
+	}
+	#toolbarTools {
+		grid-area: tools;
+	}
+
+	#toolbarStatus {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		z-index: 8;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 3px 6px;
+		border: 1px solid var(--frame-line);
+		border-radius: 6px;
+		background: rgba(11, 58, 89, 0.9);
+		color: var(--ink);
+	}
+
+	#speedLabel,
+	#speedBar {
 		grid-column: 1 / -1;
 	}
 	#speedBar {
-		grid-column: 1 / -1;
 		width: 100%;
-		max-width: 260px;
-		justify-self: center;
 	}
 }
