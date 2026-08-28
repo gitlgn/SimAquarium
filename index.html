@@ -23,6 +23,7 @@
 	<!-- Responsive shell — loaded last to win the cascade over the 2014 layout CSS. -->
 	<link rel="stylesheet" href="/css/shell.css" type="text/css">
 	<link rel="stylesheet" href="/css/mobile.css" type="text/css">
+	<link rel="stylesheet" href="/css/panels.css" type="text/css">
 
 	<script type="module" src="/src/main.ts"></script>
 </head>
@@ -79,7 +80,7 @@
 				<canvas id="tank" width="360" height="240"></canvas>
 			</div>
 			<!-- FISH SHOP VIEW -->
-			<div class="view" id="view1">
+			<div class="view" id="view1" hidden>
 				<div class="tabBar">
 					<div class="tab active">Fish Shop</div>
 				</div>
@@ -132,7 +133,7 @@
 				</div>
 			</div>
 			<!-- SCENERY VIEW -->
-			<div class="view" id="view2">
+			<div class="view" id="view2" hidden>
 				<div class="tabBar">
 					<div class="tab active">Scenery Shop</div>
 				</div>
@@ -194,7 +195,7 @@
 				</div>
 			</div>
 			<!-- LIGHTING VIEW -->
-			<div class="view" id="view3">
+			<div class="view" id="view3" hidden>
 				<div class="tabBar">
 					<div class="tab active">Lighting Shop</div>
 				</div>
@@ -257,7 +258,7 @@
 					</div>
 			</div>
 			<!-- ACCESSORIES VIEW -->
-			<div class="view" id="view4">
+			<div class="view" id="view4" hidden>
 				<div class="tabBar">
 					<div class="tab active" id="tabButtonFilterShop">Filters Shop</div>
 					<div class="tab" id="tabButtonBackgroundShop">Backgrounds Shop</div>
@@ -309,7 +310,7 @@
 
 			</div>
 			<!-- STATISTICS VIEW -->
-			<div class="view" id="view5">
+			<div class="view" id="view5" hidden>
 				<div class="tabBar">
 					<div class="tab active" id="tabButtonFishList">Fish List</div>
 					<div class="tab" id="tabButtonStatistics">Tank Info</div>

@@ -58,10 +58,10 @@ class Uio {
 		if (viewNumber === VIEW_AQUARIUM) aquarium.render();
 
 		$('buttonView' + this.#view).setAttribute('class', 'buttonView');
-		$('view' + this.#view).style.display = 'none';
+		$('view' + this.#view).hidden = true;
 
 		$('buttonView' + viewNumber).setAttribute('class', 'buttonView active');
-		$('view' + viewNumber).style.display = 'block';
+		$('view' + viewNumber).hidden = false;
 
 		this.#view = viewNumber;
 	}

@@ -1,0 +1,108 @@
+/*
+ * panels.css — shop panels reflow (Phase 4b-3). Loaded last.
+ *
+ * The 2014 shop slots are pixel-art tiles with position: absolute internals.
+ * We don't resize a tile — we turn the fixed 3-column absolute layout into an
+ * auto-fill grid so the panel fills its width, reflows to fewer columns when
+ * narrow, and scrolls. Tile internals (.title/.image/.money/.button) are
+ * untouched.
+ *
+ * Covers the three simple single-grid shops: fish (view1), scenery (view2),
+ * lighting (view3). Accessories (view4, has inner tabs) and Statistics (view5)
+ * keep the 2014 layout at native size until 4b-4.
+ *
+ * Show/hide is the `hidden` attribute now (uio.changeView), not inline
+ * style.display — so these `display: grid` rules actually take effect.
+ */
+
+[hidden] {
+	display: none !important;
+}
+
+/* the active view fills the scroll area */
+.view {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 10px;
+	overflow-y: auto;
+	color: #ededed;
+}
+#view1,
+#view2,
+#view3 {
+	background: #5f5f5f;
+}
+
+#view0 {
+	background: none;
+	padding: 0;
+	overflow: visible;
+}
+
+/* not converted yet — pin back to native size, centred in the scroll area */
+#view4,
+#view5 {
+	width: 360px;
+	height: 240px;
+	padding: 0;
+	overflow: visible;
+	margin: 0 auto;
+}
+
+/* headers / tab bar back into normal flow */
+.view .tabBar {
+	position: static;
+	float: none;
+	width: auto;
+	height: auto;
+	margin: 0 0 8px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+.view .tabBar .tab {
+	float: none;
+	margin: 0;
+}
+#view1 .headerInfo,
+#view2 .headerInfo,
+#view3 .headerInfo {
+	position: static;
+	float: none;
+	width: auto;
+	height: auto;
+	margin: 0 0 8px;
+	color: #dddddd;
+}
+
+/* the slot grids */
+#view1,
+#tabSceneries,
+#tabLightingShop {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 110px);
+	justify-content: center;
+	align-content: start;
+	gap: 10px;
+}
+
+/* view1 holds its tab bar + "new fish in" line as grid items */
+#view1 > .tabBar,
+#view1 > .headerInfo {
+	grid-column: 1 / -1;
+}
+
+/* tiles: out of absolute positioning (the per-#id top/left rules are more
+   specific than a bare .fooSlot, so scope by ancestor to beat them). */
+#view1 .fishSlot,
+#tabSceneries .scenerySlot,
+#tabLightingShop .lightSlot {
+	position: relative;
+	inset: auto;
+	top: auto;
+	left: auto;
+	margin: 0;
+}

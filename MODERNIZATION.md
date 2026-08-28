@@ -202,12 +202,31 @@ Staged so every commit boots and is checkable on a real screen.
   ≥34 px, view switch / speed-drag / minimise / Configuration all work,
   canvas painted, no 4xx. `npm run check` + `vite build` green.
 
-#### 4b-3 — shop panels reflow (fish / scenery / lighting / filters / backgrounds)
+#### ✅ 4b-3 — fish / scenery / lighting panels reflow (done)
 
-- Each `.fooSlot` grid from `position: absolute` at fixed `top/left` to a
-  responsive `grid`/`flex-wrap` of cards (`auto-fill, minmax(...)`), 1–3
-  columns by width, container scrolls. Keep the per-slot art bitmaps.
-- `.tabBar` / tabs become a normal flow row.
+- `public/css/panels.css` (loaded last). The three single-grid shops (view1–3)
+  go from a fixed 3-column absolute layout to `grid-template-columns:
+  repeat(auto-fill, 110px)` — 2 columns on a phone, 6+ on a wide screen — with
+  the panel scrolling. Tile internals (`.title/.image/.money/.button`) are
+  **untouched**; only the tile's own `position: absolute` + per-`#id`
+  `top/left` are neutralised (via `#viewN .fooSlot` selectors that out-specify
+  the id rules).
+- Show/hide moved off inline `style.display` to the **`hidden` attribute**
+  (`uio.changeView`), with a `[hidden] { display: none !important }` reset — so
+  the `display: grid` rules can actually apply. `hidden` added to `#view1`–`5`
+  in the markup; the per-view `#viewN { display: none }` rules removed.
+- `.tabBar` / `.headerInfo` back into normal flow.
+- Accessories (view4) + Statistics (view5) stay pinned at 360×240 for now.
+- Verified at 375×812 and 1024×680: shops reflow + scroll, tiles stay in
+  bounds and clickable (buy/info/sell fire), tank + other views unaffected,
+  no 4xx. `npm run check` + `vite build` green.
+
+#### 4b-4 — accessories (inner tabs) + statistics / fish-list panel
+
+- `uio.changeTab` off inline `style.display` (→ `hidden`) so `#tabFilterShop`
+  / `#tabBackgroundShop` can be grids; reflow both like 4b-3.
+- `#tabStatistics` absolute-label soup → a flow list; `#fishTableContainer`
+  rows width-fluid.
 
 #### 4b-4 — statistics + fish-list panel
 
