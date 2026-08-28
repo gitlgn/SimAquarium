@@ -6,11 +6,10 @@
 import { aquarium } from './aquarium.js';
 import { config } from './config.js';
 import { loop, smallIntervals } from './loop.js';
-import { PAGE_FRONT, PAGE_BACK, PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
+import { PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
 import { $ } from './dom.js';
 
 class Uio {
-	#page = PAGE_FRONT;
 	#frontPageMode = PAGEMODE_MAXI;
 	#view = VIEW_AQUARIUM;
 	#rememberSpeed;
@@ -37,17 +36,11 @@ class Uio {
 		}
 	}
 
-	// Flipping the widget
+	// Configuration overlay — #pageBack sits on top of the (still-rendered)
+	// #pageFront, with its own Close button, so opening it can't strand you.
 	flipWidget() {
-		if (this.#page === PAGE_FRONT) {
-			$('pageFront').style.display = 'none';
-			$('pageBack').style.display = 'block';
-			this.#page = PAGE_BACK;
-		} else if (this.#page === PAGE_BACK) {
-			$('pageBack').style.display = 'none';
-			$('pageFront').style.display = 'block';
-			this.#page = PAGE_FRONT;
-		}
+		const back = $('pageBack');
+		back.hidden = !back.hidden;
 	}
 
 	// Changing the view — the `.active` class drives the button look (toolbar.css),

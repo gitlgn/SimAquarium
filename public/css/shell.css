@@ -139,14 +139,4 @@ body {
 	display: none;
 }
 
-/* ---- configuration page (legacy size, centred overlay) ------------------ */
-
-#pageBack {
-	position: absolute;
-	inset: 0;
-	margin: auto;
-	width: 457px;
-	height: 300px;
-	max-width: 100%;
-	z-index: 10;
-}
+/* #pageBack (Configuration) is a full overlay — see config.css. */

@@ -34,7 +34,6 @@ import {
 	FI_ENERGY,
 	FI_IMAGE,
 	BG_PRICE,
-	BG_IMAGE,
 } from './constants.js';
 
 /** A 360x240 offscreen canvas for one of the two composited layers. */
@@ -85,6 +84,10 @@ class Aquarium {
 	#imageGlassFront = new Image();
 	#imageWater = new Image();
 	#imageGlassBack = new Image();
+	// the tiled back-wall colour. The 2014 code showed it as a CSS background on
+	// #view0 behind a transparent canvas; the responsive tank canvas is opaque,
+	// so it's drawn on-canvas now (like exportPhoto always did).
+	#wallImage = new Image();
 	#layerFront = makeLayerCanvas();
 	#layerBack = makeLayerCanvas();
 	#layerFrontCtx = ctx2d(this.#layerFront);
@@ -97,6 +100,11 @@ class Aquarium {
 		this.#imageGlassFront.src = 'gfx/aquarium/tank/glassFront.png';
 		this.#imageWater.src = 'gfx/aquarium/tank/water.png';
 		this.#imageGlassBack.src = 'gfx/aquarium/tank/glassBack.png';
+		this.#wallImage.addEventListener('load', () => this.render());
+	}
+
+	#setWall(bgNum) {
+		this.#wallImage.src = background.getBackgroundSrc(bgNum);
 	}
 
 	resetAquarium() {
@@ -128,7 +136,7 @@ class Aquarium {
 
 		this.#usedBackground = 0;
 		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
-		$('view0').style.background = 'url(' + background.getBackgroundData(0, BG_IMAGE) + ')';
+		this.#setWall(0);
 
 		this.#fish.length = 0;
 		for (let i = 0; i < 29; i++) {
@@ -258,8 +266,7 @@ class Aquarium {
 		}
 		this.#usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
 		$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy off');
-		$('view0').style.background =
-			'url(' + background.getBackgroundData(this.#usedBackground, BG_IMAGE) + ')';
+		this.#setWall(this.#usedBackground);
 
 		// load fish data
 
@@ -466,9 +473,9 @@ class Aquarium {
 		if (this.changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
 			$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy on');
 			$('buttonBackgroundBuy' + bgNum).setAttribute('class', 'button buy off');
-			$('view0').style.background =
-				'url(' + background.getBackgroundData(bgNum, BG_IMAGE) + ')';
 			this.#usedBackground = bgNum;
+			this.#setWall(bgNum); // #wallImage 'load' repaints; render now for the cached case
+			this.render();
 			this.#updateBuyButtons();
 			config.saveGame();
 		}
@@ -546,6 +553,7 @@ class Aquarium {
 
 	create() {
 		this.#canvasTankCtx = ctx2d($('tank') as HTMLCanvasElement);
+		this.#setWall(this.#usedBackground);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
 	}
@@ -1012,6 +1020,14 @@ class Aquarium {
 	}
 
 	#renderBackground() {
+		const wall = this.#wallImage;
+		if (wall.complete && wall.naturalWidth > 0) {
+			for (let x = 0; x < 360; x += 64) {
+				for (let y = 0; y < 240; y += 64) {
+					this.#canvasTankCtx.drawImage(wall, x, y);
+				}
+			}
+		}
 		this.#canvasTankCtx.drawImage(this.#layerBack, 0, 0);
 	}
 

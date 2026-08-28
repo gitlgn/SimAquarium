@@ -282,10 +282,31 @@ Applied after eyeballing 4b-4 on Chrome/Brave/phone:
   + camera still work, no 4xx. `npm run check` + `vite build` green; devpanel
   still tree-shaken from prod.
 
-#### 4b-6 — Configuration page (`#pageBack`)
+#### ✅ 4b-6 — Configuration overlay + kill the last bitmaps (done)
 
-The last 2014 island: still `position: absolute` on `widgetBack.png` at a
-fixed 457×300. Turn it into a plain centred flex panel and drop the bitmap.
+- `#pageBack` was shown by *hiding* `#pageFront`, which also hid the only
+  button that flipped back. Now it's a **backdrop + centred CSS card**
+  (`config.css`, contents wrapped in `#confPanel`) layered over the
+  still-rendered `#pageFront`, with its own **Close** button (`#confClose` →
+  `uio.flipWidget`). `flipWidget` is just `back.hidden = !back.hidden` now;
+  the `#page` field + `PAGE_FRONT/PAGE_BACK` are gone.
+- **Background shop had no visible effect** — the 2014 code showed the wall
+  colour as a CSS background on `#view0` behind a transparent canvas, but the
+  responsive tank canvas is opaque. Fixed: `aquarium` loads the wall into
+  `#wallImage` and tiles it on-canvas in `#renderBackground()` (as
+  `exportPhoto` always did); `buyBackground` / `loadAquarium` / `newGame` set
+  it via `#setWall()`, and the image's `load` repaints. Verified white → red →
+  blue all change the tank and survive save/load.
+- Removed the now-unused bitmaps: `widgetFront.png`, `widgetBack.png`,
+  `viewBackground.png`, `gameSpeedBar.png`, `gameSpeedHandle.png`,
+  `buttonBig/Medium/Small.png`, `viewMode.png`. Precache 208 → 199 entries.
+- Verified at 375×812 / 1100×720: config overlay opens over the game, Close +
+  toggle both work, Add Money / New Game / Relax reachable, all six views in
+  bounds, no 4xx, no requests for the deleted files. `npm run check` +
+  `vite build` green.
+
+**Phase 4b complete.** The 2014 fixed-widget UI is gone: one responsive shell,
+CSS chrome throughout, every panel reflows, tuning knobs in `theme.css`.
 
 ## Phase 5 — Android
 

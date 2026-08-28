@@ -112,6 +112,7 @@ export function eventsCreate() {
 	}
 
 	/*** PREFERENCES ***/
+	on('confClose', 'click', () => uio.flipWidget());
 	on('confRelaxMode', 'change', () => config.relaxChange());
 	on('confNewGame', 'click', () => config.newGame());
 	on('coinAdd', 'click', () => coinAdd());

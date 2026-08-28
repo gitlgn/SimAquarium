@@ -1,94 +1,117 @@
-/*** CONFIGURATION PAGE ***/
+/*
+ * config.css — the Configuration overlay (Phase 4b-6).
+ *
+ * Was: #pageBack as a 457x300 bitmap (widgetBack.png) with everything
+ * position: absolute, shown by hiding #pageFront (which stranded the only way
+ * back). Now: a backdrop + a centred CSS card with its own Close button;
+ * #pageFront keeps rendering underneath.
+ */
 
-#pageBack .header {
-	color: rgb( 25, 25, 25 );
-	font-size: 11px;
+#pageBack {
+	position: absolute;
+	inset: 0;
+	z-index: 20;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+	box-sizing: border-box;
+	background: rgba(4, 22, 36, 0.72);
+}
+
+#confPanel {
+	width: min(360px, 100%);
+	max-height: 100%;
+	overflow-y: auto;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 16px 18px;
+	border-radius: 10px;
+	background: #dfdac9;
+	color: #2a2a2a;
+	font-size: 13px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* neutralise every 2014 absolute coordinate inside the card */
+#confPanel * {
+	position: static;
+}
+
+#confPanel .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0;
+	width: auto;
+	height: auto;
+	font-size: 16px;
 	font-weight: bold;
-	width: 200px;
-	height: 14px;
-	position: absolute;
-	left: 23px;
-	top: 17px;
+	color: #2a2a2a;
 }
 
-
-#pageBack a {
-text-decoration: none;
-
-}
-
-#confNewGame {
-	position: absolute;
-	top: 90px;
-	left: 165px;
-	
-	width: 126px;
-	height: 26px;
-	font-size: 17px;
+#confClose {
+	font: inherit;
+	padding: 4px 12px;
+	border: 1px solid #8a7f63;
+	border-radius: 6px;
+	background: #cabf92;
 	cursor: pointer;
 }
-
-#confRelaxMode {
-	position: absolute;
-	top: 165px;
-	left: 164px;
-	cursor: pointer;
+#confClose:hover {
+	background: #e2d7ab;
 }
 
-#confRelaxModeLabel {
-	font-size: 12px;
-	position: absolute;
-	top: 166px;
-	left: 185px;
+#confFish {
+	display: flex;
+	justify-content: center;
+	gap: 24px;
+}
+#confFish img {
+	width: 56px;
+	height: auto;
+	image-rendering: pixelated;
+}
+
+#confPanel button#confNewGame,
+#confPanel button#coinAdd {
+	align-self: start;
+	font: inherit;
+	padding: 8px 16px;
+	border: 1px solid #8a7f63;
+	border-radius: 6px;
+	background: #cabf92;
+	cursor: pointer;
+}
+#confPanel button#confNewGame:hover,
+#confPanel button#coinAdd:hover {
+	background: #e2d7ab;
+}
+
+#confRelaxRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+}
+#confRelaxRow input {
+	cursor: pointer;
 }
 
 #confRelaxModeInfo {
-	font-size: 10px;
-	position: absolute;
-	top: 185px;
-	left: 120px;
-	text-align: center;
-	color: rgb( 80, 80, 80 );
+	font-size: 11px;
+	color: #5a5245;
 }
 
 #confCopyrights {
+	margin-top: 4px;
 	font-size: 10px;
-	position: absolute;
-	top: 260px;
-	left: 75px;
+	color: #5a5245;
 }
-
-
-
-#img1 {
-	position: absolute;
-	top: 78px;
-	left: 100px;
-
-}
-
-#img2 {
-	position: absolute;
-	top: 78px;
-	left: 308px;
-
-}
-
-#coinAdd {
-	position: absolute;
-	top: 220px;
-	left: 220px;
-	width: 70px;
-	height: 26px;
-	font-size: 10px;
-	cursor: pointer;
-}
-
-#coinCode {
-	position: absolute;
-	top: 220px;
-	left: 165px;
-	width: 50px;
-	height: 18px;
-	font-size: 17px;
+#confCopyrights a {
+	color: #3a5a78;
+	text-decoration: none;
 }
