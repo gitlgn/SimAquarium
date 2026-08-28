@@ -26,6 +26,7 @@
 	<link rel="stylesheet" href="/css/mobile.css" type="text/css">
 	<link rel="stylesheet" href="/css/panels.css" type="text/css">
 	<link rel="stylesheet" href="/css/toast.css" type="text/css">
+	<link rel="stylesheet" href="/css/menu.css" type="text/css">
 
 	<script type="module" src="/src/main.ts"></script>
 </head>
@@ -36,13 +37,19 @@
 
 	<div id="pageFront">
 
-		<!-- T O O L B A R -->
+		<!-- C O N T R O L   S T R I P  (a left drawer on phones) -->
 		<div id="aquariumToolbar">
-			<!-- AQUARIUM STATUS -->
-			<div id="toolbarStatus">
-				<div id="statusWater"><div id="statusWaterBar"></div></div>
-				<div id="statusMoney" class="money">102400</div>
-				<div id="relaxBadge">PAUSED</div>
+			<!-- VIEW SWITCH -->
+			<div id="viewSwitch">
+			<div class="buttonView active" id="buttonView0" title="Aquarium"></div>
+			<div class="buttonView" id="buttonView1" title="Fish Shop"></div>
+			<div class="buttonView" id="buttonView2" title="Scenery"></div>
+			<div class="buttonView" id="buttonView3" title="Lighting"></div>
+			<div class="buttonView" id="buttonView4" title="Accessories"></div>
+			<div class="buttonView" id="buttonView5" title="Statistics"></div>
+			<div class="buttonTool" id="cameraTool" title="Screenshot"></div>
+			<div class="buttonWidget" id="buttonWidget0"></div>
+			<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
 			</div>
 			<!-- AQUARIUM TOOLS -->
 			<div id="toolbarTools">
@@ -60,19 +67,6 @@
 
 		<!-- G A M E   V I E W S -->
 		<div id="aquariumViews">
-			<!-- SWITCH VIEW BUTTONS -->
-			<div id="viewSwitch">
-			<div class="buttonView active" id="buttonView0" title="Aquarium"></div>
-			<div class="buttonView" id="buttonView1" title="Fish Shop"></div>
-			<div class="buttonView" id="buttonView2" title="Scenery"></div>
-			<div class="buttonView" id="buttonView3" title="Lighting"></div>
-			<div class="buttonView" id="buttonView4" title="Accessories"></div>
-			<div class="buttonView" id="buttonView5" title="Statistics"></div>
-			<div class="buttonTool" id="cameraTool" title="Screenshot"></div>
-			<div class="buttonWidget" id="buttonWidget0"></div>
-			<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
-			</div>
-
 			<!-- VIEWS -->
 			<div id="panelBody">
 
@@ -350,8 +344,18 @@
 		</div>
 	</div>
 
-	<!-- MINIMISE / RESTORE (stays out of #viewSwitch so it survives .mini) -->
+	<!-- MINIMISE / RESTORE -->
 	<div id="pageMode" title="Minimise"></div>
+
+	<!-- BURGER (phones only) — toggles the control strip as a left drawer -->
+	<button id="menuToggle" type="button" title="Menu" aria-label="Menu"></button>
+
+	<!-- ALWAYS-VISIBLE STATUS: water + money + relax badge -->
+	<div id="toolbarStatus">
+		<div id="statusWater"><div id="statusWaterBar"></div></div>
+		<div id="statusMoney" class="money">102400</div>
+		<div id="relaxBadge">PAUSED</div>
+	</div>
 
 </div><!-- #stage -->
 </div><!-- #viewport -->

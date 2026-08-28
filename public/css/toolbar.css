@@ -22,7 +22,7 @@
 	#aquariumToolbar {
 		flex-direction: column;
 		flex-wrap: nowrap;
-		width: auto; /* minimum — shrink-wrap to the tools */
+		width: var(--strip-width);
 		height: 100%;
 		padding-top: calc(var(--btn-size) + 12px); /* clear the corner minimise button */
 		overflow-y: auto;
@@ -125,16 +125,7 @@
 	background-image: url(../gfx/interface/viewIcon1.png);
 }
 
-/* ---- status block --------------------------------------------------- */
-
-#toolbarStatus {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	position: static;
-	width: auto;
-	padding: 4px;
-}
+/* ---- status block (layout in menu.css — always-visible top-left panel) --- */
 
 #statusMoney {
 	position: static;

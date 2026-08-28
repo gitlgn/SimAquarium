@@ -411,7 +411,31 @@ The 4b-6 on-canvas wall render is on this branch and works (white → red → bl
 change the tank and persist). The "background gone" report was the wall simply
 not being visible while a shop / stats panel covers the tank — expected.
 
-### 6e — flexible menu bar / mobile burger (proposed)
+### ✅ 6e-1 — unified control strip + mobile burger drawer (done)
+
+- `#viewSwitch` moved into `#aquariumToolbar` — one control strip (view nav +
+  tools + speed) instead of a top row plus a side strip. `#toolbarStatus`
+  (water + money + relax badge) pulled out to a small always-visible panel,
+  top-left.
+- **≥ 760px**: strip is a `--strip-width` (176px) rail on the right; the tank
+  now gets the full height (no top row eating ~50px).
+- **< 760px**: `#menuToggle` (a CSS ☰ button, top-left) toggles `.menu-open`
+  on `#stage`; the strip becomes a left slide-in drawer (`transform`, dim
+  scrim). Picking a view or tapping outside closes it. Tank is full-screen
+  otherwise.
+- `menu.css` holds both faces; `events.ts` wires the toggle + outside-tap
+  close.
+- Verified 1280 / 412: strip 176px + tank fills the rest on desktop; burger
+  shows only < 760, drawer slides to x0 on `.menu-open` and to −300 closed,
+  view/tool actions still fire, no overflow, no 4xx.
+
+### 6e-2 — data-driven chrome (next)
+
+Describe the strip's buttons as `[{ id, icon, label, action }]` and render
+`#viewSwitch` / `#toolbarTools` from it, so the markup isn't hand-maintained
+and the drawer can reorder / relabel for touch.
+
+### (old 6e note)
 
 The icons *around* the tank (6 view buttons + camera + help + config in
 `#viewSwitch`, 8 tools + speed in `#aquariumToolbar`, minimise in the corner)

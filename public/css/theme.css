@@ -14,6 +14,7 @@
 	/* ---- spacing ---- */
 	--frame-gap: 6px; /* blue frame between the tank, the strip and the edges */
 	--strip-pad: 4px; /* padding inside the toolbar strip */
+	--strip-width: 176px; /* the control strip on >=760px (fits 2 buttons/row) */
 	--panel-pad: 0px; /* padding inside a shop / stats panel */
 
 	/* ---- buttons (one size for everything) ---- */
