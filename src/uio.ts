@@ -97,8 +97,8 @@ class Uio {
 		loop.small = window.setInterval(() => {
 			aquarium.moveFish();
 		}, smallIntervals[delay]);
-		// handle centre sits at delay/5 of the bar width (CSS transl(-50%) centres it)
-		$('speedHandle').style.left = (delay / 5) * 100 + '%';
+		// CSS turns --speed-frac into the fill width + thumb position
+		$('speedBar').style.setProperty('--speed-frac', String(delay / 5));
 		loop.chosenSpeed = delay;
 	}
 

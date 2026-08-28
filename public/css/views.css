@@ -6,8 +6,8 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 8px;
-	padding: 2px 48px 2px 2px; /* room for the absolute #pageMode top-right */
+	gap: 6px;
+	padding: 2px calc(var(--btn-size) + 10px) 2px 2px; /* room for the absolute #pageMode top-right */
 }
 
 .buttonView {

@@ -69,19 +69,17 @@
 #view1,
 #tabSceneries,
 #tabLightingShop,
-#tabFilterShop {
+#tabFilterShop,
+#tabBackgroundShop {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, var(--tile-col));
-	justify-content: center;
+	/* tiles grow to fill the row — reflow by width */
+	grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
 	align-content: start;
 	gap: var(--tile-gap);
 }
 #tabBackgroundShop {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, 64px);
-	justify-content: center;
-	align-content: start;
-	gap: var(--tile-gap);
+	/* background swatches are smaller art */
+	grid-template-columns: repeat(auto-fill, minmax(calc(var(--tile-min) * 0.6), 1fr));
 }
 
 /* view1 holds its tab bar + "new fish in" line as grid items */
@@ -91,7 +89,8 @@
 }
 
 /* tiles: out of absolute positioning (per-#id top/left rules are more specific
-   than a bare .fooSlot, so scope by ancestor to beat them). */
+   than a bare .fooSlot, so scope by ancestor to beat them) and stretched to
+   fill the grid cell; the per-slot art scales with them. */
 #view1 .fishSlot,
 #tabSceneries .scenerySlot,
 #tabLightingShop .lightSlot,
@@ -102,6 +101,25 @@
 	top: auto;
 	left: auto;
 	margin: 0;
+	width: auto;
+	background-repeat: no-repeat;
+	background-position: left top;
+	background-size: 100% 100%; /* art scales with the (proportional) tile */
+}
+/* keep each tile's native proportions as it stretches */
+#view1 .fishSlot,
+#tabSceneries .scenerySlot,
+#tabLightingShop .lightSlot {
+	aspect-ratio: 110 / 61;
+	height: auto;
+}
+#tabFilterShop .filterSlot {
+	aspect-ratio: 110 / 94;
+	height: auto;
+}
+#tabBackgroundShop .backgroundSlot {
+	aspect-ratio: 64 / 46;
+	height: auto;
 }
 
 /* ---- statistics view (view5) ---- */

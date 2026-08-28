@@ -1,6 +1,6 @@
 /*
- * toolbar.css — the control strip + all the pixel-art buttons (Phase 4b).
- * Knobs live in theme.css. Layout switch (760px) must match shell.css.
+ * toolbar.css — the control strip + buttons (Phase 4b). Knobs in theme.css.
+ * Layout switch (760px) must match shell.css.
  */
 
 #aquariumToolbar {
@@ -9,7 +9,7 @@
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: flex-start;
-	gap: 12px 18px;
+	gap: 10px 14px;
 	padding: var(--strip-pad);
 	box-sizing: border-box;
 	background: var(--strip-bg);
@@ -20,14 +20,14 @@
 	#aquariumToolbar {
 		flex-direction: column;
 		flex-wrap: nowrap;
-		width: var(--strip-width);
+		width: auto; /* minimum — shrink-wrap to the tools */
 		height: 100%;
-		padding-top: calc(var(--btn-size-sm) + 14px); /* clear the corner minimise button */
+		padding-top: calc(var(--btn-size) + 12px); /* clear the corner minimise button */
 		overflow-y: auto;
 	}
 }
 
-/* ---- shared button chrome -------------------------------------------- */
+/* ---- shared button chrome + one size for all --------------------------- */
 
 .buttonTool,
 .buttonView,
@@ -36,12 +36,15 @@
 #pageMode {
 	box-sizing: border-box;
 	flex: none;
+	width: var(--btn-size);
+	height: var(--btn-size);
 	padding: 0;
 	border: 1px solid var(--btn-border);
-	border-radius: var(--btn-radius);
+	border-radius: 6px;
 	background-color: var(--btn-bg);
 	background-repeat: no-repeat;
 	background-position: center;
+	background-size: var(--btn-icon) var(--btn-icon);
 	image-rendering: pixelated;
 	cursor: pointer;
 }
@@ -65,25 +68,10 @@
 	}
 }
 
-.buttonTool,
-.buttonView,
-#cameraTool {
-	width: var(--btn-size);
-	height: var(--btn-size);
-	background-size: var(--btn-icon) var(--btn-icon);
-}
-
 .buttonView.active {
 	background-color: var(--btn-bg-active-view);
 	border-color: #47698c;
 	cursor: default;
-}
-
-.buttonWidget,
-#pageMode {
-	width: var(--btn-size-sm);
-	height: var(--btn-size-sm);
-	background-size: var(--btn-icon-sm) var(--btn-icon-sm);
 }
 
 /* ---- tool icons ------------------------------------------------------- */
@@ -115,22 +103,38 @@
 #cameraTool {
 	background-image: url(../gfx/interface/iconToolCamera.png);
 }
+#buttonWidget0 {
+	background-image: url(../gfx/interface/iconSmall0.png);
+}
+#buttonWidget1 {
+	background-image: url(../gfx/interface/iconSmall1.png);
+}
+#buttonWidget2 {
+	background-image: url(../gfx/interface/iconSmall2.png);
+}
+#pageMode {
+	background-image: url(../gfx/interface/viewIcon0.png);
+}
+#stage.mini #pageMode {
+	background-image: url(../gfx/interface/viewIcon1.png);
+}
 
 /* ---- status block --------------------------------------------------- */
 
 #toolbarStatus {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	position: static;
-	width: 100%;
+	width: auto;
+	padding: 4px;
 }
 
 #statusMoney {
 	position: static;
 	inset: auto;
 	width: auto;
-	min-width: 48px;
+	min-width: 40px;
 	height: auto;
 	font-size: 15px;
 	font-weight: bold;
@@ -180,15 +184,18 @@
 	position: static;
 	width: 100%;
 	display: grid;
-	grid-template-columns: repeat(2, var(--btn-size) minmax(24px, 1fr));
+	/* phones: 4 tools per row (2 rows). Side-by-side layout: 1 per row. */
+	grid-template-columns: repeat(4, var(--btn-size) minmax(14px, 1fr));
 	gap: 4px 6px;
 	align-items: center;
 	justify-content: start;
+	padding: 4px;
+	box-sizing: border-box;
 }
 
 @media (min-width: 760px) {
 	#toolbarTools {
-		grid-template-columns: var(--btn-size) minmax(24px, 1fr);
+		grid-template-columns: var(--btn-size) minmax(20px, 1fr);
 	}
 }
 
@@ -201,7 +208,7 @@
 	text-align: left;
 }
 
-/* ---- speed control ------------------------------------------------- */
+/* ---- speed control — modern CSS slider (was gameSpeedBar/Handle.png) --- */
 
 #speedLabel {
 	position: static;
@@ -209,47 +216,38 @@
 	grid-column: 1 / -1;
 	text-align: left;
 	font-size: 11px;
-	margin-top: 6px;
+	margin: 8px 0 4px;
 }
 #speedBar {
 	position: relative;
 	inset: auto;
 	grid-column: 1 / -1;
-	width: 100%;
-	max-width: var(--speed-width);
-	height: var(--speed-height);
-	background: url(../gfx/interface/gameSpeedBar.png) left center / auto 100% repeat-x;
+	width: 100%; /* = strip width */
+	height: 10px;
+	border-radius: 999px;
+	background: linear-gradient(
+		to right,
+		var(--speed-fill) 0,
+		var(--speed-fill) calc(var(--speed-frac, 0.6) * 100%),
+		var(--speed-track) calc(var(--speed-frac, 0.6) * 100%),
+		var(--speed-track) 100%
+	);
 	touch-action: none;
+	cursor: pointer;
 }
 #speedHandle {
 	position: absolute;
 	top: 50%;
-	left: 0;
-	transform: translate(-50%, -50%);
-	width: 16px;
-	height: 16px;
-	background: url(../gfx/interface/gameSpeedHandle.png) center / contain no-repeat;
+	/* travel inset by the full thumb (incl. its 2px border each side) so it
+	   never overflows the track at frac 0 or 1 */
+	left: calc(var(--speed-frac, 0.6) * (100% - var(--speed-thumb-size) - 4px));
+	width: var(--speed-thumb-size);
+	height: var(--speed-thumb-size);
+	border-radius: 50%;
+	background: var(--speed-thumb);
+	border: 2px solid var(--speed-track);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	transform: translateY(-50%);
 	touch-action: none;
 	pointer-events: none;
-}
-
-/* ---- minimise / restore toggle (placed by shell.css) --------------- */
-
-#pageMode {
-	background-image: url(../gfx/interface/viewIcon0.png);
-}
-#stage.mini #pageMode {
-	background-image: url(../gfx/interface/viewIcon1.png);
-}
-
-/* ---- small widget icons ------------------------------------------- */
-
-#buttonWidget0 {
-	background-image: url(../gfx/interface/iconSmall0.png);
-}
-#buttonWidget1 {
-	background-image: url(../gfx/interface/iconSmall1.png);
-}
-#buttonWidget2 {
-	background-image: url(../gfx/interface/iconSmall2.png);
 }

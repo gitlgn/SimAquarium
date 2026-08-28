@@ -1,43 +1,31 @@
 /*
  * theme.css — the layout & colour knobs, all in one place (Phase 4b).
  *
- * Every number the responsive shell cares about lives here as a CSS variable.
  * Change a value, save, the dev server hot-reloads and you see it. No build.
- * (In dev there's also a slider panel — the ⚙ button bottom-left — that writes
- * these live; "Copy CSS" there dumps the values to paste back in here.)
+ * In dev there's also a slider panel — the ⚙ button bottom-left — that writes
+ * these live; "Copy CSS" there dumps the values to paste back in here.
  *
- * The one thing NOT here: the layout switch point. CSS @media can't read a
- * variable, so the "side-by-side vs stacked" breakpoint is the literal
- * `760px` in shell.css and toolbar.css (two `@media (min-width: 760px)` lines).
+ * The layout switch point (stacked vs side-by-side) is the literal `760px` in
+ * shell.css + toolbar.css (`@media (min-width: 760px)`) — @media can't read a
+ * variable.
  */
 
 :root {
-	/* ---- overall ---- */
-	--app-max-width: 1100px; /* desktop cap on the whole app */
-	--frame-gap: 6px; /* gap tank<->strip, and the outer padding */
+	/* ---- spacing (all zero = full-bleed) ---- */
+	--frame-gap: 0px; /* gap tank<->strip + outer padding */
+	--strip-pad: 0px; /* padding inside the toolbar strip */
+	--panel-pad: 0px; /* padding inside a shop / stats panel */
 
-	/* ---- toolbar strip ---- */
-	--strip-width: 180px; /* strip width in the side-by-side layout */
-	--strip-pad: 8px;
+	/* ---- buttons (one size for everything) ---- */
+	--btn-size: 44px; /* every button: tools, views, widgets, minimise */
+	--btn-icon: 44px; /* icon within the button (== size → edge to edge) */
 
-	/* ---- buttons ---- */
-	--btn-size: 44px; /* tool + view buttons (tap target) */
-	--btn-size-sm: 34px; /* help / config / save / minimise */
-	--btn-icon: 26px; /* icon size inside a big button */
-	--btn-icon-sm: 18px;
-	--btn-radius: 6px;
-
-	/* ---- speed bar ---- */
-	--speed-width: 180px; /* max width of the speed bar */
-	--speed-height: 18px;
-
-	/* ---- shop / stats panels ---- */
-	--tile-col: 110px; /* shop tile column width (grid auto-fill) */
-	--tile-gap: 10px;
-	--panel-pad: 10px; /* padding inside a panel */
+	/* ---- shop tiles ---- */
+	--tile-min: 110px; /* min column; tiles grow to fill the row */
+	--tile-gap: 8px;
 
 	/* ---- colours ---- */
-	--shell-bg: #0e4e7a; /* the water-blue behind everything */
+	--shell-bg: #0e4e7a; /* water-blue behind everything */
 	--strip-bg: #0c3f63; /* toolbar strip */
 	--tank-bg: #06324f; /* letterbox behind the tank canvas */
 	--panel-bg: #5f5f5f; /* shop / stats panel */
@@ -46,6 +34,13 @@
 	--btn-bg: #cabf92;
 	--btn-bg-hover: #e2d7ab;
 	--btn-bg-active: #b3a679;
-	--btn-bg-active-view: #9db8cf; /* a view button that's the current view */
+	--btn-bg-active-view: #9db8cf; /* the current view's button */
 	--btn-border: #6b5f45;
+
+	/* ---- speed slider (modern CSS track + thumb) ---- */
+	--speed-track: #103f5f;
+	--speed-fill: #6fc7f5;
+	--speed-thumb: #ffffff;
+	--speed-thumb-size: 16px;
+	--speed-frac: 0.6; /* 0..1, overridden live on #speedBar by uio.ts */
 }

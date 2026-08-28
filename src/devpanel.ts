@@ -12,18 +12,13 @@
 type Knob = readonly [string, string, number, number, number];
 
 const KNOBS: readonly Knob[] = [
-	['--app-max-width', 'app max width', 600, 1600, 20],
 	['--frame-gap', 'frame gap', 0, 24, 1],
-	['--strip-width', 'toolbar strip width', 120, 340, 4],
 	['--strip-pad', 'strip padding', 0, 24, 1],
-	['--btn-size', 'button size', 24, 72, 2],
-	['--btn-size-sm', 'small button size', 20, 52, 2],
-	['--btn-icon', 'button icon', 12, 44, 1],
-	['--btn-icon-sm', 'small button icon', 10, 32, 1],
-	['--speed-width', 'speed bar width', 80, 320, 4],
-	['--tile-col', 'shop tile column', 72, 220, 2],
-	['--tile-gap', 'shop tile gap', 0, 32, 1],
 	['--panel-pad', 'panel padding', 0, 32, 1],
+	['--btn-size', 'button size', 24, 72, 2],
+	['--btn-icon', 'button icon', 12, 56, 1],
+	['--tile-min', 'shop tile min width', 72, 260, 2],
+	['--tile-gap', 'shop tile gap', 0, 32, 1],
 ];
 
 function readPx(name: string): number {

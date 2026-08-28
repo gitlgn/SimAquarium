@@ -42,7 +42,6 @@ body {
 #stage {
 	position: relative;
 	width: 100%;
-	max-width: var(--app-max-width);
 	display: flex;
 	flex-direction: column;
 	min-height: 0;

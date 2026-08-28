@@ -254,11 +254,38 @@ Staged so every commit boots and is checkable on a real screen.
 - `#tabStatistics` (absolute label soup) → a simple two-column definition list.
 - `#fishTableContainer` rows already scroll; make them width-fluid.
 
-#### 4b-5 — drop the frame bitmaps + Configuration page
+#### ✅ 4b-5 — knob pass from real-device feedback (done)
 
-- Remove `widgetFront.png` / `widgetBack.png` / `viewBackground*.png`; the
-  chrome is CSS now.
-- `#pageBack` (Configuration) from absolute-on-bitmap to a plain centred panel.
+Applied after eyeballing 4b-4 on Chrome/Brave/phone:
+
+- **Full-bleed.** `--frame-gap`, `--strip-pad`, `--panel-pad` → `0`;
+  `#stage` `max-width` cap removed (fills the window). `--app-max-width` /
+  `--strip-width` knobs gone.
+- **One button size.** `--btn-size-sm` / `--btn-icon-sm` removed — tools,
+  view buttons, help/config/save and minimise are all `--btn-size` (44) with
+  `--btn-icon` (44, edge-to-edge). One CSS rule.
+- **Toolbar strip = minimum width.** Side-by-side layout strip is `width:
+  auto` (shrink-wraps to the tools, ~125 px) instead of a fixed 180.
+- **Speed bar is a real slider now.** `gameSpeedBar.png` / `gameSpeedHandle.png`
+  dropped for a CSS track (rounded, a `--speed-fill` portion up to the current
+  speed) + a round thumb whose travel is inset so it can't overflow the ends.
+  Driven by `--speed-frac` (0–1), which `uio.setSmallInterval` sets on
+  `#speedBar` — replaces the old `handle.style.left` write. Bar width = strip
+  width.
+- **Shop tiles resize with the window.** Grid columns went from a fixed
+  `110px` to `minmax(var(--tile-min), 1fr)`; tiles stretch to fill the row,
+  `aspect-ratio` keeps their proportions, the per-slot art scales with them.
+- Phone tools grid is 4-per-row (was 2) so the strip isn't so tall.
+- Dev tuner (`devpanel.ts`) trimmed to the 7 knobs that remain.
+- Verified 375×812 / 1024×680: strip auto-widths, speed thumb stays in the
+  track at 0 and max, tiles grow past 110 px keeping aspect, fish list + tabs
+  + camera still work, no 4xx. `npm run check` + `vite build` green; devpanel
+  still tree-shaken from prod.
+
+#### 4b-6 — Configuration page (`#pageBack`)
+
+The last 2014 island: still `position: absolute` on `widgetBack.png` at a
+fixed 457×300. Turn it into a plain centred flex panel and drop the bitmap.
 
 ## Phase 5 — Android
 
