@@ -17,6 +17,15 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]);
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 const pct = (n: number) => Math.trunc(n) + '%';
 
+/** A CSS bar: `--v` (0-1) drives both the fill width and its colour. */
+function meter(kind: string, frac: number) {
+	const p = Math.round(frac * 100);
+	return (
+		`<span class="fishRow-meter fishRow-meter--${kind}" title="${kind} ${p}%">` +
+		`<i style="width:${p}%;--v:${frac.toFixed(3)}"></i></span>`
+	);
+}
+
 class Stats {
 	/** Wire the delegated Sell handler once (called from boot). */
 	init() {
@@ -45,17 +54,17 @@ class Stats {
 				aquarium.returnFishCondition(i) / fishSpecies[specNum].maxCondition
 			);
 			const hunger = clamp01(aquarium.returnFishHunger(i) / 100);
+			const size = clamp01(aquarium.returnFishSize(i)); // #size is already 0-1
 			const sick = aquarium.returnFishDisease(i) > 0;
-			const size = Math.round(aquarium.returnFishSize(i) * 100);
 			const price = fishSpecies[specNum].price / 2;
 
 			html +=
 				'<div class="fishRow">' +
 				`<span class="fishRow-name">${esc(aquarium.returnSpecName(i))}</span>` +
-				`<span class="fishRow-meter"><i style="width:${Math.round(health * 100)}%"></i></span>` +
-				`<span class="fishRow-meter fishRow-meter--hunger"><i style="width:${Math.round(hunger * 100)}%"></i></span>` +
-				`<span class="fishRow-flag${sick ? ' is-sick' : ''}">${sick ? 'SICK' : ''}</span>` +
-				`<span class="fishRow-size">${size}%</span>` +
+				meter('health', health) +
+				meter('hunger', hunger) +
+				meter('size', size) +
+				`<span class="fishRow-dot${sick ? ' is-sick' : ''}" title="${sick ? 'sick' : 'healthy'}"></span>` +
 				`<button type="button" class="fishRow-sell" data-sell="${i}">Sell</button>` +
 				`<span class="fishRow-price money">${price}</span>` +
 				'</div>';

@@ -158,21 +158,30 @@
 	display: none;
 	background: url(../gfx/interface/alertLightIcon0.png) no-repeat;
 }
+/* water-condition gauge — a CSS bar (no bitmaps). aquarium.updatePollutionBar()
+   sets the fill's height% + colour from the pollution value; the frame is CSS.
+   Fills from the bottom, green → red as it rises. */
 #statusWater {
 	position: relative;
 	inset: auto;
 	flex: none;
-	width: 6px;
+	width: 9px;
 	height: 34px;
-	background: url(../gfx/interface/waterCondition.png) no-repeat;
+	border: 1px solid #0a3550;
+	border-radius: 3px;
+	background: #0b3a59;
+	overflow: hidden;
 }
 #statusWaterBar {
 	position: absolute;
-	bottom: 1px;
-	left: 1px;
-	width: 4px;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	height: 0;
-	background: url(../gfx/interface/waterConditionBar.png) repeat-x;
+	background: #40bd41;
+	transition:
+		height 0.3s ease,
+		background-color 0.3s ease;
 }
 
 /* ---- tools grid ---------------------------------------------------- */

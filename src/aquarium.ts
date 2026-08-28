@@ -662,7 +662,11 @@ class Aquarium {
 	}
 
 	updatePollutionBar() {
-		$('statusWaterBar').style.height = Math.trunc(this.#pollution) + 'px';
+		// water gauge is a CSS bar now (no bitmap) — fill height + hue from state
+		const frac = Math.min(1, this.#pollution / 32);
+		const bar = $('statusWaterBar');
+		bar.style.height = (frac * 100).toFixed(1) + '%';
+		bar.style.backgroundColor = 'hsl(' + (130 - frac * 130) + ' 65% 45%)';
 		this.#pollutionChanged = false;
 	}
 

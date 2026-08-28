@@ -373,6 +373,31 @@ give the **chrome** the same treatment, panel by panel:
 Start with the fish list (worst offender), then status bar, then the shops.
 Incremental, each panel shippable on its own.
 
+### ✅ 6a — fish list + Tank Info from state (done, PR #9)
+
+`statistics.ts`: 21 imperative writes + 64 pre-built hidden rows → two
+`render(state)` functions building the markup from the `aquarium` accessors,
+one delegated Sell listener. `#tabStatistics` label-soup deleted. Header + rows
+share one `--fishrow-cols` grid so the stat icons line up exactly.
+
+### ✅ 6b — status + fish meters: bitmaps → generated bars (done)
+
+- Water-condition gauge (`#statusWater`) is a CSS bar; `updatePollutionBar()`
+  sets its fill `height%` + hue (green → red) from the pollution value.
+  `waterCondition.png` / `waterConditionBar.png` gone.
+- Fish list: health / hunger / **size** are three CSS bars now
+  (`<i style="width;--v">`, `--v` drives the colour — health green→red, hunger
+  amber→red, size neutral), sick is a red **dot**. No `%` text, no
+  `bar1.png` / `bar2.png`. Bar columns are a fixed width so the header icons
+  and the bars stay aligned (delta 0).
+- Precache 199 → 195.
+
+### 6c — status bar object + notification surface (next)
+
+Fold money / water / event into one `renderStatus(state)`; replace the
+`alertLight.png` 2-frame lamp (only ever shows its off-state) with a real
+transient toast / event log.
+
 ## Phase 5 — Android
 
 Route: **Trusted Web Activity** — a thin native shell around the deployed PWA,
