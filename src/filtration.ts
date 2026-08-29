@@ -4,17 +4,7 @@
  */
 
 import { $ } from './dom.js';
-import {
-	FI_NAME,
-	FI_PRICE,
-	FI_COMFORT,
-	FI_POLLUTION,
-	FI_ENERGY,
-	FI_IMAGE,
-	BG_NAME,
-	BG_PRICE,
-	BG_IMAGE,
-} from './constants.js';
+import { BG_NAME, BG_PRICE, BG_IMAGE } from './constants.js';
 
 const PATH_FILTERS = 'gfx/filters/';
 const PATH_BGS = 'gfx/view4/';
@@ -22,20 +12,34 @@ const PATH_BGS = 'gfx/view4/';
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
+// Column order matches the FI_* constants in constants.ts.
+type FilterRow = readonly [
+	name: string,
+	price: number,
+	comfort: number,
+	pollution: number,
+	energy: number,
+	image: HTMLImageElement,
+];
+
+// Column order matches the BG_* constants; the image column is a path string.
+type BackgroundRow = readonly [name: string, price: number, imageSrc: string];
+
 class Filtration {
-	#filter: any[][] = [];
+	#filter: FilterRow[] = [];
 
 	constructor() {
-		const add = (name, fileName, price, comfort, pollution, energyCost) => {
-			const row: any[] = [];
-			row[FI_NAME] = name;
-			row[FI_PRICE] = price;
-			row[FI_COMFORT] = comfort;
-			row[FI_POLLUTION] = pollution;
-			row[FI_ENERGY] = energyCost;
-			row[FI_IMAGE] = new Image();
-			row[FI_IMAGE].src = PATH_FILTERS + fileName;
-			this.#filter.push(row);
+		const add = (
+			name: string,
+			fileName: string,
+			price: number,
+			comfort: number,
+			pollution: number,
+			energyCost: number
+		) => {
+			const img = new Image();
+			img.src = PATH_FILTERS + fileName;
+			this.#filter.push([name, price, comfort, pollution, energyCost, img]);
 		};
 
 		add('Box filter', 'filter0.png', 0, 0.95, -0.06, 0.032);
@@ -46,22 +50,17 @@ class Filtration {
 		add('Advanced Power Filter', 'filter5.png', 7680, 0.98, -1.92, 0.001);
 	}
 
-	getFilterData(num, data) {
-		const idx = Number.parseInt(num, 10) || 0;
-		return this.#filter[idx][data];
+	getFilterData<K extends number>(num: number, data: K): FilterRow[K] {
+		return this.#filter[num || 0][data];
 	}
 }
 
 class BackgroundWall {
-	#background: any[][] = [];
+	#background: BackgroundRow[] = [];
 
 	constructor() {
-		const add = (name, fileName, price) => {
-			const row: any[] = [];
-			row[BG_NAME] = name;
-			row[BG_PRICE] = price;
-			row[BG_IMAGE] = PATH_BGS + fileName;
-			this.#background.push(row);
+		const add = (name: string, fileName: string, price: number) => {
+			this.#background.push([name, price, PATH_BGS + fileName]);
 		};
 
 		add('White', 'bg0.png', 60);
@@ -83,12 +82,12 @@ class BackgroundWall {
 		add('Transparent', 'bg14.png', 240);
 	}
 
-	getBackgroundSrc(bg) {
-		return this.#background[bg][BG_IMAGE];
+	getBackgroundSrc(bg: number): string {
+		return this.#background[bg || 0][BG_IMAGE];
 	}
 
-	getBackgroundData(num, data) {
-		return this.#background[num][data];
+	getBackgroundData<K extends number>(num: number, data: K): BackgroundRow[K] {
+		return this.#background[num || 0][data];
 	}
 
 	getBackgroundCount() {

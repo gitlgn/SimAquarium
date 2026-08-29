@@ -3,42 +3,49 @@
  **
  */
 
-import {
-	SC_NAME,
-	SC_FGIMAGE,
-	SC_BGIMAGE,
-	SC_PRICE,
-	SC_COMFORT,
-	SC_BONUSFISH,
-} from './constants.js';
-
 const PATH_SCENERY_READY = 'gfx/sceneries/readyMade/';
 const PATH_SCENERY_PARTS = 'gfx/sceneries/parts/';
 
-/* Custom scenery part column indices */
-const SP_NAME = 0;
-const SP_IMAGE = 1;
-const SP_SIZEX = 2;
-const SP_SIZEY = 3;
-const SP_PRICE = 4;
-const SP_COMFORT = 5;
+// Column order matches the SC_* constants in constants.ts (0-indexed, in
+// declaration order). `getSceneryData(n, SC_PRICE)` resolves to the element
+// type at that index, so callers get `number` / `HTMLImageElement` — no cast.
+type SceneryRow = readonly [
+	name: string,
+	fgImage: HTMLImageElement,
+	bgImage: HTMLImageElement,
+	price: number,
+	comfort: number,
+	bonusFish: number | null,
+];
+
+// Custom scenery parts (Scenery Creator is unfinished — no consumer yet).
+type SceneryPartRow = readonly [
+	name: string,
+	image: HTMLImageElement,
+	sizeX: number,
+	sizeY: number,
+	price: number,
+	comfort: number,
+];
 
 class Scenery {
-	#scenery: any[][] = []; // pre-made sceneries
-	#part: any[][] = []; // custom scenery parts — no consumer yet (Scenery Creator is unfinished)
+	#scenery: SceneryRow[] = []; // pre-made sceneries
+	#part: SceneryPartRow[] = []; // custom scenery parts — no consumer yet (Scenery Creator is unfinished)
 
 	constructor() {
-		const add = (name, fgfile, bgfile, price, comfort, bonusfish) => {
-			const row: any[] = [];
-			row[SC_NAME] = name;
-			row[SC_PRICE] = price;
-			row[SC_COMFORT] = comfort;
-			row[SC_BONUSFISH] = bonusfish;
-			row[SC_FGIMAGE] = new Image();
-			row[SC_FGIMAGE].src = PATH_SCENERY_READY + fgfile;
-			row[SC_BGIMAGE] = new Image();
-			row[SC_BGIMAGE].src = PATH_SCENERY_READY + bgfile;
-			this.#scenery.push(row);
+		const add = (
+			name: string,
+			fgfile: string,
+			bgfile: string,
+			price: number,
+			comfort: number,
+			bonusfish: number | null
+		) => {
+			const fg = new Image();
+			fg.src = PATH_SCENERY_READY + fgfile;
+			const bg = new Image();
+			bg.src = PATH_SCENERY_READY + bgfile;
+			this.#scenery.push([name, fg, bg, price, comfort, bonusfish]);
 		};
 
 		//  name					fgfile		bgfile		price	comfort	bonusfish
@@ -52,29 +59,29 @@ class Scenery {
 		add('Web Browsers', '7fg.png', '7bg.png', 25600, 0.89, 5);
 		add('Seashell Palace', '8fg.png', '8bg.png', 51200, 0.99, 6);
 
-		const addPart = (name, file, sizeX, sizeY, price, comfort) => {
-			const row: any[] = [];
-			row[SP_NAME] = name;
-			row[SP_IMAGE] = new Image();
-			row[SP_IMAGE].src = PATH_SCENERY_PARTS + file;
-			row[SP_SIZEX] = sizeX;
-			row[SP_SIZEY] = sizeY;
-			row[SP_PRICE] = price;
-			row[SP_COMFORT] = comfort;
-			this.#part.push(row);
+		const addPart = (
+			name: string,
+			file: string,
+			sizeX: number,
+			sizeY: number,
+			price: number,
+			comfort: number
+		) => {
+			const img = new Image();
+			img.src = PATH_SCENERY_PARTS + file;
+			this.#part.push([name, img, sizeX, sizeY, price, comfort]);
 		};
 		addPart('Java Moss', 'javaMoss.png', 70, 66, 5, 1.01);
 		addPart('Java Fern', 'javaFern.png', 65, 85, 10, 1.02);
 		addPart('Marimo', 'marimo.png', 71, 84, 320, 1.21);
 	}
 
-	getSceneryData(num, data) {
-		const idx = Number.parseInt(num, 10) || 0;
-		return this.#scenery[idx][data];
+	getSceneryData<K extends number>(num: number, data: K): SceneryRow[K] {
+		return this.#scenery[num || 0][data];
 	}
 
-	getSceneryPartData(num, data) {
-		return this.#part[num][data];
+	getSceneryPartData<K extends number>(num: number, data: K): SceneryPartRow[K] {
+		return this.#part[num || 0][data];
 	}
 }
 
