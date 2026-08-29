@@ -350,7 +350,40 @@ const DEFS: Record<number, () => string> = {
 	28: dolphin,
 };
 
+function inner(spec: number): string {
+	return (DEFS[spec] ?? DEFS[0])();
+}
+
+// Per-species viewBox crop for the tank raster. Most fish sit fine in the full
+// 0 0 100 56 box (~1.8:1, a typical fish); the very long / very tall species
+// get a tighter box so stretching it to their sizeX:sizeY barely distorts.
+const CROP: Record<number, readonly [number, number, number, number]> = {
+	5: [4, 14, 92, 26], // zebrafish  ~3.1:1
+	9: [2, 16, 96, 22], // dojo loach ~3.8:1
+	11: [4, 8, 92, 38], // tropheus   ~2.8:1
+	24: [20, 0, 54, 56], // freshwater angelfish  ~0.8:1 (tall)
+	26: [2, 16, 96, 22], // barracuda  ~3.7:1
+	27: [0, 8, 100, 40], // sea turtle ~3.9:1 (wide shell)
+	28: [2, 14, 98, 30], // dolphin    ~3.7:1
+};
+
+/** Inline SVG for the shop card — inherits the page, no xmlns needed. */
 export function fishArt(spec: number): string {
-	const make = DEFS[spec] ?? DEFS[0];
-	return `<svg class="shopCard-fishIcon" viewBox="0 0 100 56" aria-hidden="true">${make()}</svg>`;
+	return `<svg class="shopCard-fishIcon" viewBox="0 0 100 56" aria-hidden="true">${inner(spec)}</svg>`;
+}
+
+/**
+ * Standalone SVG as a `data:` URI for an `<img>` / canvas (the aquarium tank).
+ * `preserveAspectRatio="none"` so the caller can stretch it to each species'
+ * sizeX:sizeY; `flip` mirrors the fish to face left.
+ */
+export function fishArtSvgUri(spec: number, w: number, h: number, flip = false): string {
+	const g = flip
+		? `<g transform="translate(100,0) scale(-1,1)">${inner(spec)}</g>`
+		: inner(spec);
+	const [vx, vy, vw, vh] = CROP[spec] ?? [0, 0, 100, 56];
+	const svg =
+		`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" ` +
+		`viewBox="${vx} ${vy} ${vw} ${vh}" preserveAspectRatio="none">${g}</svg>`;
+	return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
