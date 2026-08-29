@@ -130,31 +130,31 @@ for (let i = 0; i < 29; i++) {
 export class Fish {
 	#x;
 	#y;
-	#vX;
-	#vY;
-	#speed;
-	#maxSpeed;
-	#movX;
-	#movY;
+	#vX = 0;
+	#vY = 0;
+	#speed = 0;
+	#maxSpeed = 0;
+	#movX = 0;
+	#movY = 0;
 	#size;
-	#sizeX;
-	#sizeY;
-	#boxX1;
-	#boxY1;
-	#boxX2;
-	#boxY2;
+	#sizeX = 0;
+	#sizeY = 0;
+	#boxX1 = 0;
+	#boxY1 = 0;
+	#boxX2 = 0;
+	#boxY2 = 0;
 	#image = new Image();
 	#specNum;
 	#specName;
 	#disease = 0;
 	#hunger = 0;
-	#condition;
+	#condition = 0;
 
 	/**
 	 * @param {number} sNum   species index into fishSpecies
 	 * @param {number} fSize   initial size, 0-1
 	 */
-	constructor(sNum, fSize) {
+	constructor(sNum: number, fSize: number) {
 		this.#specNum = sNum;
 		this.#specName = fishSpecies[sNum].name;
 
@@ -261,7 +261,7 @@ export class Fish {
 		else this.rotate(-10, Math.trunc(Math.random() * 11 - 5));
 	}
 
-	rotate(rX, rY) {
+	rotate(rX: number, rY: number) {
 		this.#vX = rX;
 		this.#vY = rY;
 		this.#movX = this.#vX * this.#speed;
@@ -351,7 +351,7 @@ export class Fish {
 		}
 	}
 
-	changeDisease(disNum) {
+	changeDisease(disNum: number) {
 		this.#disease = this.#disease + disNum;
 		if (this.#disease < 0) this.#disease = 0;
 	}
@@ -390,7 +390,7 @@ export class Fish {
 		}
 	}
 
-	changeHunger(hNum) {
+	changeHunger(hNum: number) {
 		this.#hunger = this.#hunger + hNum;
 		if (this.#hunger < 0) this.#hunger = 0;
 		if (this.#hunger > 101) this.#hunger = 101;
@@ -401,7 +401,7 @@ export class Fish {
 		this.#condition = this.#spec.maxCondition;
 	}
 
-	changeCondition(condValue) {
+	changeCondition(condValue: number) {
 		this.#condition = this.#condition + condValue;
 		if (this.#condition < 0) {
 			this.#condition = 0;
@@ -411,7 +411,7 @@ export class Fish {
 	}
 
 	/*** FISH FIGHTS ***/
-	fight(me) {
+	fight(me: number) {
 		if (aquarium.getFishNum() < 2) return;
 
 		if (aquarium.getDistraction() > 0) return;
@@ -431,7 +431,7 @@ export class Fish {
 		}
 	}
 
-	attackEnemy(me) {
+	attackEnemy(me: number) {
 		const enemy = Math.trunc(Math.random() * aquarium.getFishNum());
 
 		if (enemy === me) return;
@@ -465,7 +465,7 @@ export class Fish {
 		);
 	}
 
-	changeData(s, d, h, c) {
+	changeData(s: number, d: number, h: number, c: number) {
 		this.#size = s;
 		this.#disease = d;
 		this.#hunger = h;

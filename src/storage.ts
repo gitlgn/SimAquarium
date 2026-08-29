@@ -12,18 +12,18 @@ export const storage = {
 	 * @param {string} key
 	 * @returns {string}
 	 */
-	getItem(key) {
+	getItem(key: string): string {
 		return window.localStorage.getItem(key) ?? '';
 	},
 	/**
 	 * @param {string} key
 	 * @param {string | number} value
 	 */
-	setItem(key, value) {
+	setItem(key: string, value: string | number) {
 		window.localStorage.setItem(key, String(value));
 	},
 	/** @param {string} key */
-	removeItem(key) {
+	removeItem(key: string) {
 		window.localStorage.removeItem(key);
 	},
 };

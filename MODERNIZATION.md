@@ -125,8 +125,8 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 - **3d-2** `src/*.js` + `test/*.js` → `.ts`, `jsconfig.json` → `tsconfig.json`.
   JSDoc `@type` casts → native TS (`#fish: Fish[]`, `expr as HTMLInputElement`,
   …). Import specifiers keep `.js` (bundler resolution maps to `.ts`).
-  `noImplicitAny` stays **off** for now (the data tables were `T[]` indexed by
-  column constants — typed as tuples in Phase 3g).
+  `noImplicitAny` was **off** here (the data tables were `T[]` indexed by
+  column constants) — tables typed as tuples in Phase 3g, flag flipped in 3h.
 - **ESLint gap (closed — see 3e):** for a while `typescript-eslint` couldn't
   parse the native TS 7.0 compiler API, so `src/**` / `test/**` were on
   `tsc --strict` + Prettier only.
@@ -171,11 +171,28 @@ type FilterRow = readonly [name: string, price: number, comfort: number,
 - The `add(...)` builders push a tuple literal in column order instead of
   index-assigning a scratch `any[]`; `fishshop` `#deliver` / `load` likewise
   build the whole row at once (dropped the `#slots[i] = []` pre-fill).
-- `eslint.config.js`: removed the `no-explicit-any` / `no-unsafe-*` rule
-  downgrades — `recommendedTypeChecked` now runs undiluted. `npm run lint`
-  is clean (0 warnings).
-- `noImplicitAny` still off — what's left is ~50 bare function params across
-  `aquarium` / `config` / `events` / `dom`, a separate mechanical pass.
+- `eslint.config.js`: `no-explicit-any` back to its default (error) — no
+  explicit `any` left. `no-unsafe-*` kept off one more step (still ~90 bare
+  params tripping it); lifted in Phase 3h.
+
+## ✅ Phase 3h — `noImplicitAny` on (done)
+
+`tsconfig` `noImplicitAny: true`. 92 findings, all mechanical:
+
+- **73 params** (`TS7006`) annotated — almost all `number` (indices, counts,
+  hormone/food/pollution deltas); `on(id: string, type: string, handler:
+  EventListener)`, `dbg(msg: unknown)`, `#renderShopButtons`'s `owned:
+  boolean[]` / `priceOf: (i: number) => number`, `#renderFish(fishObj: Fish)`.
+- **13 `Fish` fields** (`TS7008`) — `#vX … #boxY2`, `#condition`: given `= 0`
+  initialisers (they're set unconditionally in the constructor's helper calls,
+  which `strictPropertyInitialization` doesn't see).
+- **5 dynamic index accesses** (`TS7053`) — `events.ts` `aquarium[buy](i)` and
+  the tools loop: the string tables became `as const`; `NUMERIC_FIELDS` in the
+  species test likewise.
+- One cast came back: `ctx2d($('tank') as HTMLCanvasElement)` — `$()` returns
+  `HTMLElement` and `ctx2d` now takes `HTMLCanvasElement`.
+- `eslint.config.js`: `no-unsafe-*` downgrades removed — `recommendedTypeChecked`
+  now runs undiluted, `npm run check` clean.
 
 ## Phase 4 — responsive / mobile layout
 
@@ -522,9 +539,6 @@ imperative pockets remain in `uio.ts` (speed slider, widget flip) and
 
 ### Backlog
 
-- **`noImplicitAny`** on — a mechanical pass annotating ~50 bare function
-  params across `aquarium` / `config` / `events` / `dom`. The data tables it
-  used to block on are typed now (Phase 3g).
 - Bump `typescript` `~6.0.3` → `7.x` once `typescript-eslint` supports the
   TS 7.1 compiler API.
 

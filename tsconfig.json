@@ -11,10 +11,7 @@
 		"checkJs": false,
 
 		"strict": true,
-		// The data tables are typed now (tuple rows). What still trips
-		// noImplicitAny is ~50 bare function params across aquarium/config/
-		// events/dom — a mechanical annotation pass, tracked in MODERNIZATION.md.
-		"noImplicitAny": false,
+		"noImplicitAny": true,
 		"noUnusedLocals": true,
 		"noFallthroughCasesInSwitch": true
 	},
