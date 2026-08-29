@@ -24,6 +24,17 @@ import {
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
+// A plain fish glyph, tinted per species via `currentColor` (CSS reads
+// `--fish-hue` off the card). Recognisable as a fish without needing 29
+// per-species bitmaps — see public/css/viewFish.css.
+const FISH_GLYPH =
+	'<svg class="shopCard-fishIcon" viewBox="0 0 64 40" aria-hidden="true">' +
+	'<path d="M20 20 L3 6 Q9 20 3 34 Z" fill="currentColor"/>' +
+	'<ellipse cx="36" cy="20" rx="21" ry="13" fill="currentColor"/>' +
+	'<path d="M27 8 Q36 -3 46 8 Z" fill="currentColor"/>' +
+	'<circle cx="47" cy="15" r="2.6" fill="#08263b"/>' +
+	'</svg>';
+
 // Column order matches the SHOPSLOT_* constants. Mutable — `buyFish` decrements
 // the stock count in place; the rest of the row is only ever replaced wholesale
 // (by #deliver / load).
@@ -48,15 +59,22 @@ class FishShop {
 			const num = s[SHOPSLOT_NUM];
 			const price = s[SHOPSLOT_PRICE];
 			const canBuy = num > 0 && price <= money && !full;
+			const hue = (s[SHOPSLOT_SPEC] * 47) % 360;
+			const soldOut = num < 1;
 
 			html +=
-				`<div class="fishSlot" data-slot="${i}">` +
-				`<div class="title">${esc(s[SHOPSLOT_NAME])}</div>` +
-				`<div class="image" style="background-image:url(gfx/aquarium/fishes/fish${s[SHOPSLOT_SPEC]}R.png)"></div>` +
-				`<div class="money">${price}</div>` +
-				`<div class="number">${num}</div>` +
-				`<div class="button info" data-act="info"></div>` +
-				`<div class="button buy${canBuy ? '' : ' off'}" data-act="buy"></div>` +
+				`<div class="shopCard" data-slot="${i}">` +
+				`<div class="shopCard-art" style="--fish-hue:${hue}">` +
+				FISH_GLYPH +
+				`<span class="shopCard-stock${soldOut ? ' is-empty' : ''}" title="In stock: ${num}">${num}</span>` +
+				`</div>` +
+				`<div class="shopCard-name" title="${esc(s[SHOPSLOT_NAME])}">${esc(s[SHOPSLOT_NAME])}</div>` +
+				`<div class="shopCard-actions">` +
+				`<button type="button" class="shopCard-btn shopCard-info" data-act="info" aria-label="Species info">i</button>` +
+				`<button type="button" class="shopCard-btn shopCard-buy${canBuy ? '' : ' is-off'}" data-act="buy"${canBuy ? '' : ' disabled'}>` +
+				`Buy <b>${price}</b>` +
+				`</button>` +
+				`</div>` +
 				`</div>`;
 		}
 		$('view1').innerHTML = html;
