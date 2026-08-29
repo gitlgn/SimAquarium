@@ -9,6 +9,7 @@
 import { aquarium } from './aquarium.js';
 import { config } from './config.js';
 import { fishSpecies } from './species.js';
+import { fishArt } from './fishArt.js';
 import { openTab } from './util.js';
 import { $ } from './dom.js';
 import {
@@ -23,17 +24,6 @@ import {
 
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
-
-// A plain fish glyph, tinted per species via `currentColor` (CSS reads
-// `--fish-hue` off the card). Recognisable as a fish without needing 29
-// per-species bitmaps — see public/css/viewFish.css.
-const FISH_GLYPH =
-	'<svg class="shopCard-fishIcon" viewBox="0 0 64 40" aria-hidden="true">' +
-	'<path d="M20 20 L3 6 Q9 20 3 34 Z" fill="currentColor"/>' +
-	'<ellipse cx="36" cy="20" rx="21" ry="13" fill="currentColor"/>' +
-	'<path d="M27 8 Q36 -3 46 8 Z" fill="currentColor"/>' +
-	'<circle cx="47" cy="15" r="2.6" fill="#08263b"/>' +
-	'</svg>';
 
 // Column order matches the SHOPSLOT_* constants. Mutable — `buyFish` decrements
 // the stock count in place; the rest of the row is only ever replaced wholesale
@@ -59,13 +49,12 @@ class FishShop {
 			const num = s[SHOPSLOT_NUM];
 			const price = s[SHOPSLOT_PRICE];
 			const canBuy = num > 0 && price <= money && !full;
-			const hue = (s[SHOPSLOT_SPEC] * 47) % 360;
 			const soldOut = num < 1;
 
 			html +=
 				`<div class="shopCard" data-slot="${i}">` +
-				`<div class="shopCard-art" style="--fish-hue:${hue}">` +
-				FISH_GLYPH +
+				`<div class="shopCard-art">` +
+				fishArt(s[SHOPSLOT_SPEC]) +
 				`<span class="shopCard-stock${soldOut ? ' is-empty' : ''}" title="In stock: ${num}">${num}</span>` +
 				`</div>` +
 				`<div class="shopCard-name" title="${esc(s[SHOPSLOT_NAME])}">${esc(s[SHOPSLOT_NAME])}</div>` +
