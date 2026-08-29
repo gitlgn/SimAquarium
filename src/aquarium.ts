@@ -21,6 +21,7 @@ import { $, ctx2d } from './dom.js';
 import {
 	BUY,
 	SELL,
+	TANK_SCALE,
 	VIEW_AQUARIUM,
 	SC_FGIMAGE,
 	SC_BGIMAGE,
@@ -479,7 +480,14 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = ctx2d($('tank') as HTMLCanvasElement);
+		// Back the 360×240 tank with a TANK_SCALE× canvas and scale the context,
+		// so every drawImage/translate below still works in 360×240 units but
+		// paints at higher resolution (the vector fish stay sharp).
+		const canvas = $('tank') as HTMLCanvasElement;
+		canvas.width = 360 * TANK_SCALE;
+		canvas.height = 240 * TANK_SCALE;
+		this.#canvasTankCtx = ctx2d(canvas);
+		this.#canvasTankCtx.scale(TANK_SCALE, TANK_SCALE);
 		this.#setWall(this.#usedBackground);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
@@ -488,9 +496,10 @@ class Aquarium {
 	// Photo making
 	exportPhoto() {
 		const tempCanvas = document.createElement('canvas');
-		tempCanvas.width = 360;
-		tempCanvas.height = 240;
+		tempCanvas.width = 360 * TANK_SCALE;
+		tempCanvas.height = 240 * TANK_SCALE;
 		const tempCtx = ctx2d(tempCanvas);
+		tempCtx.scale(TANK_SCALE, TANK_SCALE);
 		tempCtx.globalCompositeOperation = 'source-over';
 
 		// DRAW BACKGROUND

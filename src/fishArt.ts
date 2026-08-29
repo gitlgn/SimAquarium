@@ -164,9 +164,12 @@ function dolphin(): string {
 	);
 }
 
-// index → definition. 0 (Test fish) reuses the platyfish look.
+// index → definition. Species 0 ("Test fish") can't spawn — the shop formula
+// `3*i + rand + 1` never yields 0 and the starter is species 1 — but the
+// dormant table slot still gets a frame precomputed, so mirror species 1
+// (as the old fishNR.png fallback `i === 0 ? 1 : i` did).
 const DEFS: Record<number, () => string> = {
-	0: () => drawFish({ shape: 'slim', fill: '#9aa3a8', back: '#7f888d' }),
+	0: () => inner(1),
 	1: () =>
 		drawFish({ shape: 'oval', fill: '#d9c9a8', back: '#b39a6f', belly: '#dd9a77' }),
 	2: () =>

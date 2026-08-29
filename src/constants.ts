@@ -7,6 +7,12 @@
 export const BUY = -1;
 export const SELL = 1;
 
+// The tank is a 360×240 logical space (the 2014 canvas size). The on-screen
+// canvas backs it at this multiple and `ctx.scale()`s so all the drawing code
+// keeps working in 360×240 while rendering at higher resolution — the vector
+// fish (src/fishArt.ts) then draw crisp instead of being CSS-upscaled ~4×.
+export const TANK_SCALE = 4;
+
 // Fish facing (vX values). Not yet referenced by name — species.js still uses
 // the literals 10 / -10.
 export const DIRECTION_LEFT = -10;
