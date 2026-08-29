@@ -24,7 +24,7 @@ set up as an installable **PWA**.
 | Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
 | Deploy          | ✅ GitHub Pages via Actions on push to `modernization` → **<https://gitlgn.github.io/SimAquarium/>** (`base: /SimAquarium/`)                                                                                           |
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
-| Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
+| Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint (`typescript-eslint`, type-aware on `src/**`) + test. TS pinned to `~6.0.3` until `typescript-eslint` supports the TS 7.1 API. |
 | Mobile layout   | 🟢 responsive shell: CSS grid; desktop = tank + right rail, phone portrait = button bar below the tank, phone landscape = tank between two button rails; every panel reflows, safe-area aware; layout knobs in `public/css/theme.css`   |
 | Android         | 🟢 installs from Chrome on-device (fullscreen PWA, offline); TWA `.aab`/`.apk` groundwork in place ([docs/ANDROID.md](docs/ANDROID.md)) — a *verified* barless TWA needs the site at an origin root first            |
 

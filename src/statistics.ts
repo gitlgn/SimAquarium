@@ -44,8 +44,8 @@ class Stats {
 
 	#renderFishList() {
 		const n = aquarium.getFishNum();
-		($('fishTableIcons') as HTMLElement).hidden = n === 0;
-		($('fishTableInfo') as HTMLElement).hidden = n !== 0;
+		$('fishTableIcons').hidden = n === 0;
+		$('fishTableInfo').hidden = n !== 0;
 
 		let html = '';
 		for (let i = 0; i < n; i++) {

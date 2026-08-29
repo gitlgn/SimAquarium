@@ -127,12 +127,29 @@ Vite from a single `<script type="module" src="/src/main.js">`.
   …). Import specifiers keep `.js` (bundler resolution maps to `.ts`).
   `noImplicitAny` stays **off**: the scenery/light/filter/shop rows are `T[]`
   indexed by column constants and tuple-typing them isn't worth it yet.
-- **ESLint gap:** `typescript-eslint` doesn't support the TS 7 compiler API
-  yet ([typescript-eslint#10940]). `src/**` / `test/**` are covered by
-  `tsc --strict` + Prettier for now; ESLint lints `*.config.js` +
-  `public/*.js` only. Re-add `typescript-eslint` when TS 7 is supported, and
-  turn `noImplicitAny` on with tuple types for the shop rows.
+- **ESLint gap (closed — see 3e):** for a while `typescript-eslint` couldn't
+  parse the native TS 7.0 compiler API, so `src/**` / `test/**` were on
+  `tsc --strict` + Prettier only.
 - Bundle 49.4 → 46.8 kB. `npm run check` = typecheck + lint + test.
+
+## ✅ Phase 3e — typescript-eslint restored (done)
+
+TypeScript 7.0 (native Go compiler) ships without a stable programmatic API —
+that lands in 7.1 — so `typescript-eslint@8` still peers `typescript <6.1`
+([typescript-eslint#10940]). The 7.0 line is a *port*, feature-identical to the
+classic `6.0.x` line, so:
+
+- `typescript` pinned back to `~6.0.3` (classic line, same language features,
+  same `tsconfig`). `typescript-eslint@8.68` added.
+- `eslint.config.js`: `src/**` + `test/**` now linted with
+  `tseslint.configs.recommendedTypeChecked` (type-aware, `projectService`).
+- Findings: 3 `no-unnecessary-type-assertion` errors auto-fixed (redundant
+  `as HTMLElement` / `as HTMLCanvasElement` — `$()` already returns
+  `HTMLElement`). 11 `no-explicit-any` **warnings** remain on the shop
+  row-tables (`any[][]` indexed by column constants) — the `noImplicitAny`
+  tuple-typing job, still deferred.
+- Revert path when 7.1 lands: bump `typescript` to `7.x` and `typescript-eslint`
+  to the release that supports it; nothing else changes.
 
 [typescript-eslint#10940]: https://github.com/typescript-eslint/typescript-eslint/issues/10940
 
@@ -481,8 +498,11 @@ imperative pockets remain in `uio.ts` (speed slider, widget flip) and
 
 ### Backlog
 
-- Re-add **`typescript-eslint`** + turn on `noImplicitAny` — still blocked:
-  `typescript-eslint@8.68` peers `typescript <6.1`, repo is on TS 7.0.
+- **`noImplicitAny`** on, with tuple/union-array types for the scenery /
+  lighting / filter / shop row-tables (currently 11 `no-explicit-any`
+  warnings). typescript-eslint itself is back — see Phase 3e.
+- Bump `typescript` `~6.0.3` → `7.x` once `typescript-eslint` supports the
+  TS 7.1 compiler API.
 - Real PWA icons (`public/gfx/pwa-*.png` are upscaled from the 128 px original).
 
 ## Phase 5 — Android
