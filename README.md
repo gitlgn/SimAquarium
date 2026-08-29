@@ -22,10 +22,11 @@ set up as an installable **PWA**.
 | Boots & renders | ✅ zero console errors, canvas + UI render, game loop runs                                                                                                                                                           |
 | Save / load     | ✅ `localStorage` (the old `chrome.storage` + sandbox-iframe bridge is gone)                                                                                                                                         |
 | Build           | ✅ `vite build` → static `dist/`, service worker + web manifest generated                                                                                                                                            |
+| Deploy          | ✅ GitHub Pages via Actions on push to `modernization` → **<https://gitlgn.github.io/SimAquarium/>** (`base: /SimAquarium/`)                                                                                           |
 | Tooling         | ✅ ESLint (flat config) + Prettier + EditorConfig                                                                                                                                                                    |
 | Code style      | 🟢 **TypeScript** (`strict`), classes with `#private`, data objects; 15 Vitest specs. `npm run check` = tsc + eslint + test. (ESLint only covers `*.config.js` / `public/` until `typescript-eslint` supports TS 7.) |
-| Mobile layout   | 🟢 responsive shell: CSS grid; desktop = tank + right rail, phone portrait = burger drawer, phone landscape = tank between two button rails; every panel reflows, safe-area aware; layout knobs in `public/css/theme.css`   |
-| Android         | 🟡 TWA packaging groundwork in place (`twa-manifest.json`, Digital Asset Links, [docs/ANDROID.md](docs/ANDROID.md)); building the `.aab` needs a deployed HTTPS origin + a Play Console account                        |
+| Mobile layout   | 🟢 responsive shell: CSS grid; desktop = tank + right rail, phone portrait = button bar below the tank, phone landscape = tank between two button rails; every panel reflows, safe-area aware; layout knobs in `public/css/theme.css`   |
+| Android         | 🟢 installs from Chrome on-device (fullscreen PWA, offline); TWA `.aab`/`.apk` groundwork in place ([docs/ANDROID.md](docs/ANDROID.md)) — a *verified* barless TWA needs the site at an origin root first            |
 
 ## Requirements
 
@@ -76,9 +77,10 @@ public/             served verbatim by Vite
   gfx/**            sprites, UI art, icons
   stage.js          scales the widget to the viewport; mobile.css touch-hardens it
   .well-known/assetlinks.json   Digital Asset Links for the Android TWA
-docs/ANDROID.md     Play-Store packaging playbook (Bubblewrap / PWABuilder)
-twa-manifest.json   Bubblewrap config (fill placeholders after deploy)
-vite.config.js      Vite + vite-plugin-pwa
+docs/ANDROID.md     on-device install + TWA packaging playbook
+twa-manifest.json   Bubblewrap config (filled in for the Pages URL)
+.github/workflows/deploy.yml   build + publish to GitHub Pages
+vite.config.js      Vite + vite-plugin-pwa (base: /SimAquarium/)
 vitest.config.js    test runner (jsdom, test/setup.js)
 tsconfig.json       tsc --strict settings
 eslint.config.js    lints *.config.js + public/*.js (src/ & test/ are tsc-checked)
