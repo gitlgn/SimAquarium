@@ -4,13 +4,13 @@
 export const debug = false;
 
 /** Debug log, no-op unless `debug` is true. */
-export function dbg(msg) {
+export function dbg(msg: unknown) {
 	if (!debug) return;
 	console.log('[SimAquarium]', msg);
 }
 
 /** Open a URL in a new tab. */
-export function openTab(url) {
+export function openTab(url: string) {
 	const a = document.createElement('a');
 	a.href = url;
 	a.target = '_blank';

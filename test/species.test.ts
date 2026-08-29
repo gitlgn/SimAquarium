@@ -16,7 +16,7 @@ const NUMERIC_FIELDS = [
 	'strength',
 	'longevity',
 	'fishNumAttack',
-];
+] as const;
 
 describe('fishSpecies data', () => {
 	it('has 29 species (index 0 is the debug "Test fish")', () => {

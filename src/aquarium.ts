@@ -60,7 +60,7 @@ class Aquarium {
 
 	#fish: Fish[] = []; // the list of all fish
 	#fishNum = 0;
-	#fishNumBySpecies: number[] = Array(29).fill(0);
+	#fishNumBySpecies: number[] = new Array<number>(29).fill(0);
 
 	#pollution = 0;
 	#pollutionChanged = false;
@@ -103,7 +103,7 @@ class Aquarium {
 		this.#wallImage.addEventListener('load', () => this.render());
 	}
 
-	#setWall(bgNum) {
+	#setWall(bgNum: number) {
 		this.#wallImage.src = background.getBackgroundSrc(bgNum);
 	}
 
@@ -285,24 +285,24 @@ class Aquarium {
 	}
 
 	/** Returns false (and does nothing) when the change would overdraw. */
-	changeMoney(diff) {
+	changeMoney(diff: number) {
 		if (this.#money + diff < 0) return false;
 		this.#money = this.#money + diff;
 		this.#renderMoney();
 		return true;
 	}
 
-	addMoney(mNum) {
+	addMoney(mNum: number) {
 		this.changeMoney(mNum);
 	}
 
 	/*** AQUARIUM SCENERIES ***/
 
-	getSceneries(sNum) {
+	getSceneries(sNum: number) {
 		return this.#sceneries[sNum];
 	}
 
-	buyScenery(scNum) {
+	buyScenery(scNum: number) {
 		if (this.#sceneries[scNum]) {
 			this.chooseScenery(scNum);
 		} else if (this.changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
@@ -311,7 +311,7 @@ class Aquarium {
 			this.#updateBuyButtons();
 		}
 	}
-	chooseScenery(scNum) {
+	chooseScenery(scNum: number) {
 		this.#usedScenery = scNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
@@ -320,7 +320,7 @@ class Aquarium {
 		config.saveGame();
 	}
 
-	sellScenery(scNum) {
+	sellScenery(scNum: number) {
 		if (!this.#sceneries[scNum]) return;
 
 		this.changeMoney(SELL * scenery.getSceneryData(scNum, SC_PRICE) * 0.5);
@@ -333,7 +333,7 @@ class Aquarium {
 
 	/*** AQUARIUM LIGHTING ***/
 
-	buyLight(liNum) {
+	buyLight(liNum: number) {
 		if (this.#lights[liNum]) {
 			this.chooseLight(liNum);
 		} else if (this.changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
@@ -343,7 +343,7 @@ class Aquarium {
 		}
 	}
 
-	chooseLight(liNum) {
+	chooseLight(liNum: number) {
 		this.#usedLight = liNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
@@ -352,7 +352,7 @@ class Aquarium {
 		config.saveGame();
 	}
 
-	sellLight(liNum) {
+	sellLight(liNum: number) {
 		if (!this.#lights[liNum]) return;
 
 		this.changeMoney(SELL * lighting.getLightData(liNum, LI_PRICE) * 0.5);
@@ -365,7 +365,7 @@ class Aquarium {
 
 	/*** AQUARIUM FILTERS ***/
 
-	buyFilter(fiNum) {
+	buyFilter(fiNum: number) {
 		if (this.#filters[fiNum]) {
 			this.chooseFilter(fiNum);
 		} else if (this.changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
@@ -375,7 +375,7 @@ class Aquarium {
 		}
 	}
 
-	chooseFilter(fiNum) {
+	chooseFilter(fiNum: number) {
 		this.#usedFilter = fiNum;
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
@@ -383,7 +383,7 @@ class Aquarium {
 		config.saveGame();
 	}
 
-	sellFilter(fiNum) {
+	sellFilter(fiNum: number) {
 		if (!this.#filters[fiNum]) return;
 
 		this.changeMoney(SELL * filtration.getFilterData(fiNum, FI_PRICE) * 0.5);
@@ -396,7 +396,7 @@ class Aquarium {
 
 	/*** BUY AQUARIUM BACKGROUNDS ***/
 
-	buyBackground(bgNum) {
+	buyBackground(bgNum: number) {
 		if (this.#usedBackground === bgNum) return;
 
 		if (this.changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
@@ -414,7 +414,13 @@ class Aquarium {
 	//   choose off — this one is active        choose on — owned, tap to switch
 	//   buy on     — affordable, not owned     buy off   — can't afford it
 	// and the sell button (slots 1+) is `sell on` while owned, else `sell off`.
-	#renderShopButtons(prefix, count, owned, used, priceOf) {
+	#renderShopButtons(
+		prefix: string,
+		count: number,
+		owned: boolean[],
+		used: number,
+		priceOf: (i: number) => number
+	) {
 		const active = Number(used) || 0;
 		for (let i = 0; i < count; i++) {
 			let cls;
@@ -433,13 +439,13 @@ class Aquarium {
 	}
 
 	#renderAccessoryShops() {
-		this.#renderShopButtons('Scenery', 9, this.#sceneries, this.#usedScenery, (i) =>
+		this.#renderShopButtons('Scenery', 9, this.#sceneries, this.#usedScenery, (i: number) =>
 			scenery.getSceneryData(i, SC_PRICE)
 		);
-		this.#renderShopButtons('Light', 9, this.#lights, this.#usedLight, (i) =>
+		this.#renderShopButtons('Light', 9, this.#lights, this.#usedLight, (i: number) =>
 			lighting.getLightData(i, LI_PRICE)
 		);
-		this.#renderShopButtons('Filter', 6, this.#filters, this.#usedFilter, (i) =>
+		this.#renderShopButtons('Filter', 6, this.#filters, this.#usedFilter, (i: number) =>
 			filtration.getFilterData(i, FI_PRICE)
 		);
 	}
@@ -473,7 +479,7 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = ctx2d($('tank'));
+		this.#canvasTankCtx = ctx2d($('tank') as HTMLCanvasElement);
 		this.#setWall(this.#usedBackground);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
@@ -524,7 +530,7 @@ class Aquarium {
 		return this.#fishNum;
 	}
 
-	getFishNumBySpecies(fSpec) {
+	getFishNumBySpecies(fSpec: number) {
 		return this.#fishNumBySpecies[fSpec];
 	}
 
@@ -533,7 +539,7 @@ class Aquarium {
 	 * @param {number} sNum   species index
 	 * @param {number} size   initial size, 0-1
 	 */
-	addFish(sNum, size) {
+	addFish(sNum: number, size: number) {
 		this.#fish[this.#fishNum] = new Fish(sNum, size);
 		this.#fishNum++;
 
@@ -543,7 +549,7 @@ class Aquarium {
 	}
 
 	// Remove specific fish
-	removeFish(fNum) {
+	removeFish(fNum: number) {
 		if (fNum >= this.#fishNum) return;
 
 		this.#fishNumBySpecies[this.#fish[fNum].getSpecNum()]--;
@@ -560,7 +566,7 @@ class Aquarium {
 	}
 
 	// Fish is attacked and hurt
-	hurtFish(fNum, hurtNum) {
+	hurtFish(fNum: number, hurtNum: number) {
 		this.#fish[fNum].changeCondition(hurtNum);
 	}
 
@@ -570,7 +576,7 @@ class Aquarium {
 		return this.#pollution;
 	}
 
-	changePollution(change) {
+	changePollution(change: number) {
 		this.#pollution = this.#pollution + change;
 		if (this.#pollution < 0) this.#pollution = 0;
 		else if (this.#pollution > 32) this.#pollution = 32;
@@ -624,7 +630,7 @@ class Aquarium {
 	getMedicine() {
 		return this.#medicine;
 	}
-	changeMedicine(medNum) {
+	changeMedicine(medNum: number) {
 		this.#medicine = this.#medicine + medNum;
 		if (this.#medicine < 0) this.#medicine = 0;
 		if (this.#medicine > 100) this.#medicine = 100;
@@ -655,7 +661,7 @@ class Aquarium {
 		return this.#food;
 	}
 
-	changeFood(foodNum) {
+	changeFood(foodNum: number) {
 		this.#food = this.#food + foodNum;
 		if (this.#food < 0) this.#food = 0;
 		if (this.#food > 100) this.#food = 100;
@@ -693,7 +699,7 @@ class Aquarium {
 		this.#growHormone = 0;
 	}
 
-	changeGrowHormone(ghNum) {
+	changeGrowHormone(ghNum: number) {
 		this.#growHormone = this.#growHormone + ghNum;
 		if (this.#growHormone < 0) this.#growHormone = 0;
 		if (this.#growHormone > 100) this.#growHormone = 100;
@@ -724,7 +730,7 @@ class Aquarium {
 		this.#breedHormone = 0;
 	}
 
-	changeBreedHormone(bhNum) {
+	changeBreedHormone(bhNum: number) {
 		this.#breedHormone = this.#breedHormone + bhNum;
 		if (this.#breedHormone < 0) this.#breedHormone = 0;
 		if (this.#breedHormone > 100) this.#breedHormone = 100;
@@ -806,7 +812,7 @@ class Aquarium {
 		return this.#fishDeaths;
 	}
 
-	breedFishSet(bSpec) {
+	breedFishSet(bSpec: number) {
 		this.#breedFish = bSpec;
 	}
 
@@ -953,7 +959,7 @@ class Aquarium {
 		this.#canvasTankCtx.drawImage(this.#layerBack, 0, 0);
 	}
 
-	#renderFish(fishObj) {
+	#renderFish(fishObj: Fish) {
 		this.#canvasTankCtx.save();
 		this.#canvasTankCtx.translate(fishObj.getX(), fishObj.getY());
 		this.#canvasTankCtx.rotate(fishAngle[fishObj.getVX()][fishObj.getVY()]);
@@ -970,31 +976,31 @@ class Aquarium {
 
 	// FOR STATISTICS — accessors by fish index
 
-	returnSpecNum(fNum) {
+	returnSpecNum(fNum: number) {
 		return this.#fish[fNum].getSpecNum();
 	}
 
-	returnSpecName(fNum) {
+	returnSpecName(fNum: number) {
 		return fishSpecies[this.#fish[fNum].getSpecNum()].name;
 	}
 
-	returnFishCondition(fNum) {
+	returnFishCondition(fNum: number) {
 		return this.#fish[fNum].getCondition();
 	}
 
-	returnFishHunger(fNum) {
+	returnFishHunger(fNum: number) {
 		return this.#fish[fNum].getHunger();
 	}
-	returnFishDisease(fNum) {
+	returnFishDisease(fNum: number) {
 		return this.#fish[fNum].getDisease();
 	}
 
-	returnFishSize(fNum) {
+	returnFishSize(fNum: number) {
 		return this.#fish[fNum].getSize();
 	}
 
 	// sell fish
-	sellFish(fNum) {
+	sellFish(fNum: number) {
 		this.changeMoney(fishSpecies[this.#fish[fNum].getSpecNum()].price / 2);
 		this.removeFish(fNum);
 		this.#updateBuyButtons();

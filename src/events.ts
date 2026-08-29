@@ -11,7 +11,8 @@ import { uio } from './uio.js';
 import { openTab } from './util.js';
 import { $ } from './dom.js';
 
-const on = (id, type, handler) => $(id).addEventListener(type, handler, false);
+const on = (id: string, type: string, handler: EventListener) =>
+	$(id).addEventListener(type, handler, false);
 
 // The 2014 version gated this behind a code fetched from xtrsyz.org (now dead).
 // Just top up the balance directly.
@@ -63,7 +64,7 @@ export function eventsCreate() {
 		{ prefix: 'Scenery', count: 9, buy: 'buyScenery', sell: 'sellScenery' },
 		{ prefix: 'Light', count: 9, buy: 'buyLight', sell: 'sellLight' },
 		{ prefix: 'Filter', count: 6, buy: 'buyFilter', sell: 'sellFilter' },
-	];
+	] as const;
 	for (const { prefix, count, buy, sell } of shops) {
 		for (let i = 0; i < count; i++) {
 			on('button' + prefix + 'Buy' + i, 'click', () => aquarium[buy](i));
@@ -89,7 +90,7 @@ export function eventsCreate() {
 		'waterChange',
 		'addGrowHormone',
 		'addBreedHormone',
-	];
+	] as const;
 	tools.forEach((method, i) => on('buttonTool' + i, 'click', () => aquarium[method]()));
 
 	on('cameraTool', 'click', () => aquarium.exportPhoto());

@@ -12,7 +12,7 @@ import { toast } from './toast.js';
 class Uio {
 	#frontPageMode = PAGEMODE_MAXI;
 	#view = VIEW_AQUARIUM;
-	#rememberSpeed;
+	#rememberSpeed = 0;
 	#alertNumber = -1; // 0 sick, 1 hungry/starving, 2 breeds, 3 dies, 4 attacks
 
 	getView() {
@@ -44,7 +44,7 @@ class Uio {
 
 	// Changing the view — the `.active` class drives the button look (toolbar.css),
 	// :hover is pure CSS now.
-	changeView(viewNumber) {
+	changeView(viewNumber: number) {
 		if (this.#view === viewNumber) return;
 
 		if (viewNumber === VIEW_AQUARIUM) aquarium.render();
@@ -92,7 +92,7 @@ class Uio {
 		loop.chosenSpeed = delay;
 	}
 
-	changeAlertNum(alertNum) {
+	changeAlertNum(alertNum: number) {
 		this.#alertNumber = alertNum;
 	}
 

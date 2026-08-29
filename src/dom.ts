@@ -4,7 +4,7 @@
  * @param {string} id
  * @returns {HTMLElement}
  */
-export function $(id) {
+export function $(id: string): HTMLElement {
 	const el = document.getElementById(id);
 	if (el === null) throw new Error(`missing element #${id}`);
 	return el;
@@ -15,7 +15,7 @@ export function $(id) {
  * @param {HTMLCanvasElement} canvas
  * @returns {CanvasRenderingContext2D}
  */
-export function ctx2d(canvas) {
+export function ctx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const context = canvas.getContext('2d');
 	if (context === null) throw new Error('2d canvas context unavailable');
 	return context;

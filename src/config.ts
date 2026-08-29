@@ -83,11 +83,11 @@ class Config {
 		fishShop.load();
 	}
 
-	setItem(key, val) {
+	setItem(key: string, val: string | number) {
 		storage.setItem(key, val);
 	}
 
-	getItem(key) {
+	getItem(key: string) {
 		return storage.getItem(key);
 	}
 }
