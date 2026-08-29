@@ -2,23 +2,31 @@
  **	LIGHTING OBJECT
  */
 
-import { LI_NAME, LI_PRICE, LI_COMFORT, LI_ENERGY, LI_IMAGE } from './constants.js';
-
 const PATH_LIGHTING = 'gfx/lighting/';
 
+// Column order matches the LI_* constants in constants.ts.
+type LightRow = readonly [
+	name: string,
+	price: number,
+	comfort: number,
+	energy: number,
+	image: HTMLImageElement,
+];
+
 class Lighting {
-	#light: any[][] = [];
+	#light: LightRow[] = [];
 
 	constructor() {
-		const add = (name, fileName, price, comfort, energyCost) => {
-			const row: any[] = [];
-			row[LI_NAME] = name;
-			row[LI_PRICE] = price;
-			row[LI_COMFORT] = comfort;
-			row[LI_ENERGY] = energyCost;
-			row[LI_IMAGE] = new Image();
-			row[LI_IMAGE].src = PATH_LIGHTING + fileName;
-			this.#light.push(row);
+		const add = (
+			name: string,
+			fileName: string,
+			price: number,
+			comfort: number,
+			energyCost: number
+		) => {
+			const img = new Image();
+			img.src = PATH_LIGHTING + fileName;
+			this.#light.push([name, price, comfort, energyCost, img]);
 		};
 
 		add('Simple Light', 'light0.png', 0, 0.91, 0.01);
@@ -32,9 +40,8 @@ class Lighting {
 		add('Corner Reflectors', 'light8.png', 3600, 0.99, 0.09);
 	}
 
-	getLightData(num, data) {
-		const idx = Number.parseInt(num, 10) || 0;
-		return this.#light[idx][data];
+	getLightData<K extends number>(num: number, data: K): LightRow[K] {
+		return this.#light[num || 0][data];
 	}
 }
 

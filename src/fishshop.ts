@@ -24,10 +24,15 @@ import {
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
+// Column order matches the SHOPSLOT_* constants. Mutable — `buyFish` decrements
+// the stock count in place; the rest of the row is only ever replaced wholesale
+// (by #deliver / load).
+type ShopSlotRow = [spec: number, num: number, name: string, price: number, link: string];
+
 class FishShop {
-	#slots: any[][] = [];
+	#slots: ShopSlotRow[] = [];
 	#deliveryTime = 60;
-	#timer;
+	#timer = 0;
 
 	/*** RENDER — the whole shop panel from #slots ***/
 	#render() {
@@ -59,18 +64,14 @@ class FishShop {
 
 	#deliver() {
 		for (let i = 0; i < 9; i++) {
-			this.#slots[i][SHOPSLOT_SPEC] = 3 * i + Math.trunc(Math.random() * 3) + 1;
+			let specNum = 3 * i + Math.trunc(Math.random() * 3) + 1;
 
 			// The dolphin is a rarity — needs a swimming pool to appear.
-			if (i === 8 && aquarium.getSceneries(4) && Math.random() < 0.1) {
-				this.#slots[i][SHOPSLOT_SPEC] = 28;
-			}
+			if (i === 8 && aquarium.getSceneries(4) && Math.random() < 0.1) specNum = 28;
 
-			const spec = fishSpecies[this.#slots[i][SHOPSLOT_SPEC]];
-			this.#slots[i][SHOPSLOT_NUM] = Math.trunc((Math.random() * (10 - i) + (10 - i)) / 2);
-			this.#slots[i][SHOPSLOT_NAME] = spec.name;
-			this.#slots[i][SHOPSLOT_PRICE] = spec.price;
-			this.#slots[i][SHOPSLOT_LINK] = spec.link;
+			const spec = fishSpecies[specNum];
+			const num = Math.trunc((Math.random() * (10 - i) + (10 - i)) / 2);
+			this.#slots[i] = [specNum, num, spec.name, spec.price, spec.link];
 		}
 		this.#render();
 	}
@@ -78,9 +79,6 @@ class FishShop {
 	/* Initialize the fish shop */
 	init() {
 		this.#deliveryTime = 60;
-		for (let i = 0; i < 9; i++) {
-			this.#slots[i] = [];
-		}
 		this.#deliver();
 		this.updateDeliveryTime(); // start the fish shop counter
 	}
@@ -104,11 +102,11 @@ class FishShop {
 		this.#timer = window.setTimeout(() => this.updateDeliveryTime(), TIME_MINUTE);
 	}
 
-	openFishInfo(slotNum) {
+	openFishInfo(slotNum: number) {
 		openTab(this.#slots[slotNum][SHOPSLOT_LINK]);
 	}
 
-	buyFish(slotNum) {
+	buyFish(slotNum: number) {
 		if (this.#slots[slotNum][SHOPSLOT_NUM] < 1) return;
 		if (aquarium.getFishNum() > 63) return;
 
@@ -139,17 +137,14 @@ class FishShop {
 
 	load() {
 		for (let i = 0; i < 9; i++) {
-			this.#slots[i][SHOPSLOT_SPEC] = parseInt(
-				config.getItem('fishShopSlot' + i + 'spec'),
-				10
-			);
-			this.#slots[i][SHOPSLOT_NUM] = parseInt(config.getItem('fishShopSlot' + i + 'num'), 10);
-			this.#slots[i][SHOPSLOT_NAME] = config.getItem('fishShopSlot' + i + 'name');
-			this.#slots[i][SHOPSLOT_PRICE] = parseInt(
-				config.getItem('fishShopSlot' + i + 'price'),
-				10
-			);
-			this.#slots[i][SHOPSLOT_LINK] = config.getItem('fishShopSlot' + i + 'link');
+			const key = 'fishShopSlot' + i;
+			this.#slots[i] = [
+				parseInt(config.getItem(key + 'spec'), 10),
+				parseInt(config.getItem(key + 'num'), 10),
+				config.getItem(key + 'name'),
+				parseInt(config.getItem(key + 'price'), 10),
+				config.getItem(key + 'link'),
+			];
 		}
 		this.#deliveryTime = parseInt(config.getItem('fishShopDeliveryTime'), 10);
 		this.#render();

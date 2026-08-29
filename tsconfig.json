@@ -11,8 +11,9 @@
 		"checkJs": false,
 
 		"strict": true,
-		// The scenery/light/filter/shop rows are `T[]` indexed by column
-		// constants; typing them as tuples is disproportionate for now.
+		// The data tables are typed now (tuple rows). What still trips
+		// noImplicitAny is ~50 bare function params across aquarium/config/
+		// events/dom — a mechanical annotation pass, tracked in MODERNIZATION.md.
 		"noImplicitAny": false,
 		"noUnusedLocals": true,
 		"noFallthroughCasesInSwitch": true

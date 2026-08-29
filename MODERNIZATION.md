@@ -125,8 +125,8 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 - **3d-2** `src/*.js` + `test/*.js` → `.ts`, `jsconfig.json` → `tsconfig.json`.
   JSDoc `@type` casts → native TS (`#fish: Fish[]`, `expr as HTMLInputElement`,
   …). Import specifiers keep `.js` (bundler resolution maps to `.ts`).
-  `noImplicitAny` stays **off**: the scenery/light/filter/shop rows are `T[]`
-  indexed by column constants and tuple-typing them isn't worth it yet.
+  `noImplicitAny` stays **off** for now (the data tables were `T[]` indexed by
+  column constants — typed as tuples in Phase 3g).
 - **ESLint gap (closed — see 3e):** for a while `typescript-eslint` couldn't
   parse the native TS 7.0 compiler API, so `src/**` / `test/**` were on
   `tsc --strict` + Prettier only.
@@ -145,13 +145,37 @@ classic `6.0.x` line, so:
   `tseslint.configs.recommendedTypeChecked` (type-aware, `projectService`).
 - Findings: 3 `no-unnecessary-type-assertion` errors auto-fixed (redundant
   `as HTMLElement` / `as HTMLCanvasElement` — `$()` already returns
-  `HTMLElement`). 11 `no-explicit-any` **warnings** remain on the shop
-  row-tables (`any[][]` indexed by column constants) — the `noImplicitAny`
-  tuple-typing job, still deferred.
+  `HTMLElement`). 11 `no-explicit-any` warnings on the shop row-tables,
+  cleared in Phase 3g.
 - Revert path when 7.1 lands: bump `typescript` to `7.x` and `typescript-eslint`
   to the release that supports it; nothing else changes.
 
 [typescript-eslint#10940]: https://github.com/typescript-eslint/typescript-eslint/issues/10940
+
+## ✅ Phase 3g — typed data tables (done)
+
+The scenery / lighting / filter / background / fish-shop tables were
+`any[][]` indexed by column constants (`SC_PRICE` …). Each is now a
+`readonly` tuple type in its module, e.g.
+
+```ts
+type FilterRow = readonly [name: string, price: number, comfort: number,
+                           pollution: number, energy: number,
+                           image: HTMLImageElement];
+```
+
+- The `getXData` accessors became generic — `getFilterData<K extends number>
+  (n: number, data: K): FilterRow[K]` — so the ~20 call sites in `aquarium.ts`
+  get `number` / `HTMLImageElement` back with no cast (`drawImage(...)`
+  typechecks directly).
+- The `add(...)` builders push a tuple literal in column order instead of
+  index-assigning a scratch `any[]`; `fishshop` `#deliver` / `load` likewise
+  build the whole row at once (dropped the `#slots[i] = []` pre-fill).
+- `eslint.config.js`: removed the `no-explicit-any` / `no-unsafe-*` rule
+  downgrades — `recommendedTypeChecked` now runs undiluted. `npm run lint`
+  is clean (0 warnings).
+- `noImplicitAny` still off — what's left is ~50 bare function params across
+  `aquarium` / `config` / `events` / `dom`, a separate mechanical pass.
 
 ## Phase 4 — responsive / mobile layout
 
@@ -498,9 +522,9 @@ imperative pockets remain in `uio.ts` (speed slider, widget flip) and
 
 ### Backlog
 
-- **`noImplicitAny`** on, with tuple/union-array types for the scenery /
-  lighting / filter / shop row-tables (currently 11 `no-explicit-any`
-  warnings). typescript-eslint itself is back — see Phase 3e.
+- **`noImplicitAny`** on — a mechanical pass annotating ~50 bare function
+  params across `aquarium` / `config` / `events` / `dom`. The data tables it
+  used to block on are typed now (Phase 3g).
 - Bump `typescript` `~6.0.3` → `7.x` once `typescript-eslint` supports the
   TS 7.1 compiler API.
 
