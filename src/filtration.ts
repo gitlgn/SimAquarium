@@ -19,6 +19,9 @@ import {
 const PATH_FILTERS = 'gfx/filters/';
 const PATH_BGS = 'gfx/view4/';
 
+const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
+
 class Filtration {
 	#filter: any[][] = [];
 
@@ -88,32 +91,28 @@ class BackgroundWall {
 		return this.#background[num][data];
 	}
 
-	/*** CREATE HTML FOR BACKGROUNDS ***/
-	createBackgroundSlots() {
+	getBackgroundCount() {
+		return this.#background.length;
+	}
+
+	/*** RENDER THE BACKGROUND SHOP FROM STATE ***/
+	// `id="backgroundSlot${i}"` is kept because the per-swatch artwork lives in
+	// CSS keyed on that id; `data-bg` / `data-act` drive the delegated buy
+	// listener in events.ts. A tile is `off` (unclickable) when it is the wall
+	// currently in use or the player can't afford it.
+	renderBackgrounds(money = 0, used = 0) {
+		let html = '';
 		for (let i = 0; i < this.#background.length; i++) {
-			const bgSlot = document.createElement('div');
-			const bgSlotTitle = document.createElement('div');
-			const bgSlotMoney = document.createElement('div');
-			const bgSlotBuy = document.createElement('div');
-
-			bgSlot.setAttribute('class', 'backgroundSlot');
-			bgSlot.setAttribute('id', 'backgroundSlot' + i);
-
-			bgSlotTitle.innerHTML = this.#background[i][BG_NAME];
-			bgSlotTitle.setAttribute('class', 'title');
-
-			bgSlotMoney.innerHTML = this.#background[i][BG_PRICE];
-			bgSlotMoney.setAttribute('class', 'money');
-
-			bgSlotBuy.setAttribute('class', 'button buy on');
-			bgSlotBuy.setAttribute('id', 'buttonBackgroundBuy' + i);
-
-			$('tabBackgroundShop').appendChild(bgSlot);
-			bgSlot.appendChild(bgSlotTitle);
-			bgSlot.appendChild(bgSlotMoney);
-			bgSlot.appendChild(bgSlotBuy);
+			const price = this.#background[i][BG_PRICE];
+			const disabled = i === used || money < price;
+			html +=
+				`<div class="backgroundSlot" id="backgroundSlot${i}" data-bg="${i}">` +
+				`<div class="title">${esc(this.#background[i][BG_NAME])}</div>` +
+				`<div class="money">${price}</div>` +
+				`<div class="button buy ${disabled ? 'off' : 'on'}" data-act="buy"></div>` +
+				`</div>`;
 		}
-		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
+		$('tabBackgroundShop').innerHTML = html;
 	}
 }
 

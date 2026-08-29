@@ -35,7 +35,7 @@ if (import.meta.env.DEV) {
 
 function boot() {
 	aquarium.updateComfortAquarium(); // seed the comfort factor / breeding rates
-	background.createBackgroundSlots();
+	background.renderBackgrounds();
 	eventsCreate();
 	aquarium.create();
 	fishShop.init();

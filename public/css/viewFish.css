@@ -1,10 +1,7 @@
-/*** FISH SHOP VIEW ***/
-
-#view1 {
-}
+/*** FISH SHOP VIEW — markup built by fishshop.ts; layout in panels.css ***/
 
 #newFishTime {
-	color: rgb( 215, 215, 215);
+	color: rgb(215, 215, 215);
 }
 
 .fishSlot {
@@ -87,15 +84,5 @@
 .fishSlot  .buy {
 	left: 55px;
 }
-
-#fishSlot0 { top: 37px; left: 9px; }
-#fishSlot1 { top: 37px; left: 125px; }
-#fishSlot2 { top: 37px;	left: 241px; }
-#fishSlot3 { top: 104px; left: 9px; }
-#fishSlot4 { top: 104px; left: 125px; }
-#fishSlot5 { top: 104px; left: 241px; }
-#fishSlot6 { top: 171px; left: 9px; }
-#fishSlot7 { top: 171px; left: 125px; }
-#fishSlot8 { top: 171px; left: 241px; }
 
 
