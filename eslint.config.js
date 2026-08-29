@@ -51,9 +51,9 @@ export default tseslint.config(
 		languageOptions: { globals: { ...globals.node } },
 	},
 
-	// --- Node tooling config ----------------------------------------------
+	// --- Node tooling / scripts -----------------------------------------
 	{
-		files: ['*.config.js', 'scripts/**/*.js'],
+		files: ['*.config.{js,mjs}', 'scripts/**/*.{js,mjs}'],
 		languageOptions: {
 			ecmaVersion: 2023,
 			sourceType: 'module',

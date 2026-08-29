@@ -27,7 +27,7 @@ export default defineConfig({
 	plugins: [
 		VitePWA({
 			registerType: 'autoUpdate',
-			includeAssets: ['gfx/favicon.png', 'gfx/apple-touch-icon.png'],
+			includeAssets: ['gfx/favicon.png'],
 			workbox: {
 				globPatterns: ['**/*.{js,css,html,png,jpg,svg,woff2}'],
 				// the game preloads ~120 small sprites; raise the default 2 MiB cap
@@ -47,14 +47,15 @@ export default defineConfig({
 				orientation: 'any',
 				start_url: BASE,
 				scope: BASE,
+				// icon.svg is full-bleed with the fish inside the safe circle, so the
+				// 512 serves both `any` and `maskable`.
 				icons: [
 					{ src: 'gfx/pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-					{ src: 'gfx/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
 					{
-						src: 'gfx/pwa-maskable-512.png',
+						src: 'gfx/pwa-512.png',
 						sizes: '512x512',
 						type: 'image/png',
-						purpose: 'maskable',
+						purpose: 'any maskable',
 					},
 				],
 			},

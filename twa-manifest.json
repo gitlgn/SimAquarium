@@ -19,7 +19,7 @@
 	"enableNotifications": false,
 	"startUrl": "/SimAquarium/",
 	"iconUrl": "https://gitlgn.github.io/SimAquarium/gfx/pwa-512.png",
-	"maskableIconUrl": "https://gitlgn.github.io/SimAquarium/gfx/pwa-maskable-512.png",
+	"maskableIconUrl": "https://gitlgn.github.io/SimAquarium/gfx/pwa-512.png",
 	"splashScreenFadeOutDuration": 300,
 	"signingKey": {
 		"path": "./android.keystore",

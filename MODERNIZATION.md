@@ -16,8 +16,8 @@ Staged so the game stays runnable and testable after every step.
   Baseline: **0 errors, ~650 warnings** in `public/js/**` — that warning count is
   the modernization backlog; drive it down, don't add to it.
 - `vite-plugin-pwa`: web manifest + service worker, generated PWA icons
-  (`public/gfx/pwa-*.png`, upscaled from the 128px original — **replace with real
-  artwork**).
+  (`public/gfx/pwa-*.png`, upscaled from the 128px original — replaced with a
+  vector mark in Phase 3f).
 - Replaced all 10 `setInterval("code string", …)` / `setTimeout("code string", …)`
   with function references (implied-eval; also blocks a strict CSP later).
 - Fixed the no-op `dbg()` (was a bare `console.error` reference).
@@ -503,7 +503,23 @@ imperative pockets remain in `uio.ts` (speed slider, widget flip) and
   warnings). typescript-eslint itself is back — see Phase 3e.
 - Bump `typescript` `~6.0.3` → `7.x` once `typescript-eslint` supports the
   TS 7.1 compiler API.
-- Real PWA icons (`public/gfx/pwa-*.png` are upscaled from the 128 px original).
+
+## ✅ Phase 3f — app icon (done)
+
+The PWA icons were upscaled from the 128 px Chrome-App original and looked
+soft. Replaced with a vector-drawn mark:
+
+- `public/gfx/icon.svg` — a stylised fish + bubbles on the `#0e4e7a` theme
+  colour, full-bleed background with the fish inside the maskable safe circle.
+- `scripts/generate-icons.mjs` (`npm run icons`, `sharp`) rasterises it to
+  `favicon.png` (16), `pwa-192.png`, `pwa-512.png`. The 512 carries
+  `purpose: "any maskable"` — no separate maskable file.
+- `index.html` gains an `image/svg+xml` favicon (crisp at any DPI), png as the
+  fallback.
+- Removed as redundant: `pwa-maskable-512.png`, `apple-touch-icon.png` (+ its
+  `<link>` / `includeAssets` entry — no iOS target), `icon16/48/128.png`
+  (Chrome-App leftovers, referenced by nothing).
+- Precache drops ~400 KiB (flat vector art compresses well).
 
 ## Phase 5 — Android
 
@@ -522,8 +538,8 @@ Play Store. No app code to maintain; web updates ship without a resubmit.
   `application/json`.
 - `twa-manifest.json` (repo root) — Bubblewrap config, all host/URL values as
   `PLACEHOLDER_*` to fill in after deploy. `packageId: org.gitlgn.simaquarium`.
-- `pwa-maskable-512.png` regenerated with the icon at 60 % (was 80 %) so nothing
-  is clipped by a circular mask — safe-ring now 0 % content.
+- ~~`pwa-maskable-512.png` safe-ring adjusted~~ — superseded by Phase 3f
+  (vector `icon.svg`, one 512 png with `purpose: "any maskable"`).
 - `.gitignore`: keystores (`*.keystore` / `*.jks` / `android.keystore`), bundles
   (`*.aab` / `*.apk`), `.bubblewrap/`, `/android/`, `/ios/`.
 - `docs/ANDROID.md` — full playbook (Bubblewrap steps, Digital Asset Links,
