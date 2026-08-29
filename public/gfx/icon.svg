@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SimAquarium">
+  <!--
+    Source of truth for the app icons. Regenerate the PNGs with:
+      npm run icons        (scripts/generate-icons.mjs, uses sharp)
+    Full-bleed background so it also works as a maskable icon; the fish stays
+    inside the centre ~80% safe circle. Palette anchored on the app theme
+    colour #0e4e7a.
+  -->
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12608f"/>
+      <stop offset="1" stop-color="#0a3f66"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="#0e4e7a"/>
+  <rect width="512" height="512" fill="url(#water)"/>
+
+  <!-- bubbles -->
+  <g fill="#bfe0f5">
+    <circle cx="398" cy="140" r="13" opacity="0.75"/>
+    <circle cx="380" cy="196" r="22" opacity="0.9"/>
+    <circle cx="404" cy="238" r="9" opacity="0.65"/>
+  </g>
+
+  <!-- fish -->
+  <g>
+    <!-- caudal fin (tail) -->
+    <path d="M150 256 L58 190 Q90 256 58 322 Z" fill="#9fd0ef"/>
+    <!-- dorsal fin: base is tucked well under the body so the body ellipse
+         (drawn next) covers the join with no visible corner -->
+    <path d="M300 202 Q268 132 234 96 Q214 150 190 214 Z" fill="#9fd0ef"/>
+    <!-- pelvic fin -->
+    <path d="M206 328 Q248 374 288 322 Z" fill="#9fd0ef"/>
+    <!-- body -->
+    <ellipse cx="252" cy="258" rx="128" ry="86" fill="#ddeefb"/>
+    <!-- belly highlight -->
+    <ellipse cx="244" cy="232" rx="96" ry="44" fill="#ffffff" opacity="0.35"/>
+    <!-- eye -->
+    <circle cx="320" cy="236" r="20" fill="#ffffff"/>
+    <circle cx="324" cy="238" r="10" fill="#0e4e7a"/>
+  </g>
+</svg>
