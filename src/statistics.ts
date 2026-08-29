@@ -48,18 +48,14 @@ class Stats {
 	updateFishListTable() {
 		const fishNum = aquarium.getFishNum();
 
-		$('fishTableContainer').style.overflow = fishNum < 10 ? 'hidden' : 'auto';
+		$('fishTableContainer').style.overflowY = fishNum < 10 ? 'hidden' : 'auto';
 
-		if (fishNum === 0) {
-			$('fishTableIcons').style.display = 'none';
-			$('fishTableInfo').style.display = 'block';
-		} else {
-			$('fishTableIcons').style.display = 'block';
-			$('fishTableInfo').style.display = 'none';
-		}
+		// toggle via `hidden` / empty inline display so panels.css's grid rules win
+		($('fishTableIcons') as HTMLElement).hidden = fishNum === 0;
+		($('fishTableInfo') as HTMLElement).hidden = fishNum !== 0;
 
 		for (let i = 0; i < fishNum; i++) {
-			$('fishTableRow' + i).style.display = 'block';
+			$('fishTableRow' + i).style.display = '';
 			$('fishTableSpeciesName' + i).innerHTML = aquarium.returnSpecName(i);
 			$('fishTableHealthBoxBar' + i).style.width =
 				(aquarium.returnFishCondition(i) /
@@ -83,7 +79,7 @@ class Stats {
 	refreshStatsPage() {
 		if (uio.getView() !== VIEW_STATISTICS) return;
 
-		if ($('tabFishList').style.display === 'block') {
+		if (!($('tabFishList') as HTMLElement).hidden) {
 			this.updateFishListTable();
 		} else {
 			$('statFishNumber').innerHTML = String(aquarium.getFishNum());

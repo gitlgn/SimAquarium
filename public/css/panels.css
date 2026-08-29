@@ -1,0 +1,228 @@
+/*
+ * panels.css — shop / stats panels reflow (Phase 4b-3 / 4b-4). Loaded last.
+ * Knobs live in theme.css.
+ *
+ * The 2014 slots are pixel-art tiles with position: absolute internals. We
+ * don't resize a tile — we turn the fixed absolute layout into an auto-fill
+ * grid so the panel fills its width, reflows to fewer columns when narrow, and
+ * scrolls. Tile internals (.title/.image/.money/.button) are untouched.
+ *
+ * Show/hide is the `hidden` attribute now (uio.changeView / uio.changeTab),
+ * not inline style.display — so these `display: grid` rules take effect.
+ */
+
+[hidden] {
+	display: none !important;
+}
+
+/* the active view fills the scroll area */
+.view {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	margin: 0;
+	padding: var(--panel-pad);
+	overflow-y: auto;
+	color: var(--ink);
+}
+#view1,
+#view2,
+#view3,
+#view4,
+#view5 {
+	background: var(--panel-bg);
+}
+
+#view0 {
+	background: none;
+	padding: 0;
+	overflow: visible;
+}
+
+/* headers / tab bar back into normal flow */
+.view .tabBar {
+	position: static;
+	float: none;
+	width: auto;
+	height: auto;
+	margin: 0 0 8px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+.view .tabBar .tab {
+	float: none;
+	margin: 0;
+}
+.view .headerInfo {
+	position: static;
+	float: none;
+	width: auto;
+	height: auto;
+	margin: 0 0 8px;
+	color: #dddddd;
+}
+
+/* ---- shop slot grids (fish / scenery / lighting / filters / backgrounds) ---- */
+
+#view1,
+#tabSceneries,
+#tabLightingShop,
+#tabFilterShop,
+#tabBackgroundShop {
+	display: grid;
+	/* one column per rendered tile width (native 110 * the zoom factor) */
+	grid-template-columns: repeat(auto-fill, calc(110px * var(--tile-zoom)));
+	justify-content: start;
+	align-content: start;
+	gap: var(--tile-gap);
+}
+#tabBackgroundShop {
+	/* background swatches are 64px native */
+	grid-template-columns: repeat(auto-fill, calc(64px * var(--tile-zoom)));
+}
+
+/* view1 holds its tab bar + "new fish in" line as grid items */
+#view1 > .tabBar,
+#view1 > .headerInfo {
+	grid-column: 1 / -1;
+}
+
+/* tiles: out of absolute positioning (per-#id top/left rules are more specific
+   than a bare .fooSlot, so scope by ancestor to beat them), kept at their
+   native design size, then `zoom`ed as one unit — art, labels and the
+   buy/sell buttons all scale together and stay clickable. */
+#view1 .fishSlot,
+#tabSceneries .scenerySlot,
+#tabLightingShop .lightSlot,
+#tabFilterShop .filterSlot,
+#tabBackgroundShop .backgroundSlot {
+	position: relative;
+	inset: auto;
+	top: auto;
+	left: auto;
+	margin: 0;
+	zoom: var(--tile-zoom);
+	background-repeat: no-repeat;
+	background-position: left top;
+	background-size: 100% 100%;
+}
+
+/* ---- statistics view (view5) ----
+   `zoom` on the container scales the whole table (text, bars, row height).
+   Rows + the icon header share one grid so the stat columns line up. */
+
+#tabFishList {
+	display: block;
+	zoom: var(--fishlist-zoom); /* scales the header + rows together, so their grids align */
+}
+#fishTableInfo {
+	position: static;
+	margin: 6px 0;
+	font-size: 12px;
+}
+#fishTableContainer {
+	position: static;
+	width: 100%;
+	height: auto;
+	max-height: none;
+	overflow-x: auto; /* narrow screens: rows scroll sideways instead of clipping */
+}
+
+/* both share one fixed-column grid so the stat icons line up with the bars.
+   every non-1fr track is a fixed width (no `auto`) or the two grids, having
+   different cell content, would resolve them differently. */
+#fishTableIcons,
+.fishTableRow {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 34px 34px 40px 40px 64px 48px;
+	gap: 4px;
+	align-items: center;
+}
+
+#fishTableIcons {
+	position: static;
+	width: auto;
+	height: 12px;
+	margin: 4px 0;
+	background: none;
+}
+#fishTableIcons span {
+	width: 24px;
+	height: 10px;
+	justify-self: start;
+	margin-left: -5px; /* nudge onto the bars (which sit ~6px into their box) */
+	background: url(../gfx/view5/icons.png) no-repeat;
+	image-rendering: pixelated;
+}
+#fishTableIcons span:nth-child(1) {
+	grid-column: 2;
+	background-position: 0 0;
+}
+#fishTableIcons span:nth-child(2) {
+	grid-column: 3;
+	background-position: -25px 0;
+}
+#fishTableIcons span:nth-child(3) {
+	grid-column: 4;
+	background-position: -51px 0;
+}
+#fishTableIcons span:nth-child(4) {
+	grid-column: 5;
+	background-position: -76px 0;
+}
+
+.fishTableRow {
+	width: auto;
+	height: auto;
+	padding: 2px 4px;
+	box-sizing: border-box;
+}
+.fishTableRow > * {
+	float: none;
+	margin: 0;
+	min-width: 0;
+}
+.fishTableRow .fishTableSpeciesName {
+	width: auto;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.fishTableRow .fishTableHealthBox,
+.fishTableRow .fishTableHungerBox,
+.fishTableRow .fishTableSickBox,
+.fishTableRow .fishTableSizeBox {
+	width: auto;
+}
+.fishTableRow .button {
+	box-sizing: border-box;
+	width: 100%;
+	height: auto;
+	padding: 2px 4px;
+}
+/* the 2014 rule shrank the button on :press — jarring in a grid; just darken */
+.fishTableRow .button:active {
+	width: 100%;
+	height: auto;
+	border-width: 1px;
+	background: #b7a97e;
+}
+
+#tabStatistics {
+	display: block;
+	font-size: 13px;
+	line-height: 1.7;
+}
+#tabStatistics div {
+	position: static;
+}
+#tabStatistics #fishStats,
+#tabStatistics #waterProperties {
+	margin-top: 10px;
+	font-weight: bold;
+}
+#tabStatistics #fishStats {
+	margin-top: 0;
+}

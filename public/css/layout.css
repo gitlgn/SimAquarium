@@ -3,18 +3,8 @@ body {
 	font-family: Arial, sans-serif;
 }
 
-#pageFront {
-	width: 457px;
-	height: 300px;
-	background: url(../gfx/interface/widgetFront.png) -78px 0 no-repeat;
-}
-
-#pageBack {
-	width: 457px;
-	height: 300px;
-	background: url(../gfx/interface/widgetBack.png) no-repeat;
-	display: none;
-}
+/* #pageFront placement is in shell.css; #pageBack (Configuration) is a CSS
+   overlay in config.css now (Phase 4b-6) — no more widgetBack.png. */
 
 .money:after {
 	content: "$";

@@ -1,11 +1,10 @@
 /*
- * mobile.css — touch / small-screen hardening for the scaled widget.
- * Loaded last. The fluid/reflowing layout (bigger tank, panels that stack on
- * a phone in portrait) is still to come — see MODERNIZATION.md Phase 4b.
+ * mobile.css — touch / small-screen hardening. Loaded last.
+ * Layout itself now lives in shell.css / toolbar.css / views.css (Phase 4b).
  */
 
 #viewport {
-	/* Keep the widget clear of a notch / rounded corners / home indicator. */
+	/* Keep the UI clear of a notch / rounded corners / home indicator. */
 	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
 		env(safe-area-inset-left);
 	box-sizing: border-box;
@@ -21,15 +20,14 @@
 	-webkit-user-select: none;
 }
 
-/* The speed bar is now drag-to-set (pointer events) — don't let the browser
-   claim the gesture for scrolling/zooming. */
+/* The speed bar is drag-to-set (pointer events) — don't let the browser claim
+   the gesture for scrolling/zooming. */
 #speedBar,
 #speedHandle {
 	touch-action: none;
 }
 
-/* Everything clickable gets the hand cursor on desktop (belt-and-braces on top
-   of the per-file fixes) and a comfortable min hit area is handled by the scale. */
+/* Everything clickable gets the hand cursor on desktop. */
 .buttonTool,
 .buttonView,
 .buttonWidget,
@@ -37,7 +35,6 @@
 #pageMode,
 #cameraTool,
 #speedBar,
-#speedHandle,
 #confNewGame,
 #coinAdd,
 [id^='button'] {

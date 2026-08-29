@@ -1,0 +1,62 @@
+/*
+ * theme.css — the layout & colour knobs, all in one place (Phase 4b).
+ *
+ * Change a value, save, the dev server hot-reloads and you see it. No build.
+ * In dev there's also a slider panel — the ⚙ button bottom-left — that writes
+ * these live; "Copy CSS" there dumps the values to paste back in here.
+ *
+ * The layout switch point (stacked vs side-by-side) is the literal `760px` in
+ * shell.css + toolbar.css (`@media (min-width: 760px)`) — @media can't read a
+ * variable.
+ */
+
+:root {
+	/* ---- spacing ---- */
+	--frame-gap: 0px; /* gap tank<->strip + outer padding */
+	--strip-pad: 0px; /* padding inside the toolbar strip */
+	--panel-pad: 0px; /* padding inside a shop / stats panel */
+
+	/* ---- buttons (one size for everything) ---- */
+	--btn-size: 66px; /* every button: tools, views, widgets, minimise */
+	--btn-icon: calc(var(--btn-size) - 10px); /* icon within the button */
+
+	/* ---- shop tiles ---- */
+	--tile-min: 260; /* rendered tile width in px (unitless — feeds the calc below) */
+	--tile-gap: 0px;
+	/* derived — the whole tile (art + text + buy/sell buttons) scales as one
+	   unit via `zoom`; 110 is the tiles' native design width. */
+	--tile-zoom: calc(var(--tile-min) / 110);
+
+	/* ---- fish list ---- */
+	--fishlist-zoom: 1.6; /* scales the fish-list text, bars and row height */
+}
+
+/* Phones: everything a notch smaller so a shop page fits without scrolling and
+   the button row doesn't wrap three deep. */
+@media (max-width: 600px) {
+	:root {
+		--btn-size: 44px;
+		--tile-min: 150;
+		--fishlist-zoom: 1.15;
+	}
+
+	/* ---- colours ---- */
+	--shell-bg: #0e4e7a; /* water-blue behind everything */
+	--strip-bg: #0c3f63; /* toolbar strip */
+	--tank-bg: #06324f; /* letterbox behind the tank canvas */
+	--panel-bg: #5f5f5f; /* shop / stats panel */
+	--ink: #ededed; /* default text on dark */
+
+	--btn-bg: #cabf92;
+	--btn-bg-hover: #e2d7ab;
+	--btn-bg-active: #b3a679;
+	--btn-bg-active-view: #9db8cf; /* the current view's button */
+	--btn-border: #6b5f45;
+
+	/* ---- speed slider ---- */
+	--speed-track: #103f5f;
+	--speed-fill: #6fc7f5;
+	--speed-thumb: #ffffff;
+	--speed-thumb-size: 16px;
+	--speed-frac: 0.6; /* 0..1, overridden live on #speedBar by uio.ts */
+}

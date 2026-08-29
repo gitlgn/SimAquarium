@@ -1,209 +1,252 @@
-.buttonWidget {
-	width: 14px;
-	height: 14px;
-	position: absolute;
-	top: 12px;
-	background: url(../gfx/interface/buttonSmall.png);
+/*
+ * toolbar.css — the control strip + buttons (Phase 4b). Knobs in theme.css.
+ * Layout switch (760px) must match shell.css.
+ */
+
+#aquariumToolbar {
+	grid-area: toolbar;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 10px 14px;
+	padding: var(--strip-pad);
+	box-sizing: border-box;
+	background: var(--strip-bg);
+	color: var(--ink);
+}
+
+@media (min-width: 760px) {
+	#aquariumToolbar {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		width: auto; /* minimum — shrink-wrap to the tools */
+		height: 100%;
+		padding-top: calc(var(--btn-size) + 12px); /* clear the corner minimise button */
+		overflow-y: auto;
+	}
+}
+
+/* ---- shared button chrome + one size for all --------------------------- */
+
+.buttonTool,
+.buttonView,
+#cameraTool,
+.buttonWidget,
+#pageMode {
+	box-sizing: border-box;
+	flex: none;
+	width: var(--btn-size);
+	height: var(--btn-size);
+	padding: 0;
+	border: 1px solid var(--btn-border);
+	border-radius: 6px;
+	background-color: var(--btn-bg);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: var(--btn-icon) var(--btn-icon);
+	image-rendering: pixelated;
 	cursor: pointer;
 }
-.buttonWidget:hover {
-	background-position: 28px 0;
+
+.buttonTool:active,
+.buttonView:active,
+#cameraTool:active,
+.buttonWidget:active,
+#pageMode:active {
+	background-color: var(--btn-bg-active);
+	box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
 }
-.buttonWidget:active {
-	background-position: 14px 0;
+
+@media (hover: hover) {
+	.buttonTool:hover,
+	.buttonView:hover:not(.active),
+	#cameraTool:hover,
+	.buttonWidget:hover,
+	#pageMode:hover {
+		background-color: var(--btn-bg-hover);
+	}
+}
+
+.buttonView.active {
+	background-color: var(--btn-bg-active-view);
+	border-color: #47698c;
+	cursor: default;
+}
+
+/* ---- tool icons ------------------------------------------------------- */
+
+#buttonTool0 {
+	background-image: url(../gfx/interface/iconTool0.png);
+}
+#buttonTool1 {
+	background-image: url(../gfx/interface/iconTool1.png);
+}
+#buttonTool2 {
+	background-image: url(../gfx/interface/iconTool2.png);
+}
+#buttonTool3 {
+	background-image: url(../gfx/interface/iconTool3.png);
+}
+#buttonTool4 {
+	background-image: url(../gfx/interface/iconTool4.png);
+}
+#buttonTool5 {
+	background-image: url(../gfx/interface/iconTool5.png);
+}
+#buttonTool6 {
+	background-image: url(../gfx/interface/iconTool6.png);
+}
+#buttonTool7 {
+	background-image: url(../gfx/interface/iconTool7.png);
+}
+#cameraTool {
+	background-image: url(../gfx/interface/iconToolCamera.png);
 }
 #buttonWidget0 {
-	content: url(../gfx/interface/iconSmall0.png);
-	right: 50px;
+	background-image: url(../gfx/interface/iconSmall0.png);
 }
 #buttonWidget1 {
-	content: url(../gfx/interface/iconSmall1.png);
-	right: 32px;
+	background-image: url(../gfx/interface/iconSmall1.png);
 }
-#buttonWidget2 {
-	content: url(../gfx/interface/iconSmall2.png);
-	right: 14px;
+#pageMode {
+	background-image: url(../gfx/interface/viewIcon0.png);
 }
+#stage.mini #pageMode {
+	background-image: url(../gfx/interface/viewIcon1.png);
+}
+
+/* ---- status block --------------------------------------------------- */
+
+#toolbarStatus {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	position: static;
+	width: auto;
+	padding: 4px;
+}
+
+#statusMoney {
+	position: static;
+	inset: auto;
+	width: auto;
+	min-width: 40px;
+	height: auto;
+	font-size: 15px;
+	font-weight: bold;
+	color: var(--ink);
+	text-align: left;
+}
+
+/* alert lamp + water gauge keep their native bitmap sizes so the game's
+   inline style writes (backgroundPosition, bar height in px) stay valid. */
 #statusEvent {
+	position: relative;
+	inset: auto;
+	flex: none;
 	width: 38px;
 	height: 39px;
-	position: absolute;
-	top: 35px;
-	right: 26px;
-	background: url(../gfx/interface/alertLight.png);
+	background: url(../gfx/interface/alertLight.png) no-repeat;
 }
 #statusEventIcon {
-	width: 24px;
-	height: 24px;
 	position: absolute;
 	top: 7px;
 	left: 7px;
+	width: 24px;
+	height: 24px;
 	display: none;
-	background: url(../gfx/interface/alertLightIcon0.png);
+	background: url(../gfx/interface/alertLightIcon0.png) no-repeat;
 }
 #statusWater {
+	position: relative;
+	inset: auto;
+	flex: none;
 	width: 6px;
 	height: 34px;
-	position: absolute;
-	top: 37px;
-	right: 14px;
-	background: url(../gfx/interface/waterCondition.png);
+	background: url(../gfx/interface/waterCondition.png) no-repeat;
 }
 #statusWaterBar {
-	width: 4px;
-	height: 0px;
 	position: absolute;
 	bottom: 1px;
 	left: 1px;
-	background: transparent url(../gfx/interface/waterConditionBar.png) repeat-x fixed 0 38px;
-}
-#statusMoney {
-	position: absolute;
-	right: 14px;
-	top: 80px;
-	width: 50px;
-	height: 10px;
-	font-size: 9px;
-	color: rgb( 25, 25, 25 );
-	text-align: center;
-}
-.buttonTool {
-	width: 20px;
-	height: 20px;
-	position: absolute;
-	background: url(../gfx/interface/buttonMedium.png);
-	cursor: pointer;
-}
-.buttonTool:hover {
-	background-position: 40px 0;
-}
-.buttonTool:active {
-	background-position: 20px 0;
+	width: 4px;
+	height: 0;
+	background: url(../gfx/interface/waterConditionBar.png) repeat-x;
 }
 
-#buttonTool0 {
-	content: url(../gfx/interface/iconTool0.png);
-	top: 103px;
-	right: 42px;
+/* ---- tools grid ---------------------------------------------------- */
+
+#toolbarTools {
+	position: static;
+	width: 100%;
+	display: grid;
+	/* phones: 4 tools per row (2 rows). Side-by-side layout: 1 per row. */
+	grid-template-columns: repeat(4, var(--btn-size) minmax(14px, 1fr));
+	gap: 4px 6px;
+	align-items: center;
+	justify-content: start;
+	padding: 4px;
+	box-sizing: border-box;
 }
-#buttonTool1 {
-	content: url(../gfx/interface/iconTool1.png);
-	top: 103px;
-	right: 16px;
+
+@media (min-width: 760px) {
+	/* two tools per row so the strip is half as tall (uses the empty space
+	   beside the tank instead of scrolling) */
+	#toolbarTools {
+		grid-template-columns: repeat(2, var(--btn-size) minmax(16px, 1fr));
+	}
 }
-#buttonTool2 {
-	content: url(../gfx/interface/iconTool2.png);
-	top: 137px;
-	right: 42px;
-}
-#buttonTool3 {
-	content: url(../gfx/interface/iconTool3.png);
-	top: 137px;
-	right: 16px;
-}
-#buttonTool4 {
-	content: url(../gfx/interface/iconTool4.png);
-	top: 171px;
-	right: 42px;
-}
-#buttonTool5 {
-	content: url(../gfx/interface/iconTool5.png);
-	top: 171px;
-	right: 16px;
-}
-#buttonTool6 {
-	content: url(../gfx/interface/iconTool6.png);
-	top: 205px;
-	right: 42px;
-}
-#buttonTool7 {
-	content: url(../gfx/interface/iconTool7.png);
-	top: 205px;
-	right: 16px;
-}
+
 .toolPrice {
-	font-size: 9px;
-	color: rgb( 25, 25, 25 );
-	text-align: center;
-	width: 20px;
-	position: absolute;
+	position: static;
+	inset: auto;
+	width: auto;
+	font-size: 11px;
+	color: var(--ink);
+	text-align: left;
 }
-#toolPrice0 {
-	top: 123px;
-	right: 42px;
-}
-#toolPrice1 {
-	top: 123px;
-	right: 16px;
-}
-#toolPrice2 {
-	top: 157px;
-	right: 42px;
-}
-#toolPrice3 {
-	top: 157px;
-	right: 16px;
-}
-#toolPrice4 {
-	top: 191px;
-	right: 42px;
-}
-#toolPrice5 {
-	top: 191px;
-	right: 16px;
-}
-#toolPrice6 {
-	top: 225px;
-	right: 42px;
-}
-#toolPrice7 {
-	top: 225px;
-	right: 16px;
-}
+
+/* ---- speed control — modern CSS slider (was gameSpeedBar/Handle.png) --- */
+
 #speedLabel {
-	position: absolute;
-	right: 12px;
-	top: 245px;
-	width: 54px;
-	height: 12px;
-	text-align: center;
-	font-size: 9px;
+	position: static;
+	inset: auto;
+	grid-column: 1 / -1;
+	text-align: left;
+	font-size: 11px;
+	margin: 8px 0 4px;
 }
 #speedBar {
-	position: absolute;
-	right: 14px;
-	top: 258px;
-	width: 50px;
+	position: relative;
+	inset: auto;
+	grid-column: 1 / -1;
+	width: 100%; /* = strip width */
 	height: 10px;
-	background: url(../gfx/interface/gameSpeedBar.png);
+	border-radius: 999px;
+	background: linear-gradient(
+		to right,
+		var(--speed-fill) 0,
+		var(--speed-fill) calc(var(--speed-frac, 0.6) * 100%),
+		var(--speed-track) calc(var(--speed-frac, 0.6) * 100%),
+		var(--speed-track) 100%
+	);
+	touch-action: none;
+	cursor: pointer;
 }
 #speedHandle {
 	position: absolute;
-	left: 416px;
-	top: 258px;
-	width: 13px;
-	height: 13px;
-	background: url(../gfx/interface/gameSpeedHandle.png);
-}
-#pageMode {
-	width: 14px;
-	height: 14px;
-	position: absolute;
-	bottom: 13px;
-	right: 9px;
-	background: url(../gfx/interface/viewMode.png);
-	cursor: pointer;
-	content: url(../gfx/interface/viewIcon0.png);
-}
-#pageMode:hover {
-	background-position: 28px 0;
-}
-
-#pageMode:active {
-	background-position: 14px 0;
-}
-#cameraTool {
-	content: url(../gfx/interface/iconToolCamera.png);
-	top: 257px;
-	left: 354px;
+	top: 50%;
+	/* travel inset by the full thumb (incl. its 2px border each side) so it
+	   never overflows the track at frac 0 or 1 */
+	left: calc(var(--speed-frac, 0.6) * (100% - var(--speed-thumb-size) - 4px));
+	width: var(--speed-thumb-size);
+	height: var(--speed-thumb-size);
+	border-radius: 50%;
+	background: var(--speed-thumb);
+	border: 2px solid var(--speed-track);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	transform: translateY(-50%);
+	touch-action: none;
+	pointer-events: none;
 }

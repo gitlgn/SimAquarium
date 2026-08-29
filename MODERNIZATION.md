@@ -149,19 +149,229 @@ Vite from a single `<script type="module" src="/src/main.js">`.
 - `cursor: hand` → `cursor: pointer` (12×); dead `-apple-dashboard-region`
   declarations removed (7×).
 
-### 4b — fluid re-layout (needs visual iteration)
+### 4b — fluid re-layout
 
-The whole 2014 UI is `position: absolute` + pixel coordinates. Making the
-**tank grow to fill the space** and the **shop panels reflow into a scrollable
-column on a narrow screen** is effectively a new layout (flex/grid), and it
-has to be built while looking at it on real screen sizes — not blind. Do this
-with screenshots / a device in the loop.
+The whole 2014 UI is `position: absolute` on a 457×300 raster, drawn by one
+frame bitmap (`widgetFront.png`), scaled uniformly. Making it fluid means a
+real grid/flex shell and converting each panel off its pixel coordinates.
+Staged so every commit boots and is checkable on a real screen.
 
-- Tank `<canvas>` sizes to its container (keep the 360×240 draw buffer,
-  `object-fit`-style CSS scaling, or raise the buffer + rescale sprites).
-- Toolbar + views stack under the tank in portrait; side-by-side in landscape.
-- Real ≥ 44 px hit targets (not just the scaled pixel buttons).
-- Replace the widget-frame background art with CSS chrome so it can resize.
+#### ✅ 4b-1 — responsive shell + fluid tank (done)
+
+- New `public/css/shell.css`; `stage.css` + `stage.js` (the uniform-scale
+  wrapper) removed. `#pageFront` is now a grid: tank region + toolbar strip —
+  **stacked in portrait, side-by-side in landscape**.
+- Tank `<canvas>` keeps its 360×240 buffer and fills `#panelBody` via
+  `object-fit: contain` (`image-rendering: pixelated`). On a phone it goes from
+  ~360-scaled to near-fullscreen.
+- `#aquariumToolbar` is a flex strip (`toolbar.css` rewritten from absolute
+  coords). Speed bar is now **width-independent**: `uio.speedBarSet()` maps the
+  pointer's x-fraction to one of six speeds; the handle sits at `delay/5 * 100%`
+  inside the bar. `main.ts` boots the fish loop through `setSmallInterval()` so
+  the handle and loop agree from the start.
+- View-switch buttons wrapped in `#viewSwitch` (flex row); the six `.view`
+  panels wrapped in `#panelBody` (scrolls). `#pageMode` moved to the corner
+  next to the widget buttons.
+- Minimise (`#pageMode`) reworked: toggles `.mini` on `#stage` (CSS hides the
+  strip + switcher) and forces the aquarium view → distraction-free tank.
+- Shop/stats panel internals are **still on their 2014 CSS** at a fixed
+  360×240 inside the scroll area — converted next.
+- Verified (functional, at 1280×720 and 375×812): boots, canvas fully painted,
+  no 4xx, no page overflow, view switch / Configuration / Add Money / mini /
+  speed-drag all work. `npm run check` green.
+
+#### ✅ 4b-2 — ≥44 px targets + CSS button chrome (done)
+
+- Dropped the 3-state sprite frames (`buttonMedium/Big/Small.png`,
+  `viewMode.png`) for CSS button chrome — rounded rect, border, `:active`
+  inset, `:hover` tint. Icons are a centred `background-image` now (was
+  `content: url()`), so size is clean: tools + view buttons **44×44**, the
+  help/config/save + minimise buttons **34×34**.
+- `uio.ts`: `changeView()` no longer pokes `style.backgroundPosition` — the
+  `.active` class drives the look. `highlightViewButtonOn/Off` + their
+  `mouseover`/`mouseout` bindings deleted (`:hover` is pure CSS). `.mini`
+  swaps the minimise icon via CSS, not `style.content`.
+- Regression fixes from 4b-1: the camera button lost its icon (rule dropped in
+  the rewrite) — restored; the alert lamp + water gauge lost their bitmaps +
+  sizes — restored (the water bar's px height is still game-driven).
+- Help/config/save buttons moved into `#viewSwitch` (right-aligned group);
+  minimise (`#pageMode`) stays a `#stage` child so `.mini` can't hide it.
+  Landscape strip gets `padding-top` so the corner minimise button clears the
+  money readout.
+- Verified at 375×812, 768×1024 and 1024×680: no overflow/overlap, buttons
+  ≥34 px, view switch / speed-drag / minimise / Configuration all work,
+  canvas painted, no 4xx. `npm run check` + `vite build` green.
+
+#### ✅ 4b-3 — fish / scenery / lighting panels reflow (done)
+
+- `public/css/panels.css` (loaded last). The three single-grid shops (view1–3)
+  go from a fixed 3-column absolute layout to `grid-template-columns:
+  repeat(auto-fill, 110px)` — 2 columns on a phone, 6+ on a wide screen — with
+  the panel scrolling. Tile internals (`.title/.image/.money/.button`) are
+  **untouched**; only the tile's own `position: absolute` + per-`#id`
+  `top/left` are neutralised (via `#viewN .fooSlot` selectors that out-specify
+  the id rules).
+- Show/hide moved off inline `style.display` to the **`hidden` attribute**
+  (`uio.changeView`), with a `[hidden] { display: none !important }` reset — so
+  the `display: grid` rules can actually apply. `hidden` added to `#view1`–`5`
+  in the markup; the per-view `#viewN { display: none }` rules removed.
+- `.tabBar` / `.headerInfo` back into normal flow.
+- Accessories (view4) + Statistics (view5) stay pinned at 360×240 for now.
+- Verified at 375×812 and 1024×680: shops reflow + scroll, tiles stay in
+  bounds and clickable (buy/info/sell fire), tank + other views unaffected,
+  no 4xx. `npm run check` + `vite build` green.
+
+#### ✅ 4b-4 — accessories + statistics panels + the knob file (done)
+
+- `uio.changeTab` off inline `style.display` → the `hidden` attribute, so
+  `#tabFilterShop` / `#tabBackgroundShop` reflow as grids (filters on the
+  110 px column, backgrounds on a 64 px column). `#tabStatistics` /
+  `#tabFishList` markup lost their inline `display`; `statistics.ts`'s
+  `refreshStatsPage` guard changed from `style.display === 'block'` to
+  `!hidden` to match.
+- `#tabStatistics` absolute-label soup → a plain stacked flow list.
+  `#fishTableContainer` goes full-width (was 342 px) and grows with the
+  panel's scroll instead of its own fixed 180 px box.
+- **`public/css/theme.css`** — every layout number the shell uses is now a
+  `:root` custom property (widths, gaps, button + tile sizes, colours). One
+  place to tune. The layout switch point stays a literal `760px` in two
+  `@media (min-width: …)` lines (shell.css + toolbar.css) since `@media`
+  can't read a variable — the orientation query it replaced was fragile on
+  wide phones.
+- **`src/devpanel.ts`** — dev-only (`import.meta.env.DEV`, dynamically
+  imported, absent from the production bundle). A `⚙ layout` panel bottom-left
+  with a slider per numeric knob that writes it live onto `<html>`; "Copy CSS"
+  emits the matching `:root { … }` block to paste into theme.css, "Reset"
+  drops the overrides.
+- Verified at 375×812 / 1024×680: all six views reflow + stay in bounds,
+  tab switches (filters/backgrounds, fish-list/tank-info) work, buy / sell /
+  info fire, stats populate, dev panel mounts + Copy/Reset work, canvas
+  painted, no 4xx. `npm run check` + `vite build` green; devpanel confirmed
+  tree-shaken from prod.
+
+#### 4b-4 — statistics + fish-list panel
+
+- `#tabStatistics` (absolute label soup) → a simple two-column definition list.
+- `#fishTableContainer` rows already scroll; make them width-fluid.
+
+#### ✅ 4b-5 — knob pass from real-device feedback (done)
+
+Applied after eyeballing 4b-4 on Chrome/Brave/phone:
+
+- **Full-bleed.** `--frame-gap`, `--strip-pad`, `--panel-pad` → `0`;
+  `#stage` `max-width` cap removed (fills the window). `--app-max-width` /
+  `--strip-width` knobs gone.
+- **One button size.** `--btn-size-sm` / `--btn-icon-sm` removed — tools,
+  view buttons, help/config/save and minimise are all `--btn-size` (44) with
+  `--btn-icon` (44, edge-to-edge). One CSS rule.
+- **Toolbar strip = minimum width.** Side-by-side layout strip is `width:
+  auto` (shrink-wraps to the tools, ~125 px) instead of a fixed 180.
+- **Speed bar is a real slider now.** `gameSpeedBar.png` / `gameSpeedHandle.png`
+  dropped for a CSS track (rounded, a `--speed-fill` portion up to the current
+  speed) + a round thumb whose travel is inset so it can't overflow the ends.
+  Driven by `--speed-frac` (0–1), which `uio.setSmallInterval` sets on
+  `#speedBar` — replaces the old `handle.style.left` write. Bar width = strip
+  width.
+- **Shop tiles resize with the window.** Grid columns went from a fixed
+  `110px` to `minmax(var(--tile-min), 1fr)`; tiles stretch to fill the row,
+  `aspect-ratio` keeps their proportions, the per-slot art scales with them.
+- Phone tools grid is 4-per-row (was 2) so the strip isn't so tall.
+- Dev tuner (`devpanel.ts`) trimmed to the 7 knobs that remain.
+- Verified 375×812 / 1024×680: strip auto-widths, speed thumb stays in the
+  track at 0 and max, tiles grow past 110 px keeping aspect, fish list + tabs
+  + camera still work, no 4xx. `npm run check` + `vite build` green; devpanel
+  still tree-shaken from prod.
+
+#### ✅ 4b-6 — Configuration overlay + kill the last bitmaps (done)
+
+- `#pageBack` was shown by *hiding* `#pageFront`, which also hid the only
+  button that flipped back. Now it's a **backdrop + centred CSS card**
+  (`config.css`, contents wrapped in `#confPanel`) layered over the
+  still-rendered `#pageFront`, with its own **Close** button (`#confClose` →
+  `uio.flipWidget`). `flipWidget` is just `back.hidden = !back.hidden` now;
+  the `#page` field + `PAGE_FRONT/PAGE_BACK` are gone.
+- **Background shop had no visible effect** — the 2014 code showed the wall
+  colour as a CSS background on `#view0` behind a transparent canvas, but the
+  responsive tank canvas is opaque. Fixed: `aquarium` loads the wall into
+  `#wallImage` and tiles it on-canvas in `#renderBackground()` (as
+  `exportPhoto` always did); `buyBackground` / `loadAquarium` / `newGame` set
+  it via `#setWall()`, and the image's `load` repaints. Verified white → red →
+  blue all change the tank and survive save/load.
+- Removed the now-unused bitmaps: `widgetFront.png`, `widgetBack.png`,
+  `viewBackground.png`, `gameSpeedBar.png`, `gameSpeedHandle.png`,
+  `buttonBig/Medium/Small.png`, `viewMode.png`. Precache 208 → 199 entries.
+- Verified at 375×812 / 1100×720: config overlay opens over the game, Close +
+  toggle both work, Add Money / New Game / Relax reachable, all six views in
+  bounds, no 4xx, no requests for the deleted files. `npm run check` +
+  `vite build` green.
+
+#### ✅ 4b-7 — scale the tile + list contents (done)
+
+Second knob round — "make the shop tile *and its buttons/text* bigger, and the
+fish-list text":
+
+- Shop tiles are kept at their native design size and `zoom`ed as one unit
+  (`--tile-zoom`, derived from `--tile-min`), so the art, labels **and the
+  buy/sell buttons** scale together and stay clickable (`zoom` scales the hit
+  area, unlike `transform`). Grid columns are `calc(110px * var(--tile-zoom))`.
+- Fish list: `#tabFishList` is `zoom`ed by `--fishlist-zoom`; the row and the
+  `#fishTableIcons` header share **one fixed-column grid** so the stat icons
+  line up with the health/hunger/sick/size bars. `#fishTableIcons` gained four
+  `<span>` slices of `icons.png`, one per stat column.
+- `statistics.ts` show/hide moved off inline `style.display` (`.hidden` for
+  the header/info, `''` for shown rows) so the grid CSS applies;
+  `overflow` → `overflowY` so narrow screens scroll rows sideways.
+- Dev tuner: knobs support non-px units now; added `--tile-min` (unitless) +
+  `--fishlist-zoom`.
+- Values from device testing baked into `theme.css`: btn 66 / icon 56, tile
+  260, all gaps + padding 0.
+
+#### ✅ 4b-8 — device-feedback fixes (done)
+
+- **Phones downscale.** `@media (max-width: 600px)` drops `--btn-size` to 44,
+  `--tile-min` to 150, `--fishlist-zoom` to 1.15 — the button row is 2 deep
+  instead of 3, and a 9-slot shop fits without scrolling.
+- **Save & Exit button removed.** It called `window.close()` (a no-op in a
+  normal tab). The game already saves on every buy/sell/tool; added a flush on
+  `visibilitychange` (hidden) + `pagehide`. `uio.closeWidget` deleted.
+- Toolbar strip: **two tool columns** side-by-side (was one) — half the height,
+  no scroll, uses the space beside the tank.
+- Fish-list **Sell no longer shrinks on press** (the 2014 `:active` rule);
+  stat icons nudged onto their bars (±3 px now).
+- `--btn-icon` follows `--btn-size` (`calc(size - 10px)`) so one knob scales
+  the button and its glyph together.
+
+Known, deferred to a UI rethink: the alert lamp (`alertLight.png`) only ever
+shows its dim off-state — the 2014 event-notification is a 2-frame sprite
+that's easy to miss; wants a real toast/log. Shops still scroll one row on a
+very short viewport (height-aware tile sizing needs JS).
+
+**Phase 4b complete.** The 2014 fixed-widget UI is gone: one responsive shell,
+CSS chrome throughout, every panel reflows and scales, tuning knobs in
+`theme.css` (+ the dev slider panel).
+
+## Phase 6 — view / state split (proposed)
+
+Phases 4a–4b retrofitted a responsive layer over DOM that the game logic still
+drives imperatively: **~114 `$('id').style.x = …` / `.innerHTML` /
+`setAttribute('class', …)` calls** across `aquarium` (52), `statistics` (21),
+`uio` (15), `fishshop` (14), `filtration` (7). Every layout change fights those
+inline writes (the `hidden`-vs-`style.display`, two-grids-must-align, and
+`refreshStatsPage` guard fixes were all this leaking through).
+
+The canvas game-sim is already clean (a real render loop). The proposal is to
+give the **chrome** the same treatment, panel by panel:
+
+- each game object exposes plain state; a thin per-panel `render(state)` owns
+  its DOM subtree and rebuilds it from data (the shop tables are already
+  data-driven in `species.ts` / `filtration.ts` — they're just not *rendered*
+  from it, they're hand-placed in `index.html` and mutated in place)
+- one `renderStatus(state)` for money / water / alert (+ a real notification
+  surface, replacing the lamp)
+- delete the scattered `$('id').style.*` writes → layout becomes pure CSS
+
+Start with the fish list (worst offender), then status bar, then the shops.
+Incremental, each panel shippable on its own.
 
 ## Phase 5 — Android
 

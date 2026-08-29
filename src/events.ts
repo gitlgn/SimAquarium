@@ -27,17 +27,19 @@ export function eventsCreate() {
 		openTab('https://xtrsyz.org/2014/02/simaquarium-extensions/')
 	);
 	on('buttonWidget1', 'click', () => uio.flipWidget());
-	on('buttonWidget2', 'click', () => {
-		uio.closeWidget();
-		config.saveGame();
-	});
 	on('pageMode', 'click', () => uio.changeFrontPageMode());
+
+	// Autosave — the game already saves on every buy/sell/tool; also flush when
+	// the tab is hidden or unloaded (there's no "Save & Exit" button any more).
+	const flush = () => config.saveGame();
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'hidden') flush();
+	});
+	window.addEventListener('pagehide', flush);
 	on('Copyrights', 'click', () => openTab('https://xtrsyz.org/'));
 
-	/*** VIEW BUTTONS (index === view number) ***/
+	/*** VIEW BUTTONS (index === view number) — :hover is CSS now ***/
 	for (let v = 0; v <= 5; v++) {
-		on('buttonView' + v, 'mouseover', () => uio.highlightViewButtonOn(v));
-		on('buttonView' + v, 'mouseout', () => uio.highlightViewButtonOff(v));
 		on('buttonView' + v, 'click', () => {
 			uio.changeView(v);
 			if (v === 5) stats.refreshStatsPage();
@@ -114,6 +116,7 @@ export function eventsCreate() {
 	}
 
 	/*** PREFERENCES ***/
+	on('confClose', 'click', () => uio.flipWidget());
 	on('confRelaxMode', 'change', () => config.relaxChange());
 	on('confNewGame', 'click', () => config.newGame());
 	on('coinAdd', 'click', () => coinAdd());

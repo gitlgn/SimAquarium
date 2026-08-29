@@ -1,8 +1,6 @@
 /*** ACCESSORIES VIEW ***/
 
 #view4 {
-	background: url(../gfx/interface/viewBackground.png);
-	display: none;
 }
 
 
@@ -109,10 +107,6 @@
 
 
 /*** AQUARIUM BACKGROUNDS ***/
-
-#tabBackgroundShop {
-	display: none;
-}
 
 
 .backgroundSlot {

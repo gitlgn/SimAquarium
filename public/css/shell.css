@@ -1,0 +1,142 @@
+/*
+ * shell.css — responsive shell (Phase 4b). Knobs live in theme.css.
+ *
+ *   #viewport ................ fixed, full screen, safe-area padding
+ *     #stage ................. flex column, capped width
+ *       #pageFront .......... grid: tank region + toolbar strip
+ *         #aquariumViews .... grows to fill — view-switch row + panel body
+ *           #viewSwitch .... the 6 view buttons + camera + help/config/save
+ *           #panelBody ..... the active .view (tank fills it; shops scroll)
+ *         #aquariumToolbar . fixed-size strip: status + tools + speed
+ *       #pageBack ........... configuration page (still legacy-sized for now)
+ *       #pageMode .......... minimise / restore, top-right corner
+ *
+ * < 760px wide: toolbar strip sits under the tank (stacked).
+ * >= 760px wide: strip to the right (side-by-side). Change 760 here AND in
+ * toolbar.css to move that switch.
+ */
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--shell-bg);
+	overflow: hidden;
+	font-family: Arial, sans-serif;
+}
+
+#viewport {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+		env(safe-area-inset-left);
+	box-sizing: border-box;
+}
+
+#stage {
+	position: relative;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+/* ---- the game frame ------------------------------------------------------- */
+
+#pageFront {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: auto;
+	height: auto;
+	background: none; /* was widgetFront.png */
+	display: grid;
+	grid-template-rows: 1fr auto;
+	grid-template-columns: 1fr;
+	grid-template-areas:
+		'views'
+		'toolbar';
+	gap: var(--frame-gap);
+	padding: var(--frame-gap);
+	box-sizing: border-box;
+}
+
+@media (min-width: 760px) {
+	#pageFront {
+		grid-template-rows: 1fr;
+		grid-template-columns: 1fr auto;
+		grid-template-areas: 'views toolbar';
+	}
+}
+
+#aquariumViews {
+	grid-area: views;
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--frame-gap);
+}
+
+#panelBody {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	background: var(--tank-bg);
+}
+
+/* ---- tank view fills the panel body ------------------------------------- */
+
+#view0 {
+	position: absolute;
+	inset: 0;
+	width: auto;
+	height: auto;
+	background: none;
+}
+
+#tank {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	object-position: top center; /* sit at the top, not lost mid-void in tall portrait */
+	image-rendering: pixelated;
+	background: var(--tank-bg);
+}
+
+/* shop / stats views keep their 2014 internals for now — panels.css sizes
+   them; .view here just neutralises the old absolute top/left. */
+.view {
+	position: relative;
+	top: auto;
+	left: auto;
+	margin: 0 auto;
+}
+
+/* ---- minimise / restore toggle -----------------------------------------
+   Lives directly on #stage (not in #viewSwitch) so it stays reachable when
+   .mini hides the rest of the chrome. */
+
+#stage > #pageMode {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	z-index: 7;
+}
+
+#stage.mini #aquariumToolbar,
+#stage.mini #viewSwitch {
+	display: none;
+}
+
+/* #pageBack (Configuration) is a full overlay — see config.css. */
