@@ -511,18 +511,41 @@ Play Store. No app code to maintain; web updates ship without a resubmit.
 
 Build stays green: `npm run check` + `vite build` (207 precache entries).
 
-### 5b — publish (needs owner action, cannot be automated here)
+### ✅ 5b — deploy to GitHub Pages (done)
 
-1. Deploy `dist/` to a public HTTPS origin (GitHub Pages / Netlify / Cloudflare
-   Pages / Vercel). Confirm `/manifest.webmanifest` and
-   `/.well-known/assetlinks.json` load.
-2. Fill the `PLACEHOLDER_*` values in `twa-manifest.json`.
-3. `npm i -g @bubblewrap/cli`; `bubblewrap init --manifest https://HOST/manifest.webmanifest`
-   (creates `android.keystore` — **back up the keystore + password**).
-4. `keytool -list -v -keystore android.keystore -alias android` → put the SHA-256
-   into `assetlinks.json`, rebuild, redeploy.
-5. `bubblewrap build` → upload the `.aab` to Play Console (developer account:
-   one-time US$25).
+Hosting decided: a GitHub Pages **project** site,
+`https://gitlgn.github.io/SimAquarium/` (subpath).
 
-JDK 17 + Android SDK are needed locally for step 3–5, or use
-<https://www.pwabuilder.com> to generate the same `.aab` in the cloud.
+- `vite.config.js` — `base: '/SimAquarium/'`; manifest `id` / `start_url` /
+  `scope` follow it. All emitted asset URLs, the `registerSW` target and the
+  SW `scope` are now `/SimAquarium/…`; `dist/.well-known/assetlinks.json`
+  still ships (at the subpath).
+- `.github/workflows/deploy.yml` — on push to `modernization` (and manual
+  dispatch): `npm ci` → `npm run check` → `vite build` →
+  `configure-pages@v5` (`enablement: true`, creates the site on first run) →
+  `upload-pages-artifact` → `deploy-pages`.
+- `twa-manifest.json` — filled in for `gitlgn.github.io` /
+  `/SimAquarium/`; carries a `_WARNING_ASSET_LINKS` note.
+- `docs/ANDROID.md` — rewritten: §0 "Install from Chrome" is the primary way
+  onto the S25; the TWA sections carry the asset-links caveat.
+
+Verified locally (`vite preview` at `/SimAquarium/`): base rewriting, manifest
+scope, `registerSW.js` target, `assetlinks.json` reachable, game boots. SW
+registration itself only testable on the live HTTPS origin.
+
+**One manual step:** after the first workflow run, GitHub → repo **Settings →
+Pages** should already show "GitHub Actions" as the source (auto-enabled). If
+not, set it there once.
+
+### 5c — TWA `.aab` / `.apk` (owner action, optional)
+
+Only needed for a shareable install artifact or a Play listing — Chrome's
+"Install app" (`docs/ANDROID.md` §0) already puts the game fullscreen on the
+S25.
+
+Blocker for a *verified* (barless) TWA: Digital Asset Links must sit at the
+origin root `gitlgn.github.io/.well-known/assetlinks.json`, which a project
+site can't provide. Fix by moving to an origin root first — a
+`gitlgn.github.io` user-pages repo or a custom domain — then `base` goes back
+to `/`. Steps in `docs/ANDROID.md` §1–6. JDK 17 + Android SDK (or PWABuilder
+in the cloud); Play Console is one-time US$25.
