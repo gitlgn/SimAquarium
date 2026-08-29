@@ -116,7 +116,9 @@ body {
 	height: 100%;
 	object-fit: contain;
 	object-position: top center; /* sit at the top, not lost mid-void in tall portrait */
-	image-rendering: pixelated;
+	/* canvas is rendered at device resolution now (aquarium.#fitTank) — let the
+	   browser scale it smoothly rather than nearest-neighbour */
+	image-rendering: auto;
 	background: var(--tank-bg);
 }
 

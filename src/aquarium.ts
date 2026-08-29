@@ -490,24 +490,28 @@ class Aquarium {
 
 	// Match the tank's backing store to the pixels it actually occupies on
 	// screen (× devicePixelRatio) and scale the context, so all the drawing
-	// code stays in 360×240 units while painting ~1:1 — crisp, no wasted fill.
-	// `object-fit: contain` keeps the painted area at 360:240, so only the
-	// width needs measuring. Called at the top of every render(); the measure
-	// is one layout read and it returns early when the size is unchanged.
+	// code stays in 360×240 units while painting sharp. `object-fit: contain`
+	// keeps the painted area at 360:240, so only the width needs measuring.
+	// The scale is an INTEGER (ceil of the needed ratio): the wall is drawn as
+	// 64×64 tiles, and a fractional scale leaves sub-pixel seams between them —
+	// a visible grid. Integer scale → exact tile edges; the canvas ends up a
+	// touch larger than the display and the browser downscales it cleanly.
+	// Called at the top of every render(); one layout read, early-returns when
+	// unchanged.
 	#fitTank() {
 		const canvas = $('tank') as HTMLCanvasElement;
 		const box = canvas.getBoundingClientRect();
 		if (box.width === 0 || box.height === 0) return;
 		const paintW = Math.min(box.width, box.height * (360 / 240));
 		const dpr = window.devicePixelRatio || 1;
-		const scale = Math.max(2, Math.min(TANK_SCALE_MAX, (paintW * dpr) / 360));
-		const w = Math.round(360 * scale);
-		const h = Math.round(240 * scale);
+		const scale = Math.max(2, Math.min(TANK_SCALE_MAX, Math.ceil((paintW * dpr) / 360)));
+		const w = 360 * scale;
+		const h = 240 * scale;
 		if (canvas.width === w && canvas.height === h) return;
 		canvas.width = w; // clears + resets the context
 		canvas.height = h;
 		this.#canvasTankCtx = ctx2d(canvas);
-		this.#canvasTankCtx.setTransform(w / 360, 0, 0, h / 240, 0, 0);
+		this.#canvasTankCtx.setTransform(scale, 0, 0, scale, 0, 0);
 	}
 
 	// Photo making
