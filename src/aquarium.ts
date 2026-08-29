@@ -21,7 +21,7 @@ import { $, ctx2d } from './dom.js';
 import {
 	BUY,
 	SELL,
-	TANK_SCALE,
+	TANK_SCALE_MAX,
 	VIEW_AQUARIUM,
 	SC_FGIMAGE,
 	SC_BGIMAGE,
@@ -480,26 +480,44 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		// Back the 360×240 tank with a TANK_SCALE× canvas and scale the context,
-		// so every drawImage/translate below still works in 360×240 units but
-		// paints at higher resolution (the vector fish stay sharp).
-		const canvas = $('tank') as HTMLCanvasElement;
-		canvas.width = 360 * TANK_SCALE;
-		canvas.height = 240 * TANK_SCALE;
-		this.#canvasTankCtx = ctx2d(canvas);
-		this.#canvasTankCtx.scale(TANK_SCALE, TANK_SCALE);
+		this.#fitTank();
 		this.#setWall(this.#usedBackground);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
+		// window resize / phone rotation — repaint promptly (render() re-fits).
+		window.addEventListener('resize', () => this.render());
+	}
+
+	// Match the tank's backing store to the pixels it actually occupies on
+	// screen (× devicePixelRatio) and scale the context, so all the drawing
+	// code stays in 360×240 units while painting ~1:1 — crisp, no wasted fill.
+	// `object-fit: contain` keeps the painted area at 360:240, so only the
+	// width needs measuring. Called at the top of every render(); the measure
+	// is one layout read and it returns early when the size is unchanged.
+	#fitTank() {
+		const canvas = $('tank') as HTMLCanvasElement;
+		const box = canvas.getBoundingClientRect();
+		if (box.width === 0 || box.height === 0) return;
+		const paintW = Math.min(box.width, box.height * (360 / 240));
+		const dpr = window.devicePixelRatio || 1;
+		const scale = Math.max(2, Math.min(TANK_SCALE_MAX, (paintW * dpr) / 360));
+		const w = Math.round(360 * scale);
+		const h = Math.round(240 * scale);
+		if (canvas.width === w && canvas.height === h) return;
+		canvas.width = w; // clears + resets the context
+		canvas.height = h;
+		this.#canvasTankCtx = ctx2d(canvas);
+		this.#canvasTankCtx.setTransform(w / 360, 0, 0, h / 240, 0, 0);
 	}
 
 	// Photo making
 	exportPhoto() {
+		const PHOTO_SCALE = 4; // fixed, so a screenshot doesn't depend on window size
 		const tempCanvas = document.createElement('canvas');
-		tempCanvas.width = 360 * TANK_SCALE;
-		tempCanvas.height = 240 * TANK_SCALE;
+		tempCanvas.width = 360 * PHOTO_SCALE;
+		tempCanvas.height = 240 * PHOTO_SCALE;
 		const tempCtx = ctx2d(tempCanvas);
-		tempCtx.scale(TANK_SCALE, TANK_SCALE);
+		tempCtx.scale(PHOTO_SCALE, PHOTO_SCALE);
 		tempCtx.globalCompositeOperation = 'source-over';
 
 		// DRAW BACKGROUND
@@ -944,6 +962,7 @@ class Aquarium {
 	/*** AQUARIUM RENDERING ***/
 
 	render() {
+		this.#fitTank();
 		this.#canvasTankCtx.clearRect(0, 0, 360, 240);
 		this.#renderBackground();
 		for (let i = 0; i < this.#fishNum; i++) {
