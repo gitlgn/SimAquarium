@@ -58,12 +58,11 @@ export function eventsCreate() {
 		stats.refreshStatsPage();
 	});
 
-	/*** SCENERY / LIGHTING / FILTER / BACKGROUND SHOPS ***/
+	/*** SCENERY / LIGHTING / FILTER SHOPS (static buttons in index.html) ***/
 	const shops = [
 		{ prefix: 'Scenery', count: 9, buy: 'buyScenery', sell: 'sellScenery' },
 		{ prefix: 'Light', count: 9, buy: 'buyLight', sell: 'sellLight' },
 		{ prefix: 'Filter', count: 6, buy: 'buyFilter', sell: 'sellFilter' },
-		{ prefix: 'Background', count: 15, buy: 'buyBackground', sell: null },
 	];
 	for (const { prefix, count, buy, sell } of shops) {
 		for (let i = 0; i < count; i++) {
@@ -71,6 +70,14 @@ export function eventsCreate() {
 			if (sell && i > 0) on('button' + prefix + 'Sell' + i, 'click', () => aquarium[sell](i));
 		}
 	}
+
+	/*** BACKGROUND SHOP — delegated (the panel is re-rendered from state) ***/
+	on('tabBackgroundShop', 'click', (e) => {
+		const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act="buy"]');
+		const slot = el?.closest<HTMLElement>('[data-bg]');
+		if (!slot) return;
+		aquarium.buyBackground(Number(slot.dataset.bg));
+	});
 
 	/*** AQUARIUM TOOLS (buttonTool0..7) ***/
 	const tools = [
@@ -108,12 +115,15 @@ export function eventsCreate() {
 	speedBar.addEventListener('pointerup', endSpeedDrag);
 	speedBar.addEventListener('pointercancel', endSpeedDrag);
 
-	/*** FISH SHOP SLOTS (info = child 4, buy = child 5) ***/
-	for (let i = 0; i < 9; i++) {
-		const slot = $('fishSlot' + i);
-		slot.children[4].addEventListener('click', () => fishShop.openFishInfo(i), false);
-		slot.children[5].addEventListener('click', () => fishShop.buyFish(i), false);
-	}
+	/*** FISH SHOP SLOTS — delegated (the panel is re-rendered from state) ***/
+	on('view1', 'click', (e) => {
+		const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
+		if (!el) return;
+		const slot = Number(el.closest<HTMLElement>('[data-slot]')?.dataset.slot);
+		if (Number.isNaN(slot)) return;
+		if (el.dataset.act === 'info') fishShop.openFishInfo(slot);
+		else if (el.dataset.act === 'buy') fishShop.buyFish(slot);
+	});
 
 	/*** PREFERENCES ***/
 	on('confClose', 'click', () => uio.flipWidget());

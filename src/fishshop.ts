@@ -1,6 +1,9 @@
 /*
  **	FISH SHOP OBJECT
  **
+ **	Phase 6f: #view1 is rendered from #slots each time it changes — no
+ **	per-cell `$('fishSlotN').children[x].innerHTML = …` writes, one delegated
+ **	Buy / Info listener (wired in events.ts).
  */
 
 import { aquarium } from './aquarium.js';
@@ -18,22 +21,49 @@ import {
 	TIME_MINUTE,
 } from './constants.js';
 
+const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ESCAPES[c]);
+
 class FishShop {
 	#slots: any[][] = [];
 	#deliveryTime = 60;
 	#timer;
 
-	#delivery() {
+	/*** RENDER — the whole shop panel from #slots ***/
+	#render() {
+		const money = aquarium.getMoney();
+		const full = aquarium.getFishNum() > 63;
+
+		let html =
+			'<h2 class="panelHead">Fish Shop</h2>' +
+			`<p class="panelInfo">New fish in: <span id="newFishTime">${this.#deliveryTime}</span> minutes</p>`;
+
+		for (let i = 0; i < 9; i++) {
+			const s = this.#slots[i];
+			const num = s[SHOPSLOT_NUM];
+			const price = s[SHOPSLOT_PRICE];
+			const canBuy = num > 0 && price <= money && !full;
+
+			html +=
+				`<div class="fishSlot" data-slot="${i}">` +
+				`<div class="title">${esc(s[SHOPSLOT_NAME])}</div>` +
+				`<div class="image" style="background-image:url(gfx/aquarium/fishes/fish${s[SHOPSLOT_SPEC]}R.png)"></div>` +
+				`<div class="money">${price}</div>` +
+				`<div class="number">${num}</div>` +
+				`<div class="button info" data-act="info"></div>` +
+				`<div class="button buy${canBuy ? '' : ' off'}" data-act="buy"></div>` +
+				`</div>`;
+		}
+		$('view1').innerHTML = html;
+	}
+
+	#deliver() {
 		for (let i = 0; i < 9; i++) {
 			this.#slots[i][SHOPSLOT_SPEC] = 3 * i + Math.trunc(Math.random() * 3) + 1;
 
 			// The dolphin is a rarity — needs a swimming pool to appear.
-			if (i === 8) {
-				if (aquarium.getSceneries(4)) {
-					if (Math.random() < 0.1) {
-						this.#slots[i][SHOPSLOT_SPEC] = 28;
-					}
-				}
+			if (i === 8 && aquarium.getSceneries(4) && Math.random() < 0.1) {
+				this.#slots[i][SHOPSLOT_SPEC] = 28;
 			}
 
 			const spec = fishSpecies[this.#slots[i][SHOPSLOT_SPEC]];
@@ -41,14 +71,8 @@ class FishShop {
 			this.#slots[i][SHOPSLOT_NAME] = spec.name;
 			this.#slots[i][SHOPSLOT_PRICE] = spec.price;
 			this.#slots[i][SHOPSLOT_LINK] = spec.link;
-
-			const el = $('fishSlot' + i);
-			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
-			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
-			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			(el.children[1] as HTMLElement).style.backgroundImage =
-				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
+		this.#render();
 	}
 
 	/* Initialize the fish shop */
@@ -57,7 +81,7 @@ class FishShop {
 		for (let i = 0; i < 9; i++) {
 			this.#slots[i] = [];
 		}
-		this.#delivery();
+		this.#deliver();
 		this.updateDeliveryTime(); // start the fish shop counter
 	}
 
@@ -72,11 +96,11 @@ class FishShop {
 	updateDeliveryTime() {
 		this.#deliveryTime--;
 		if (this.#deliveryTime === 0) {
-			this.#delivery();
+			this.#deliver();
 			aquarium.updateBuyButtonsAlias();
 			this.#deliveryTime = 60;
 		}
-		$('newFishTime').innerHTML = String(this.#deliveryTime);
+		$('newFishTime').textContent = String(this.#deliveryTime); // one value binding per tick
 		this.#timer = window.setTimeout(() => this.updateDeliveryTime(), TIME_MINUTE);
 	}
 
@@ -91,23 +115,15 @@ class FishShop {
 		if (aquarium.changeMoney(BUY * this.#slots[slotNum][SHOPSLOT_PRICE])) {
 			aquarium.addFish(this.#slots[slotNum][SHOPSLOT_SPEC], 0.4);
 			this.#slots[slotNum][SHOPSLOT_NUM]--;
-			$('fishSlot' + slotNum).children[3].innerHTML = this.#slots[slotNum][SHOPSLOT_NUM];
+			this.#render();
 			aquarium.updateBuyButtonsAlias();
 			config.saveGame();
 		}
 	}
 
+	/** Re-evaluate affordability / stock (called from aquarium.#updateBuyButtons). */
 	updateView() {
-		for (let i = 0; i < 9; i++) {
-			const buyButton = $('fishSlot' + i).children[5];
-			if (this.#slots[i][SHOPSLOT_PRICE] > aquarium.getMoney()) {
-				buyButton.setAttribute('class', 'button buy off');
-			} else if (this.#slots[i][SHOPSLOT_NUM] === 0) {
-				buyButton.setAttribute('class', 'button buy off');
-			} else {
-				buyButton.setAttribute('class', 'button buy on');
-			}
-		}
+		this.#render();
 	}
 
 	save() {
@@ -134,16 +150,9 @@ class FishShop {
 				10
 			);
 			this.#slots[i][SHOPSLOT_LINK] = config.getItem('fishShopSlot' + i + 'link');
-			this.#deliveryTime = parseInt(config.getItem('fishShopDeliveryTime'), 10);
-
-			$('newFishTime').innerHTML = String(this.#deliveryTime);
-			const el = $('fishSlot' + i);
-			el.children[0].innerHTML = this.#slots[i][SHOPSLOT_NAME];
-			el.children[2].innerHTML = this.#slots[i][SHOPSLOT_PRICE];
-			el.children[3].innerHTML = this.#slots[i][SHOPSLOT_NUM];
-			(el.children[1] as HTMLElement).style.backgroundImage =
-				'url(gfx/aquarium/fishes/fish' + this.#slots[i][SHOPSLOT_SPEC] + 'R.png)';
 		}
+		this.#deliveryTime = parseInt(config.getItem('fishShopDeliveryTime'), 10);
+		this.#render();
 	}
 }
 

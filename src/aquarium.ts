@@ -135,7 +135,7 @@ class Aquarium {
 		}
 
 		this.#usedBackground = 0;
-		$('buttonBackgroundBuy0').setAttribute('class', 'button buy off');
+		background.renderBackgrounds(this.#money, 0);
 		this.#setWall(0);
 
 		this.#fish.length = 0;
@@ -212,7 +212,7 @@ class Aquarium {
 
 	loadAquarium() {
 		this.#money = parseFloat(config.getItem('money'));
-		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		this.#renderMoney();
 
 		this.#usedScenery = parseInt(config.getItem('usedScenery'), 10);
 		this.#usedLight = parseInt(config.getItem('usedLight'), 10);
@@ -265,7 +265,7 @@ class Aquarium {
 			}
 		}
 		this.#usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
-		$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy off');
+		background.renderBackgrounds(this.#money, this.#usedBackground);
 		this.#setWall(this.#usedBackground);
 
 		// load fish data
@@ -319,16 +319,24 @@ class Aquarium {
 	getMoney() {
 		return this.#money;
 	}
+	getUsedBackground() {
+		return this.#usedBackground;
+	}
+
+	#renderMoney() {
+		$('statusMoney').textContent = String(Math.trunc(this.#money));
+	}
+
 	resetMoney() {
 		this.#money = 100;
-		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		this.#renderMoney();
 	}
 
 	/** Returns false (and does nothing) when the change would overdraw. */
 	changeMoney(diff) {
 		if (this.#money + diff < 0) return false;
 		this.#money = this.#money + diff;
-		$('statusMoney').innerHTML = String(Math.trunc(this.#money));
+		this.#renderMoney();
 		return true;
 	}
 
@@ -471,8 +479,6 @@ class Aquarium {
 		if (this.#usedBackground === bgNum) return;
 
 		if (this.changeMoney(BUY * background.getBackgroundData(bgNum, BG_PRICE))) {
-			$('buttonBackgroundBuy' + this.#usedBackground).setAttribute('class', 'button buy on');
-			$('buttonBackgroundBuy' + bgNum).setAttribute('class', 'button buy off');
 			this.#usedBackground = bgNum;
 			this.#setWall(bgNum); // #wallImage 'load' repaints; render now for the cached case
 			this.render();
@@ -517,16 +523,7 @@ class Aquarium {
 			}
 		}
 
-		for (let i = 0; i < 15; i++) {
-			// update backgrounds view
-			if (i !== this.#usedBackground) {
-				if (this.#money < background.getBackgroundData(i, BG_PRICE)) {
-					$('buttonBackgroundBuy' + i).setAttribute('class', 'button buy off');
-				} else {
-					$('buttonBackgroundBuy' + i).setAttribute('class', 'button buy on');
-				}
-			}
-		}
+		background.renderBackgrounds(this.#money, this.#usedBackground);
 	}
 
 	updateBuyButtonsAlias() {

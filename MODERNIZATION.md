@@ -443,20 +443,34 @@ Iterated from device (S25) testing over several passes.
   shop buy / tool / speed drag / config / relax / mini / fish-list sell /
   water→Tank-Info / camera export works; no overflow, no 4xx.
 
-### 6f — shops + `aquarium` from state (remaining)
+### 6f — shops + `aquarium` from state
 
-The imperative-write count is down to ~86: **`aquarium` 53, `fishshop` 14,
-`filtration` 7, `uio` 7, `statistics` 5**. Still to convert, each shippable on
-its own:
+Converting the imperative shop DOM writes to per-panel `render(state)`,
+panel by panel.
 
-- **`fishshop.ts`** (14) + **`filtration.createBackgroundSlots`** (7): build
-  the slot markup from the data tables via a `render(state)` instead of
-  `$('fishSlot0').children[3].innerHTML = …` etc.
-- **`aquarium.ts`** (53): the big one — the money readout, the buy-button
-  enable/disable loop (`#updateBuyButtons`), the per-slot `class` toggles. A
-  `renderShopAffordability(state)` + a `renderMoney(state)` would take most of
-  it.
-- Then `layout.css` / the `.off` opacity toggles become pure CSS.
+**Done:**
+
+- **`fishshop.ts`** — `#view1` is emptied in `index.html` and rebuilt by
+  `#render()` from `#slots` on every change (deliver / buy / load). One
+  delegated Buy/Info listener via `data-act` / `data-slot`. Only the
+  "new fish in" counter stays a per-tick value binding.
+- **`filtration.ts`** — `createBackgroundSlots()` → `renderBackgrounds(money,
+  used)`: `$('tabBackgroundShop').innerHTML` from the `#background` table,
+  `id="backgroundSlot${i}"` kept for the CSS swatch art, `data-bg` /
+  `data-act` for the delegated buy listener on `#tabBackgroundShop`. The four
+  `$('buttonBackgroundBuy…').setAttribute('class', …)` sites in `aquarium.ts`
+  (`resetAquarium`, `loadAquarium`, `buyBackground`, `#updateBuyButtons`) now
+  call `background.renderBackgrounds(…)`.
+- **`aquarium.ts` money readout** — `#renderMoney()`; every mutation
+  (`resetMoney` / `changeMoney` / `loadAquarium`) routes through it, no more
+  `$('statusMoney').innerHTML = …`.
+
+**Remaining:** the scenery / lighting / filter shops — ~35 scattered
+`$('buttonXBuyN').setAttribute('class', …)` `choose` / `buy` / `sell` toggles
+across `newGame` / `loadAquarium` / `buy*` / `sell*` / `#updateBuyButtons`.
+Their slot markup is still hand-placed in `index.html`; fold the class logic
+into one `#renderAccessoryButtons()` first, then decide on a full template
+rebuild.
 
 ### Backlog
 
