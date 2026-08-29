@@ -464,13 +464,20 @@ panel by panel.
 - **`aquarium.ts` money readout** — `#renderMoney()`; every mutation
   (`resetMoney` / `changeMoney` / `loadAquarium`) routes through it, no more
   `$('statusMoney').innerHTML = …`.
+- **`aquarium.ts` scenery / lighting / filter shops** — the ~35 scattered
+  `choose` / `buy` / `sell` `setAttribute` toggles across `resetAquarium` /
+  `loadAquarium` / `buy*` / `choose*` / `sell*` / `#updateBuyButtons` collapse
+  into one `#renderShopButtons(prefix, count, owned, used, priceOf)` helper
+  (called for all three via `#renderAccessoryShops()`). Every slot's class is
+  now derived from `#sceneries` / `#lights` / `#filters` + `#usedX` + `#money`;
+  the `buy*` / `sell*` / `choose*` methods only mutate state. The slot markup
+  stays hand-placed in `index.html` (per-slot art is CSS keyed on the id) and
+  the static `button…Buy/Sell` listeners in `events.ts` are unchanged.
 
-**Remaining:** the scenery / lighting / filter shops — ~35 scattered
-`$('buttonXBuyN').setAttribute('class', …)` `choose` / `buy` / `sell` toggles
-across `newGame` / `loadAquarium` / `buy*` / `sell*` / `#updateBuyButtons`.
-Their slot markup is still hand-placed in `index.html`; fold the class logic
-into one `#renderAccessoryButtons()` first, then decide on a full template
-rebuild.
+`aquarium.ts` no longer writes shop DOM outside the render helpers — what's
+left there is value bindings (money / water gauge) and the canvas. Small
+imperative pockets remain in `uio.ts` (speed slider, widget flip) and
+`statistics.ts` (`.hidden` toggles) — low-value, left as-is for now.
 
 ### Backlog
 

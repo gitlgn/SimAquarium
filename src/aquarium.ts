@@ -113,26 +113,16 @@ class Aquarium {
 		this.#usedScenery = 0;
 		this.#sceneries.length = 0;
 		this.#sceneries[0] = true;
-		$('buttonSceneryBuy0').setAttribute('class', 'button choose off');
-		for (let i = 1; i < 9; i++) {
-			$('buttonScenerySell' + i).setAttribute('class', 'button sell off');
-		}
 
 		this.#usedLight = 0;
 		this.#lights.length = 0;
 		this.#lights[0] = true;
-		$('buttonLightBuy0').setAttribute('class', 'button choose off');
-		for (let i = 1; i < 9; i++) {
-			$('buttonLightSell' + i).setAttribute('class', 'button sell off');
-		}
 
 		this.#usedFilter = 0;
 		this.#filters.length = 0;
 		this.#filters[0] = true;
-		$('buttonFilterBuy0').setAttribute('class', 'button choose off');
-		for (let i = 1; i < 6; i++) {
-			$('buttonFilterSell' + i).setAttribute('class', 'button sell off');
-		}
+		// the scenery / lighting / filter button classes are painted by
+		// #updateBuyButtons() at the end of this method
 
 		this.#usedBackground = 0;
 		background.renderBackgrounds(this.#money, 0);
@@ -214,55 +204,17 @@ class Aquarium {
 		this.#money = parseFloat(config.getItem('money'));
 		this.#renderMoney();
 
+		// button classes for these three shops are painted from state by
+		// #updateBuyButtons() at the end of this method
 		this.#usedScenery = parseInt(config.getItem('usedScenery'), 10);
 		this.#usedLight = parseInt(config.getItem('usedLight'), 10);
 		for (let i = 0; i < 9; i++) {
-			const scStored = config.getItem('sceneries' + i);
-			if (scStored === '1') {
-				this.#sceneries[i] = true;
-				if (i !== this.#usedScenery) {
-					$('buttonSceneryBuy' + i).setAttribute('class', 'button choose on');
-				} else {
-					$('buttonSceneryBuy' + i).setAttribute('class', 'button choose off');
-				}
-				if (i > 0) {
-					$('buttonScenerySell' + i).setAttribute('class', 'button sell on');
-				}
-			} else {
-				this.#sceneries[i] = false;
-			}
-
-			const liStored = config.getItem('lights' + i);
-			if (liStored === '1') {
-				this.#lights[i] = true;
-				if (i !== this.#usedLight) {
-					$('buttonLightBuy' + i).setAttribute('class', 'button choose on');
-				} else {
-					$('buttonLightBuy' + i).setAttribute('class', 'button choose off');
-				}
-				if (i > 0) {
-					$('buttonLightSell' + i).setAttribute('class', 'button sell on');
-				}
-			} else {
-				this.#lights[i] = false;
-			}
+			this.#sceneries[i] = config.getItem('sceneries' + i) === '1';
+			this.#lights[i] = config.getItem('lights' + i) === '1';
 		}
 		this.#usedFilter = parseInt(config.getItem('usedFilter'), 10);
 		for (let i = 0; i < 6; i++) {
-			const fiStored = config.getItem('filters' + i);
-			if (fiStored === '1') {
-				this.#filters[i] = true;
-				if (i !== this.#usedFilter) {
-					$('buttonFilterBuy' + i).setAttribute('class', 'button choose on');
-				} else {
-					$('buttonFilterBuy' + i).setAttribute('class', 'button choose off');
-				}
-				if (i > 0) {
-					$('buttonFilterSell' + i).setAttribute('class', 'button sell on');
-				}
-			} else {
-				this.#filters[i] = false;
-			}
+			this.#filters[i] = config.getItem('filters' + i) === '1';
 		}
 		this.#usedBackground = parseInt(config.getItem('usedBackground'), 10) || 0;
 		background.renderBackgrounds(this.#money, this.#usedBackground);
@@ -353,27 +305,18 @@ class Aquarium {
 	buyScenery(scNum) {
 		if (this.#sceneries[scNum]) {
 			this.chooseScenery(scNum);
-		} else {
-			if (this.changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
-				$('buttonSceneryBuy' + scNum).setAttribute('class', 'button choose on');
-				if (scNum) $('buttonScenerySell' + scNum).setAttribute('class', 'button sell on');
-				this.#sceneries[scNum] = true;
-				this.chooseScenery(scNum);
-				this.#updateBuyButtons();
-			}
+		} else if (this.changeMoney(BUY * scenery.getSceneryData(scNum, SC_PRICE))) {
+			this.#sceneries[scNum] = true;
+			this.chooseScenery(scNum);
+			this.#updateBuyButtons();
 		}
 	}
 	chooseScenery(scNum) {
-		this.#usedScenery = Number(this.#usedScenery) || 0;
-		if (this.#sceneries[this.#usedScenery])
-			$('buttonSceneryBuy' + this.#usedScenery).setAttribute('class', 'button choose on');
-		else $('buttonSceneryBuy' + this.#usedScenery).setAttribute('class', 'button buy on');
-
-		$('buttonSceneryBuy' + scNum).setAttribute('class', 'button choose off');
 		this.#usedScenery = scNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
+		this.#renderAccessoryShops();
 		config.saveGame();
 	}
 
@@ -381,8 +324,6 @@ class Aquarium {
 		if (!this.#sceneries[scNum]) return;
 
 		this.changeMoney(SELL * scenery.getSceneryData(scNum, SC_PRICE) * 0.5);
-		$('buttonSceneryBuy' + scNum).setAttribute('class', 'button buy on');
-		$('buttonScenerySell' + scNum).setAttribute('class', 'button sell off');
 		this.#sceneries[scNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -395,27 +336,19 @@ class Aquarium {
 	buyLight(liNum) {
 		if (this.#lights[liNum]) {
 			this.chooseLight(liNum);
-		} else {
-			if (this.changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
-				$('buttonLightBuy' + liNum).setAttribute('class', 'button choose on');
-				if (liNum) $('buttonLightSell' + liNum).setAttribute('class', 'button sell on');
-				this.#lights[liNum] = true;
-				this.chooseLight(liNum);
-				this.#updateBuyButtons();
-			}
+		} else if (this.changeMoney(BUY * lighting.getLightData(liNum, LI_PRICE))) {
+			this.#lights[liNum] = true;
+			this.chooseLight(liNum);
+			this.#updateBuyButtons();
 		}
 	}
 
 	chooseLight(liNum) {
-		if (this.#lights[this.#usedLight])
-			$('buttonLightBuy' + this.#usedLight).setAttribute('class', 'button choose on');
-		else $('buttonLightBuy' + this.#usedLight).setAttribute('class', 'button buy on');
-
-		$('buttonLightBuy' + liNum).setAttribute('class', 'button choose off');
 		this.#usedLight = liNum;
 		this.updateComfortAquarium();
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
+		this.#renderAccessoryShops();
 		config.saveGame();
 	}
 
@@ -423,8 +356,6 @@ class Aquarium {
 		if (!this.#lights[liNum]) return;
 
 		this.changeMoney(SELL * lighting.getLightData(liNum, LI_PRICE) * 0.5);
-		$('buttonLightBuy' + liNum).setAttribute('class', 'button buy on');
-		$('buttonLightSell' + liNum).setAttribute('class', 'button sell off');
 		this.#lights[liNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -437,26 +368,18 @@ class Aquarium {
 	buyFilter(fiNum) {
 		if (this.#filters[fiNum]) {
 			this.chooseFilter(fiNum);
-		} else {
-			if (this.changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
-				$('buttonFilterBuy' + fiNum).setAttribute('class', 'button choose on');
-				if (fiNum) $('buttonFilterSell' + fiNum).setAttribute('class', 'button sell on');
-				this.#filters[fiNum] = true;
-				this.chooseFilter(fiNum);
-				this.#updateBuyButtons();
-			}
+		} else if (this.changeMoney(BUY * filtration.getFilterData(fiNum, FI_PRICE))) {
+			this.#filters[fiNum] = true;
+			this.chooseFilter(fiNum);
+			this.#updateBuyButtons();
 		}
 	}
 
 	chooseFilter(fiNum) {
-		if (this.#filters[this.#usedFilter])
-			$('buttonFilterBuy' + this.#usedFilter).setAttribute('class', 'button choose on');
-		else $('buttonFilterBuy' + this.#usedFilter).setAttribute('class', 'button buy on');
-
-		$('buttonFilterBuy' + fiNum).setAttribute('class', 'button choose off');
 		this.#usedFilter = fiNum;
 		this.layerFrontRefresh();
 		this.layerBackRefresh();
+		this.#renderAccessoryShops();
 		config.saveGame();
 	}
 
@@ -464,8 +387,6 @@ class Aquarium {
 		if (!this.#filters[fiNum]) return;
 
 		this.changeMoney(SELL * filtration.getFilterData(fiNum, FI_PRICE) * 0.5);
-		$('buttonFilterBuy' + fiNum).setAttribute('class', 'button buy on');
-		$('buttonFilterSell' + fiNum).setAttribute('class', 'button sell off');
 		this.#filters[fiNum] = false;
 
 		// Return to custom scenery if you sell current scenery
@@ -487,42 +408,45 @@ class Aquarium {
 		}
 	}
 
-	/*** UPDATE AQUARIUM SHOPS - DISABLE OPTIONS YOU CAN'T AFFORD ***/
+	/*** UPDATE AQUARIUM SHOPS — every button's class is derived from state ***/
+
+	// One scenery / lighting / filter shop. Per slot the buy button is:
+	//   choose off — this one is active        choose on — owned, tap to switch
+	//   buy on     — affordable, not owned     buy off   — can't afford it
+	// and the sell button (slots 1+) is `sell on` while owned, else `sell off`.
+	#renderShopButtons(prefix, count, owned, used, priceOf) {
+		const active = Number(used) || 0;
+		for (let i = 0; i < count; i++) {
+			let cls;
+			if (i === active) cls = 'button choose off';
+			else if (owned[i]) cls = 'button choose on';
+			else cls = this.#money < priceOf(i) ? 'button buy off' : 'button buy on';
+			$('button' + prefix + 'Buy' + i).setAttribute('class', cls);
+
+			if (i >= 1) {
+				$('button' + prefix + 'Sell' + i).setAttribute(
+					'class',
+					owned[i] ? 'button sell on' : 'button sell off'
+				);
+			}
+		}
+	}
+
+	#renderAccessoryShops() {
+		this.#renderShopButtons('Scenery', 9, this.#sceneries, this.#usedScenery, (i) =>
+			scenery.getSceneryData(i, SC_PRICE)
+		);
+		this.#renderShopButtons('Light', 9, this.#lights, this.#usedLight, (i) =>
+			lighting.getLightData(i, LI_PRICE)
+		);
+		this.#renderShopButtons('Filter', 6, this.#filters, this.#usedFilter, (i) =>
+			filtration.getFilterData(i, FI_PRICE)
+		);
+	}
 
 	#updateBuyButtons() {
 		fishShop.updateView();
-
-		for (let i = 0; i < 9; i++) {
-			// update sceneries view
-			if (!this.#sceneries[i]) {
-				if (this.#money < scenery.getSceneryData(i, SC_PRICE)) {
-					$('buttonSceneryBuy' + i).setAttribute('class', 'button buy off');
-				} else {
-					$('buttonSceneryBuy' + i).setAttribute('class', 'button buy on');
-				}
-			}
-
-			// update lights view
-			if (!this.#lights[i]) {
-				if (this.#money < lighting.getLightData(i, LI_PRICE)) {
-					$('buttonLightBuy' + i).setAttribute('class', 'button buy off');
-				} else {
-					$('buttonLightBuy' + i).setAttribute('class', 'button buy on');
-				}
-			}
-		}
-
-		for (let i = 0; i < 6; i++) {
-			// update filters view
-			if (!this.#filters[i]) {
-				if (this.#money < filtration.getFilterData(i, FI_PRICE)) {
-					$('buttonFilterBuy' + i).setAttribute('class', 'button buy off');
-				} else {
-					$('buttonFilterBuy' + i).setAttribute('class', 'button buy on');
-				}
-			}
-		}
-
+		this.#renderAccessoryShops();
 		background.renderBackgrounds(this.#money, this.#usedBackground);
 	}
 
