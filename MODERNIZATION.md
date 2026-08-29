@@ -541,6 +541,13 @@ imperative pockets remain in `uio.ts` (speed slider, widget flip) and
 
 - Bump `typescript` `~6.0.3` → `7.x` once `typescript-eslint` supports the
   TS 7.1 compiler API.
+- **Art direction (long-term).** The PoC (`src/fishArt.ts`) is flat vector
+  fish approximating the 2014 sprites, used by both the shop cards and the
+  tank (rasterised via data-URI SVG). Goal: an "HD" set — same silhouettes,
+  proper shading / detail — and a **skin option** (theme switch) so the
+  player can pick an art style. Would want the fish art behind an interface
+  (`getFishArt(spec, skin)`) and the scenery / lighting / filter / background
+  shops moved off their sprite slices too.
 
 ## ✅ Phase 3f — app icon (done)
 

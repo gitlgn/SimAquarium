@@ -5,6 +5,7 @@
 
 import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
+import { fishArtSvgUri } from './fishArt.js';
 
 /**
  * @typedef {object} Species
@@ -109,6 +110,12 @@ export function computeFishNumComfort() {
 }
 
 // FISH FRAMES — fishFrame{L,R}[species][frame]
+//
+// The tank fish are the same vector art as the shop cards (src/fishArt.ts),
+// rasterised via a data-URI SVG at 4× each species' sizeX:sizeY. Sharper than
+// the blurry 2014 sprites; `#renderFish` scales them to the live size exactly
+// as it did the PNGs. (The old fishNR.png files still ship — the Config panel
+// preview uses one directly.)
 
 const fishFrameL: HTMLImageElement[][] = [];
 const fishFrameR: HTMLImageElement[][] = [];
@@ -117,14 +124,13 @@ for (let i = 0; i < 29; i++) {
 	fishFrameL[i] = [];
 	fishFrameR[i] = [];
 
-	fishFrameL[i][0] = new Image();
-	fishFrameR[i][0] = new Image();
+	const w = Math.round(fishSpecies[i].sizeX * 4);
+	const h = Math.round(fishSpecies[i].sizeY * 4);
 
-	// Species 0 ("Test fish") is a debug entry that ships no artwork —
-	// fall back to species 1's sprite so it still has a valid image.
-	const spriteNum = i === 0 ? 1 : i;
-	fishFrameL[i][0].src = 'gfx/aquarium/fishes/fish' + spriteNum + 'L.png';
-	fishFrameR[i][0].src = 'gfx/aquarium/fishes/fish' + spriteNum + 'R.png';
+	fishFrameR[i][0] = new Image();
+	fishFrameR[i][0].src = fishArtSvgUri(i, w, h, false);
+	fishFrameL[i][0] = new Image();
+	fishFrameL[i][0].src = fishArtSvgUri(i, w, h, true);
 }
 
 export class Fish {

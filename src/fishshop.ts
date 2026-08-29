@@ -9,6 +9,7 @@
 import { aquarium } from './aquarium.js';
 import { config } from './config.js';
 import { fishSpecies } from './species.js';
+import { fishArt } from './fishArt.js';
 import { openTab } from './util.js';
 import { $ } from './dom.js';
 import {
@@ -48,15 +49,21 @@ class FishShop {
 			const num = s[SHOPSLOT_NUM];
 			const price = s[SHOPSLOT_PRICE];
 			const canBuy = num > 0 && price <= money && !full;
+			const soldOut = num < 1;
 
 			html +=
-				`<div class="fishSlot" data-slot="${i}">` +
-				`<div class="title">${esc(s[SHOPSLOT_NAME])}</div>` +
-				`<div class="image" style="background-image:url(gfx/aquarium/fishes/fish${s[SHOPSLOT_SPEC]}R.png)"></div>` +
-				`<div class="money">${price}</div>` +
-				`<div class="number">${num}</div>` +
-				`<div class="button info" data-act="info"></div>` +
-				`<div class="button buy${canBuy ? '' : ' off'}" data-act="buy"></div>` +
+				`<div class="shopCard" data-slot="${i}">` +
+				`<div class="shopCard-art">` +
+				fishArt(s[SHOPSLOT_SPEC]) +
+				`<span class="shopCard-stock${soldOut ? ' is-empty' : ''}" title="In stock: ${num}">${num}</span>` +
+				`</div>` +
+				`<div class="shopCard-name" title="${esc(s[SHOPSLOT_NAME])}">${esc(s[SHOPSLOT_NAME])}</div>` +
+				`<div class="shopCard-actions">` +
+				`<button type="button" class="shopCard-btn shopCard-info" data-act="info" aria-label="Species info">i</button>` +
+				`<button type="button" class="shopCard-btn shopCard-buy${canBuy ? '' : ' is-off'}" data-act="buy"${canBuy ? '' : ' disabled'}>` +
+				`Buy <b>${price}</b>` +
+				`</button>` +
+				`</div>` +
 				`</div>`;
 		}
 		$('view1').innerHTML = html;
