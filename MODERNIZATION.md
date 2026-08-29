@@ -411,43 +411,58 @@ The 4b-6 on-canvas wall render is on this branch and works (white → red → bl
 change the tank and persist). The "background gone" report was the wall simply
 not being visible while a shop / stats panel covers the tank — expected.
 
-### ✅ 6e-1 — unified control strip + mobile burger drawer (done)
+### ✅ 6e — the control chrome: one strip, three responsive faces (done)
 
-- `#viewSwitch` moved into `#aquariumToolbar` — one control strip (view nav +
-  tools + speed) instead of a top row plus a side strip. `#toolbarStatus`
-  (water + money + relax badge) pulled out to a small always-visible panel,
-  top-left.
-- **≥ 760px**: strip is a `--strip-width` (176px) rail on the right; the tank
-  now gets the full height (no top row eating ~50px).
-- **< 760px**: `#menuToggle` (a CSS ☰ button, top-left) toggles `.menu-open`
-  on `#stage`; the strip becomes a left slide-in drawer (`transform`, dim
-  scrim). Picking a view or tapping outside closes it. Tank is full-screen
-  otherwise.
-- `menu.css` holds both faces; `events.ts` wires the toggle + outside-tap
-  close.
-- Verified 1280 / 412: strip 176px + tank fills the rest on desktop; burger
-  shows only < 760, drawer slides to x0 on `.menu-open` and to −300 closed,
-  view/tool actions still fire, no overflow, no 4xx.
+Iterated from device (S25) testing over several passes.
 
-### 6e-2 — data-driven chrome (next)
+- **Structure.** `#viewSwitch` (6 view buttons + camera + help + config +
+  minimise) and `#toolbarTools` (8 tools + prices + speed) live in one
+  `#aquariumToolbar`, plus `#toolbarStatus` (water gauge + money). Tabs are
+  gone everywhere (`.tabBar`/`.tab`/`uio.changeTab` deleted) — panels use
+  plain `<h2 class="panelHead">` headings; Accessories shows Filters +
+  Backgrounds on one page; Statistics shows the Fish List, and the water gauge
+  toggles Tank Info (`#view5.show-tankinfo`).
+- **≥ 760 px wide** — a vertical rail right of the tank. `--strip-width` =
+  `calc(--btn-size * 2 + 24px)`; `--btn-size` is `clamp(38px, 7vh, 64px)` so
+  the 2-column button grids fit any height with no scrollbar.
+- **Portrait phone** — tank on top, `#aquariumToolbar` a static bar below it:
+  status row, then `#viewSwitch` / `#toolbarTools` as `auto-fill` grids
+  (~7 columns on a 380px phone → 2 rows each), then speed. Capped at 52 vh.
+- **Landscape phone** (`max-height: 560px`) — `#aquariumToolbar` is
+  `display: contents`; `#viewSwitch` becomes a rail on the **left**,
+  `#toolbarTools` a rail on the **right**, tank fills the middle at full
+  height. `#toolbarStatus` is its own grid cell above the left rail, so it
+  can't overlap the buttons however short the viewport gets.
+- No burger. Prices are corner badges on the tool buttons. Frame gap 0
+  (tank flush to the edges; region borders are the bezel). Icon fills the
+  button (`--btn-icon` = `--btn-size`).
+- `.mini` (`#pageMode`) collapses the strip to just the restore button in
+  every layout.
+- Dev layout-tuner (`src/devpanel.ts`) removed.
+- Verified full functional sweep at 1280×800, 380×820, 800×360: every view /
+  shop buy / tool / speed drag / config / relax / mini / fish-list sell /
+  water→Tank-Info / camera export works; no overflow, no 4xx.
 
-Describe the strip's buttons as `[{ id, icon, label, action }]` and render
-`#viewSwitch` / `#toolbarTools` from it, so the markup isn't hand-maintained
-and the drawer can reorder / relabel for touch.
+### 6f — shops + `aquarium` from state (remaining)
 
-### (old 6e note)
+The imperative-write count is down to ~86: **`aquarium` 53, `fishshop` 14,
+`filtration` 7, `uio` 7, `statistics` 5**. Still to convert, each shippable on
+its own:
 
-The icons *around* the tank (6 view buttons + camera + help + config in
-`#viewSwitch`, 8 tools + speed in `#aquariumToolbar`, minimise in the corner)
-are hand-placed in `index.html` and eat space on a phone. Proposal:
+- **`fishshop.ts`** (14) + **`filtration.createBackgroundSlots`** (7): build
+  the slot markup from the data tables via a `render(state)` instead of
+  `$('fishSlot0').children[3].innerHTML = …` etc.
+- **`aquarium.ts`** (53): the big one — the money readout, the buy-button
+  enable/disable loop (`#updateBuyButtons`), the per-slot `class` toggles. A
+  `renderShopAffordability(state)` + a `renderMoney(state)` would take most of
+  it.
+- Then `layout.css` / the `.off` opacity toggles become pure CSS.
 
-- describe the chrome as **data** — `[{ id, icon, label, action, group }]` —
-  and render `#viewSwitch` / `#aquariumToolbar` from it (finishes the
-  view/state split for the chrome)
-- **≥ 760px**: today's layout (row of view buttons on top, tool strip beside)
-- **< 760px**: a single **☰** button; tap → a slide-in drawer with the view
-  switch + tools as a list; the tank keeps the full screen otherwise
-- speed control + money/water move into a slim always-visible bar
+### Backlog
+
+- Re-add **`typescript-eslint`** + turn on `noImplicitAny` — still blocked:
+  `typescript-eslint@8.68` peers `typescript <6.1`, repo is on TS 7.0.
+- Real PWA icons (`public/gfx/pwa-*.png` are upscaled from the 128 px original).
 
 ## Phase 5 — Android
 
