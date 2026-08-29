@@ -1,0 +1,104 @@
+/*
+ * menu.css — the control strip's three faces. Loaded last.
+ *
+ * The strip has #toolbarStatus (water + money), #viewSwitch (view nav + camera
+ * + help + config + minimise) and #toolbarTools (8 tools + speed).
+ *
+ *  >= 760px wide ............ vertical rail to the right of the tank (toolbar.css)
+ *  portrait phone ........... tank on top, all buttons in a bar below
+ *  landscape phone (short) .. tank in the middle, buttons in two rails L / R
+ *
+ * No burger — every button is always on screen.
+ */
+
+/* ---- portrait phone: buttons fill the space under the tank --------------- */
+
+#aquariumToolbar {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+}
+/* portrait phone: cap the button area so the tank keeps the upper half */
+@media (max-width: 759px) and (min-height: 561px) {
+	#aquariumToolbar {
+		max-height: 52vh;
+		overflow-y: auto;
+	}
+}
+
+#toolbarStatus {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 4px 6px;
+	border: 1px solid var(--frame-line);
+	border-radius: 6px;
+	background: rgba(0, 0, 0, 0.18);
+	color: var(--ink);
+}
+
+#viewSwitch,
+#toolbarTools {
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(auto-fill, var(--btn-size));
+	justify-content: center;
+	align-content: start;
+	gap: 5px;
+}
+#speedLabel,
+#speedBar {
+	grid-column: 1 / -1;
+}
+#speedBar {
+	width: 100%;
+	max-width: 320px;
+	justify-self: center;
+}
+
+/* ---- landscape phone: split the two blocks around the tank ==============
+   #aquariumToolbar is `display: contents` so its blocks become #pageFront
+   grid items. #toolbarStatus gets its own cell above the left rail — it can
+   never overlap the buttons however short the viewport (URL bar) gets. */
+@media (max-height: 560px) and (min-width: 560px) {
+	#pageFront {
+		grid-template-columns: auto 1fr auto;
+		grid-template-rows: auto 1fr;
+		grid-template-areas:
+			'status views tools'
+			'nav    views tools';
+		gap: 3px; /* hair of space so status / rails / tank read as separate */
+	}
+
+	#aquariumToolbar {
+		display: contents;
+	}
+
+	#toolbarStatus {
+		grid-area: status;
+		align-self: stretch;
+		border-width: 2px;
+		background: var(--strip-bg);
+	}
+
+	#viewSwitch,
+	#toolbarTools {
+		align-self: stretch;
+		min-height: 0;
+		overflow-y: auto;
+		grid-template-columns: repeat(2, var(--btn-size));
+		padding: var(--strip-pad);
+		box-sizing: border-box;
+		background: var(--strip-bg);
+		border: 2px solid var(--frame-line);
+		border-radius: 6px;
+	}
+	#viewSwitch {
+		grid-area: nav;
+	}
+	#toolbarTools {
+		grid-area: tools;
+	}
+}

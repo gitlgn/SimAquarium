@@ -14,15 +14,17 @@
 	box-sizing: border-box;
 	background: var(--strip-bg);
 	color: var(--ink);
+	border: 2px solid var(--frame-line);
+	border-radius: 6px;
 }
 
 @media (min-width: 760px) {
 	#aquariumToolbar {
 		flex-direction: column;
 		flex-wrap: nowrap;
-		width: auto; /* minimum — shrink-wrap to the tools */
+		width: var(--strip-width);
 		height: 100%;
-		padding-top: calc(var(--btn-size) + 12px); /* clear the corner minimise button */
+		gap: 6px;
 		overflow-y: auto;
 	}
 }
@@ -40,13 +42,18 @@
 	height: var(--btn-size);
 	padding: 0;
 	border: 1px solid var(--btn-border);
-	border-radius: 6px;
+	border-radius: 7px;
 	background-color: var(--btn-bg);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: var(--btn-icon) var(--btn-icon);
 	image-rendering: pixelated;
 	cursor: pointer;
+	/* raised bevel — stands in for the 2014 buttonMedium.png texture */
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.55),
+		inset 0 -3px 4px rgba(0, 0, 0, 0.16),
+		0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .buttonTool:active,
@@ -55,7 +62,9 @@
 .buttonWidget:active,
 #pageMode:active {
 	background-color: var(--btn-bg-active);
-	box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+	box-shadow:
+		inset 0 2px 4px rgba(0, 0, 0, 0.4),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.25);
 }
 
 @media (hover: hover) {
@@ -116,16 +125,7 @@
 	background-image: url(../gfx/interface/viewIcon1.png);
 }
 
-/* ---- status block --------------------------------------------------- */
-
-#toolbarStatus {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	position: static;
-	width: auto;
-	padding: 4px;
-}
+/* ---- status block (layout in menu.css — always-visible top-left panel) --- */
 
 #statusMoney {
 	position: static;
@@ -139,72 +139,72 @@
 	text-align: left;
 }
 
-/* alert lamp + water gauge keep their native bitmap sizes so the game's
-   inline style writes (backgroundPosition, bar height in px) stay valid. */
-#statusEvent {
-	position: relative;
-	inset: auto;
-	flex: none;
-	width: 38px;
-	height: 39px;
-	background: url(../gfx/interface/alertLight.png) no-repeat;
-}
-#statusEventIcon {
-	position: absolute;
-	top: 7px;
-	left: 7px;
-	width: 24px;
-	height: 24px;
-	display: none;
-	background: url(../gfx/interface/alertLightIcon0.png) no-repeat;
-}
+/* water-condition gauge — a CSS bar (no bitmaps). aquarium.updatePollutionBar()
+   sets the fill's height% + colour from the pollution value; the frame is CSS.
+   Fills from the bottom, green → red as it rises. */
 #statusWater {
 	position: relative;
 	inset: auto;
 	flex: none;
-	width: 6px;
+	width: 18px;
 	height: 34px;
-	background: url(../gfx/interface/waterCondition.png) no-repeat;
+	border: 1px solid #0a3550;
+	border-radius: 4px;
+	background: #0b3a59;
+	overflow: hidden;
+	cursor: pointer;
+}
+#statusWater:hover {
+	border-color: #6fc7f5;
 }
 #statusWaterBar {
 	position: absolute;
-	bottom: 1px;
-	left: 1px;
-	width: 4px;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	height: 0;
-	background: url(../gfx/interface/waterConditionBar.png) repeat-x;
+	background: #40bd41;
+	transition:
+		height 0.3s ease,
+		background-color 0.3s ease;
 }
 
 /* ---- tools grid ---------------------------------------------------- */
 
 #toolbarTools {
 	position: static;
-	width: 100%;
 	display: grid;
-	/* phones: 4 tools per row (2 rows). Side-by-side layout: 1 per row. */
-	grid-template-columns: repeat(4, var(--btn-size) minmax(14px, 1fr));
-	gap: 4px 6px;
-	align-items: center;
-	justify-content: start;
-	padding: 4px;
-	box-sizing: border-box;
+	grid-template-columns: repeat(2, var(--btn-size));
+	justify-content: center;
+	align-content: start;
+	gap: 5px;
+	padding: 0;
 }
 
-@media (min-width: 760px) {
-	/* two tools per row so the strip is half as tall (uses the empty space
-	   beside the tank instead of scrolling) */
-	#toolbarTools {
-		grid-template-columns: repeat(2, var(--btn-size) minmax(16px, 1fr));
-	}
+/* each tool = a button with its price as a corner badge, so the tools grid is
+   the same 2×btn width as the view switch — no price column to overflow the
+   strip / drawer. */
+.toolCell {
+	position: relative;
+	width: var(--btn-size);
+	height: var(--btn-size);
 }
-
+.toolCell .buttonTool {
+	width: 100%;
+	height: 100%;
+}
 .toolPrice {
-	position: static;
-	inset: auto;
-	width: auto;
-	font-size: 11px;
+	position: absolute;
+	inset: auto -3px -3px auto;
+	min-width: 12px;
+	padding: 0 3px;
+	font-size: 9px;
+	line-height: 1.5;
+	text-align: center;
 	color: var(--ink);
-	text-align: left;
+	background: #0b3a59;
+	border: 1px solid var(--frame-line);
+	border-radius: 5px;
 }
 
 /* ---- speed control — modern CSS slider (was gameSpeedBar/Handle.png) --- */
@@ -213,39 +213,34 @@
 	position: static;
 	inset: auto;
 	grid-column: 1 / -1;
-	text-align: left;
-	font-size: 11px;
-	margin: 8px 0 4px;
+	text-align: center;
+	font-size: 10px;
+	margin: 4px 0 2px;
 }
 #speedBar {
 	position: relative;
 	inset: auto;
 	grid-column: 1 / -1;
 	width: 100%; /* = strip width */
-	height: 10px;
+	height: 12px;
+	border: 1px solid var(--frame-line);
 	border-radius: 999px;
-	background: linear-gradient(
-		to right,
-		var(--speed-fill) 0,
-		var(--speed-fill) calc(var(--speed-frac, 0.6) * 100%),
-		var(--speed-track) calc(var(--speed-frac, 0.6) * 100%),
-		var(--speed-track) 100%
-	);
+	/* fill/track split is repainted by uio.setSmallInterval(); this is the
+	   default (60%) so the bar is never blank */
+	background: linear-gradient(to right, var(--speed-fill) 60%, var(--speed-track) 60%);
 	touch-action: none;
 	cursor: pointer;
 }
 #speedHandle {
 	position: absolute;
 	top: 50%;
-	/* travel inset by the full thumb (incl. its 2px border each side) so it
-	   never overflows the track at frac 0 or 1 */
-	left: calc(var(--speed-frac, 0.6) * (100% - var(--speed-thumb-size) - 4px));
+	left: calc(60% - 9.6px); /* repainted by uio.setSmallInterval() */
 	width: var(--speed-thumb-size);
 	height: var(--speed-thumb-size);
 	border-radius: 50%;
 	background: var(--speed-thumb);
 	border: 2px solid var(--speed-track);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 	transform: translateY(-50%);
 	touch-action: none;
 	pointer-events: none;

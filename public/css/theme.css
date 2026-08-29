@@ -1,9 +1,7 @@
 /*
- * theme.css — the layout & colour knobs, all in one place (Phase 4b).
+ * theme.css — the layout & colour knobs, all in one place.
  *
  * Change a value, save, the dev server hot-reloads and you see it. No build.
- * In dev there's also a slider panel — the ⚙ button bottom-left — that writes
- * these live; "Copy CSS" there dumps the values to paste back in here.
  *
  * The layout switch point (stacked vs side-by-side) is the literal `760px` in
  * shell.css + toolbar.css (`@media (min-width: 760px)`) — @media can't read a
@@ -12,40 +10,37 @@
 
 :root {
 	/* ---- spacing ---- */
-	--frame-gap: 0px; /* gap tank<->strip + outer padding */
-	--strip-pad: 0px; /* padding inside the toolbar strip */
+	--frame-gap: 0px; /* gap between the tank, the strip and the screen edges */
+	--strip-pad: 5px; /* padding inside the toolbar strip */
 	--panel-pad: 0px; /* padding inside a shop / stats panel */
 
-	/* ---- buttons (one size for everything) ---- */
-	--btn-size: 66px; /* every button: tools, views, widgets, minimise */
-	--btn-icon: calc(var(--btn-size) - 10px); /* icon within the button */
+	/* ---- buttons (one size for everything) ----
+	   shrinks with viewport height so the vertical strip (10 chrome + 8 tool
+	   buttons + status + speed) fits without a scrollbar on short screens. */
+	--btn-size: clamp(38px, 7vh, 64px);
+	--btn-icon: var(--btn-size); /* icon fills the button edge to edge */
+
+	/* the control strip on >=760px: two button columns + padding */
+	--strip-width: calc(var(--btn-size) * 2 + 24px);
 
 	/* ---- shop tiles ---- */
 	--tile-min: 260; /* rendered tile width in px (unitless — feeds the calc below) */
-	--tile-gap: 0px;
-	/* derived — the whole tile (art + text + buy/sell buttons) scales as one
-	   unit via `zoom`; 110 is the tiles' native design width. */
+	--tile-gap: 4px;
+	/* derived — the whole tile scales as one unit via `zoom`; 110 = native width */
 	--tile-zoom: calc(var(--tile-min) / 110);
 
 	/* ---- fish list ---- */
 	--fishlist-zoom: 1.6; /* scales the fish-list text, bars and row height */
-}
-
-/* Phones: everything a notch smaller so a shop page fits without scrolling and
-   the button row doesn't wrap three deep. */
-@media (max-width: 600px) {
-	:root {
-		--btn-size: 44px;
-		--tile-min: 150;
-		--fishlist-zoom: 1.15;
-	}
 
 	/* ---- colours ---- */
-	--shell-bg: #0e4e7a; /* water-blue behind everything */
-	--strip-bg: #0c3f63; /* toolbar strip */
+	--shell-bg: #0e4e7a; /* water-blue behind everything / the frame */
+	--strip-bg: #0c3f63; /* toolbar strip fill */
 	--tank-bg: #06324f; /* letterbox behind the tank canvas */
 	--panel-bg: #5f5f5f; /* shop / stats panel */
 	--ink: #ededed; /* default text on dark */
+
+	--frame-line: #0a3550; /* borders between regions */
+	--tank-frame: #123f5c; /* bezel around the tank */
 
 	--btn-bg: #cabf92;
 	--btn-bg-hover: #e2d7ab;
@@ -54,9 +49,32 @@
 	--btn-border: #6b5f45;
 
 	/* ---- speed slider ---- */
-	--speed-track: #103f5f;
+	--speed-track: #0b3a59;
 	--speed-fill: #6fc7f5;
 	--speed-thumb: #ffffff;
 	--speed-thumb-size: 16px;
-	--speed-frac: 0.6; /* 0..1, overridden live on #speedBar by uio.ts */
+	--speed-frac: 0.6; /* 0..1, set live on #speedBar by uio.ts */
+}
+
+/* Phones (either orientation): flat 44 px buttons, and shop tiles close to
+   their native 110 px so a page shows more per screen and scrolls less. */
+@media (max-width: 759px) {
+	:root {
+		--btn-size: 44px;
+		--tile-min: 120;
+		--fishlist-zoom: 1.1;
+	}
+}
+@media (max-width: 420px) {
+	:root {
+		--tile-min: 112;
+	}
+}
+/* short viewport (phone landscape): the shop panel only gets ~200 px tall, so
+   drop tiles to native size + no list zoom — more columns, far less scroll. */
+@media (max-height: 560px) {
+	:root {
+		--tile-min: 110;
+		--fishlist-zoom: 1;
+	}
 }

@@ -42,9 +42,21 @@ export function eventsCreate() {
 	for (let v = 0; v <= 5; v++) {
 		on('buttonView' + v, 'click', () => {
 			uio.changeView(v);
-			if (v === 5) stats.refreshStatsPage();
+			if (v === 5) {
+				$('view5').classList.remove('show-tankinfo'); // stats button = fish list
+				stats.refreshStatsPage();
+			}
 		});
 	}
+
+	/*** WATER GAUGE — tap to toggle the Statistics view between Fish List and
+	     Tank Info (tap again, or the Statistics button, to go back). ***/
+	on('statusWater', 'click', () => {
+		const wantTankInfo = !$('view5').classList.contains('show-tankinfo');
+		$('view5').classList.toggle('show-tankinfo', wantTankInfo);
+		uio.changeView(5); // no-op if already there
+		stats.refreshStatsPage();
+	});
 
 	/*** SCENERY / LIGHTING / FILTER / BACKGROUND SHOPS ***/
 	const shops = [
@@ -59,18 +71,6 @@ export function eventsCreate() {
 			if (sell && i > 0) on('button' + prefix + 'Sell' + i, 'click', () => aquarium[sell](i));
 		}
 	}
-
-	/*** ACCESSORIES / STATISTICS TABS ***/
-	on('tabButtonFilterShop', 'click', () => uio.changeTab('BackgroundShop', 'FilterShop'));
-	on('tabButtonBackgroundShop', 'click', () => uio.changeTab('FilterShop', 'BackgroundShop'));
-	on('tabButtonFishList', 'click', () => {
-		uio.changeTab('Statistics', 'FishList');
-		stats.refreshStatsPage();
-	});
-	on('tabButtonStatistics', 'click', () => {
-		uio.changeTab('FishList', 'Statistics');
-		stats.refreshStatsPage();
-	});
 
 	/*** AQUARIUM TOOLS (buttonTool0..7) ***/
 	const tools = [

@@ -17,7 +17,7 @@ import { uio } from './uio.js';
 import { eventsCreate } from './events.js';
 import { loop } from './loop.js';
 
-// Dev-only: expose the singletons for poking around in DevTools + the layout tuner.
+// Dev-only: expose the singletons for poking around in DevTools.
 if (import.meta.env.DEV) {
 	Object.assign(window, {
 		aquarium,
@@ -31,7 +31,6 @@ if (import.meta.env.DEV) {
 		uio,
 		loop,
 	});
-	void import('./devpanel.js').then((m) => m.mountDevPanel());
 }
 
 function boot() {
@@ -40,7 +39,7 @@ function boot() {
 	eventsCreate();
 	aquarium.create();
 	fishShop.init();
-	stats.createFishListTable();
+	stats.init();
 
 	if (config.checkFirstTime()) {
 		aquarium.addFish(1, 0.9999);

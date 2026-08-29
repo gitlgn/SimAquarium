@@ -7,13 +7,13 @@ import { aquarium } from './aquarium.js';
 import { loop, smallIntervals } from './loop.js';
 import { PAGEMODE_MAXI, PAGEMODE_MINI, VIEW_AQUARIUM } from './constants.js';
 import { $ } from './dom.js';
+import { toast } from './toast.js';
 
 class Uio {
 	#frontPageMode = PAGEMODE_MAXI;
 	#view = VIEW_AQUARIUM;
 	#rememberSpeed;
 	#alertNumber = -1; // 0 sick, 1 hungry/starving, 2 breeds, 3 dies, 4 attacks
-	#hideStatusTimer;
 
 	getView() {
 		return this.#view;
@@ -62,14 +62,6 @@ class Uio {
 		// widget.openURL( "http://xtrsyz.org/" );
 	}
 
-	changeTab(tabOff, tabOn) {
-		$('tab' + tabOff).hidden = true;
-		$('tab' + tabOn).hidden = false;
-
-		$('tabButton' + tabOff).setAttribute('class', 'tab');
-		$('tabButton' + tabOn).setAttribute('class', 'tab active');
-	}
-
 	/*** Speed bar — map the pointer's x fraction across the bar to one of the
 	 * six speeds (0 = slowest). Width-independent so the bar can be any size. */
 	speedBarSet(e: MouseEvent) {
@@ -84,32 +76,31 @@ class Uio {
 		loop.small = window.setInterval(() => {
 			aquarium.moveFish();
 		}, smallIntervals[delay]);
-		// CSS turns --speed-frac into the fill width + thumb position
-		$('speedBar').style.setProperty('--speed-frac', String(delay / 5));
+
+		// paint the slider fill + thumb from the value (calc(var()*%) is flaky
+		// with plain-number custom props, so compute it here)
+		const frac = delay / 5;
+		const stop = (frac * 100).toFixed(1) + '%';
+		$('speedBar').style.background =
+			'linear-gradient(to right, var(--speed-fill) ' +
+			stop +
+			', var(--speed-track) ' +
+			stop +
+			')';
+		$('speedHandle').style.left = 'calc(' + stop + ' - ' + (frac * 16).toFixed(1) + 'px)';
+
 		loop.chosenSpeed = delay;
 	}
 
-	getAlertNum() {
-		return this.#alertNumber;
-	}
 	changeAlertNum(alertNum) {
 		this.#alertNumber = alertNum;
 	}
 
-	blikStatusWidgetIcon() {
-		window.clearTimeout(this.#hideStatusTimer);
-		$('statusEvent').style.backgroundPosition = '38px';
-		$('statusEventIcon').style.background =
-			'url(gfx/interface/alertLightIcon' + this.#alertNumber + '.png)';
-		$('statusEventIcon').style.display = 'block';
-		this.#hideStatusTimer = window.setTimeout(() => {
-			this.hideStatusWidgetIcon();
-		}, 4000);
-	}
-
-	hideStatusWidgetIcon() {
-		$('statusEvent').style.backgroundPosition = '0';
-		$('statusEventIcon').style.display = 'none';
+	/** Called once per update() tick — surface any pending game event as a toast. */
+	flushAlert() {
+		if (this.#alertNumber < 0) return;
+		toast.event(this.#alertNumber);
+		this.#alertNumber = -1;
 	}
 }
 

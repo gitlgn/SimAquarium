@@ -1,0 +1,84 @@
+/*
+ * toast.css — transient event notifications (src/toast.ts). Replaces the
+ * alertLight.png lamp. Overlays the top of the tank; ignores pointer events.
+ */
+
+#toasts {
+	position: absolute;
+	top: calc(env(safe-area-inset-top, 0px) + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 40;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	width: max-content;
+	max-width: min(90%, 360px);
+	pointer-events: none;
+}
+
+.toast {
+	padding: 8px 14px;
+	border-radius: 8px;
+	font: 13px/1.3 Arial, sans-serif;
+	color: #fff;
+	background: #333;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+	animation: toast-in 0.25s ease both;
+}
+.toast.is-leaving {
+	animation: toast-out 0.4s ease both;
+}
+
+@keyframes toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+@keyframes toast-out {
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+.toast--sick {
+	background: #b26b00;
+}
+.toast--hungry {
+	background: #a8480c;
+}
+.toast--breed {
+	background: #1f7a3d;
+}
+.toast--death {
+	background: #5b3a3a;
+}
+.toast--attack {
+	background: #a51111;
+}
+.toast--relax {
+	background: #2a5a80;
+}
+
+/* persistent "paused" badge in the status area while relax mode is on */
+#relaxBadge {
+	display: none;
+	flex: none;
+	padding: 1px 6px;
+	border-radius: 4px;
+	background: #2a5a80;
+	color: #fff;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+}
+#stage.relax #relaxBadge {
+	display: inline-block;
+}

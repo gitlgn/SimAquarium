@@ -662,7 +662,11 @@ class Aquarium {
 	}
 
 	updatePollutionBar() {
-		$('statusWaterBar').style.height = Math.trunc(this.#pollution) + 'px';
+		// water gauge is a CSS bar now (no bitmap) — fill height + hue from state
+		const frac = Math.min(1, this.#pollution / 32);
+		const bar = $('statusWaterBar');
+		bar.style.height = (frac * 100).toFixed(1) + '%';
+		bar.style.backgroundColor = 'hsl(' + (130 - frac * 130) + ' 65% 45%)';
 		this.#pollutionChanged = false;
 	}
 
@@ -966,11 +970,8 @@ class Aquarium {
 			config.saveGame();
 		}
 
-		// animate icon
-		if (uio.getAlertNum() > -1) {
-			uio.blikStatusWidgetIcon();
-			uio.changeAlertNum(-1);
-		}
+		// surface any pending game event (sick / hungry / breed / death / attack)
+		uio.flushAlert();
 
 		stats.refreshStatsPage();
 	}
@@ -1076,7 +1077,7 @@ class Aquarium {
 		this.changeMoney(fishSpecies[this.#fish[fNum].getSpecNum()].price / 2);
 		this.removeFish(fNum);
 		this.#updateBuyButtons();
-		stats.updateFishListTable();
+		stats.refreshStatsPage();
 	}
 }
 

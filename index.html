@@ -25,6 +25,8 @@
 	<link rel="stylesheet" href="/css/shell.css" type="text/css">
 	<link rel="stylesheet" href="/css/mobile.css" type="text/css">
 	<link rel="stylesheet" href="/css/panels.css" type="text/css">
+	<link rel="stylesheet" href="/css/toast.css" type="text/css">
+	<link rel="stylesheet" href="/css/menu.css" type="text/css">
 
 	<script type="module" src="/src/main.ts"></script>
 </head>
@@ -35,31 +37,16 @@
 
 	<div id="pageFront">
 
-		<!-- T O O L B A R -->
+		<!-- C O N T R O L   S T R I P  (right rail on desktop, bar below the tank
+		     on portrait phones, two rails L/R on landscape phones — see menu.css) -->
 		<div id="aquariumToolbar">
-			<!-- AQUARIUM STATUS -->
+			<!-- STATUS: water + money + relax badge -->
 			<div id="toolbarStatus">
-				<div id="statusEvent"><div id="statusEventIcon"></div></div>
-				<div id="statusWater"><div id="statusWaterBar"></div></div>
+				<div id="statusWater" title="Water quality — tap for Tank Info"><div id="statusWaterBar"></div></div>
 				<div id="statusMoney" class="money">102400</div>
+				<div id="relaxBadge">PAUSED</div>
 			</div>
-			<!-- AQUARIUM TOOLS -->
-			<div id="toolbarTools">
-				<div class="buttonTool" id="buttonTool0" title="Scare Fish"></div><div class="toolPrice money" id="toolPrice0">5</div>
-				<div class="buttonTool" id="buttonTool1" title="Attract Fish"></div><div class="toolPrice money" id="toolPrice1">5</div>
-				<div class="buttonTool" id="buttonTool2" title="Buy Food"></div><div class="toolPrice money" id="toolPrice2">20</div>
-				<div class="buttonTool" id="buttonTool3" title="Buy Medicine"></div><div class="toolPrice money" id="toolPrice3">20</div>
-				<div class="buttonTool" id="buttonTool4" title="Clean"></div><div class="toolPrice money" id="toolPrice4">10</div>
-				<div class="buttonTool" id="buttonTool5" title="Change Water"></div><div class="toolPrice money" id="toolPrice5">40</div>
-				<div class="buttonTool" id="buttonTool6" title="Buy Growth Hormone"></div><div class="toolPrice money" id="toolPrice6">100</div>
-				<div class="buttonTool" id="buttonTool7" title="Buy Breed Hormone"></div><div class="toolPrice money" id="toolPrice7">200</div>
-				<div id="speedLabel">Fish Speed</div><div id="speedBar"><div id="speedHandle"></div></div>
-			</div>
-		</div>
-
-		<!-- G A M E   V I E W S -->
-		<div id="aquariumViews">
-			<!-- SWITCH VIEW BUTTONS -->
+			<!-- VIEW SWITCH + chrome buttons (2-column grid) -->
 			<div id="viewSwitch">
 			<div class="buttonView active" id="buttonView0" title="Aquarium"></div>
 			<div class="buttonView" id="buttonView1" title="Fish Shop"></div>
@@ -68,10 +55,26 @@
 			<div class="buttonView" id="buttonView4" title="Accessories"></div>
 			<div class="buttonView" id="buttonView5" title="Statistics"></div>
 			<div class="buttonTool" id="cameraTool" title="Screenshot"></div>
-			<div class="buttonWidget" id="buttonWidget0"></div>
+			<div class="buttonWidget" id="buttonWidget0" title="Extensions"></div>
 			<div class="buttonWidget" id="buttonWidget1" title="Configuration"></div>
+			<div id="pageMode" title="Minimise"></div>
 			</div>
+			<!-- AQUARIUM TOOLS -->
+			<div id="toolbarTools">
+				<div class="toolCell"><div class="buttonTool" id="buttonTool0" title="Scare Fish"></div><div class="toolPrice money" id="toolPrice0">5</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool1" title="Attract Fish"></div><div class="toolPrice money" id="toolPrice1">5</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool2" title="Buy Food"></div><div class="toolPrice money" id="toolPrice2">20</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool3" title="Buy Medicine"></div><div class="toolPrice money" id="toolPrice3">20</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool4" title="Clean"></div><div class="toolPrice money" id="toolPrice4">10</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool5" title="Change Water"></div><div class="toolPrice money" id="toolPrice5">40</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool6" title="Buy Growth Hormone"></div><div class="toolPrice money" id="toolPrice6">100</div></div>
+				<div class="toolCell"><div class="buttonTool" id="buttonTool7" title="Buy Breed Hormone"></div><div class="toolPrice money" id="toolPrice7">200</div></div>
+				<div id="speedLabel">Fish Speed</div><div id="speedBar"><div id="speedHandle"></div></div>
+			</div>
+		</div>
 
+		<!-- G A M E   V I E W S -->
+		<div id="aquariumViews">
 			<!-- VIEWS -->
 			<div id="panelBody">
 
@@ -81,10 +84,8 @@
 			</div>
 			<!-- FISH SHOP VIEW -->
 			<div class="view" id="view1" hidden>
-				<div class="tabBar">
-					<div class="tab active">Fish Shop</div>
-				</div>
-				<div class="headerInfo">New fish in: <span id="newFishTime">60</span> minutes</div>
+				<h2 class="panelHead">Fish Shop</h2>
+				<p class="panelInfo">New fish in: <span id="newFishTime">60</span> minutes</p>
 
 				<div class="fishSlot" id="fishSlot0">
 					<div class="title"></div>
@@ -134,9 +135,7 @@
 			</div>
 			<!-- SCENERY VIEW -->
 			<div class="view" id="view2" hidden>
-				<div class="tabBar">
-					<div class="tab active">Scenery Shop</div>
-				</div>
+				<h2 class="panelHead">Scenery</h2>
 				<div id="tabSceneries">
 
 					<div class="scenerySlot" id="scenerySlot0">
@@ -196,9 +195,7 @@
 			</div>
 			<!-- LIGHTING VIEW -->
 			<div class="view" id="view3" hidden>
-				<div class="tabBar">
-					<div class="tab active">Lighting Shop</div>
-				</div>
+				<h2 class="panelHead">Lighting</h2>
 					<div id="tabLightingShop">
 
 						<div class="lightSlot" id="lightSlot0">
@@ -259,10 +256,7 @@
 			</div>
 			<!-- ACCESSORIES VIEW -->
 			<div class="view" id="view4" hidden>
-				<div class="tabBar">
-					<div class="tab active" id="tabButtonFilterShop">Filters Shop</div>
-					<div class="tab" id="tabButtonBackgroundShop">Backgrounds Shop</div>
-				</div>
+				<h2 class="panelHead">Filters</h2>
 
 				<div id="tabFilterShop">
 
@@ -303,7 +297,9 @@
 						</div>
 
 				</div>
-				<div id="tabBackgroundShop" hidden>
+
+				<h2 class="panelHead">Backgrounds</h2>
+				<div id="tabBackgroundShop">
 
 
 				</div>
@@ -311,11 +307,8 @@
 			</div>
 			<!-- STATISTICS VIEW -->
 			<div class="view" id="view5" hidden>
-				<div class="tabBar">
-					<div class="tab active" id="tabButtonFishList">Fish List</div>
-					<div class="tab" id="tabButtonStatistics">Tank Info</div>
-				</div>
 				<div id="tabFishList">
+					<h2 class="panelHead">Fish List</h2>
 
 					<div id="fishTableIcons"><span></span><span></span><span></span><span></span></div>
 					<div id="fishTableInfo">No fish in the tank.</div>
@@ -324,25 +317,9 @@
 					</div>
 
 				</div>
-				<div id="tabStatistics" hidden>
-
-					<div id="fishStats">Fish Statistics:</div>
-
-					<div id="statFishNumberLabel">Fish number: <span id="statFishNumber">1</span></div>
-					<div id="statFishBirthsLabel">Fish births: <span id="statFishBirths">0</span></div>
-					<div id="statFishDeathsLabel">Fish deaths: <span id="statFishDeaths">0</span></div>
-
-					<div id="waterProperties">Tank Properties:</div>
-
-					<div id="statPollutionLabel">Pollution: <span id="statPollution">0</span></div>
-					<div id="statFoodLabel">Food: <span id="statFood">0</span></div>
-					<div id="statMedicineLabel">Medicines: <span id="statMedicine">0</span></div>
-					<div id="statGrowHLabel">Growth hormones: <span id="statGrowH">0</span></div>
-					<div id="statBreedHLabel">Breed hormones: <span id="statBreedH">0</span></div>
-
-					<div id="statDistractionLabel">Fish distraction: <span id="statDistraction">0</span></div>
-
-				</div>
+				<!-- filled by statistics.ts #renderTankInfo(); shown via #view5.show-tankinfo
+				     (click the water gauge) -->
+				<div id="tabStatistics"></div>
 			</div>
 
 			</div><!-- #panelBody -->
@@ -366,8 +343,6 @@
 		</div>
 	</div>
 
-	<!-- MINIMISE / RESTORE (stays out of #viewSwitch so it survives .mini) -->
-	<div id="pageMode" title="Minimise"></div>
 
 </div><!-- #stage -->
 </div><!-- #viewport -->

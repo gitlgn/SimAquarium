@@ -31,11 +31,12 @@
 .buttonTool,
 .buttonView,
 .buttonWidget,
-.tab,
 #pageMode,
 #cameraTool,
 #speedBar,
+#statusWater,
 #confNewGame,
+#confClose,
 #coinAdd,
 [id^='button'] {
 	cursor: pointer;

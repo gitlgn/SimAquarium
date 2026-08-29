@@ -40,28 +40,21 @@
 	overflow: visible;
 }
 
-/* headers / tab bar back into normal flow */
-.view .tabBar {
-	position: static;
-	float: none;
-	width: auto;
-	height: auto;
-	margin: 0 0 8px;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
+/* second section heading in Accessories (Backgrounds, after the Filters grid) */
+#view4 > div + .panelHead {
+	margin-top: 18px;
 }
-.view .tabBar .tab {
-	float: none;
-	margin: 0;
+
+/* Statistics: Fish List by default; Tank Info shown by clicking the water gauge
+   (#view5.show-tankinfo, set in events.ts) */
+#view5 #tabStatistics {
+	display: none;
 }
-.view .headerInfo {
-	position: static;
-	float: none;
-	width: auto;
-	height: auto;
-	margin: 0 0 8px;
-	color: #dddddd;
+#view5.show-tankinfo #tabStatistics {
+	display: block;
+}
+#view5.show-tankinfo #tabFishList {
+	display: none;
 }
 
 /* ---- shop slot grids (fish / scenery / lighting / filters / backgrounds) ---- */
@@ -83,9 +76,9 @@
 	grid-template-columns: repeat(auto-fill, calc(64px * var(--tile-zoom)));
 }
 
-/* view1 holds its tab bar + "new fish in" line as grid items */
-#view1 > .tabBar,
-#view1 > .headerInfo {
+/* view1 holds its heading + "new fish in" line as grid items */
+#view1 > .panelHead,
+#view1 > .panelInfo {
 	grid-column: 1 / -1;
 }
 
@@ -109,120 +102,5 @@
 	background-size: 100% 100%;
 }
 
-/* ---- statistics view (view5) ----
-   `zoom` on the container scales the whole table (text, bars, row height).
-   Rows + the icon header share one grid so the stat columns line up. */
-
-#tabFishList {
-	display: block;
-	zoom: var(--fishlist-zoom); /* scales the header + rows together, so their grids align */
-}
-#fishTableInfo {
-	position: static;
-	margin: 6px 0;
-	font-size: 12px;
-}
-#fishTableContainer {
-	position: static;
-	width: 100%;
-	height: auto;
-	max-height: none;
-	overflow-x: auto; /* narrow screens: rows scroll sideways instead of clipping */
-}
-
-/* both share one fixed-column grid so the stat icons line up with the bars.
-   every non-1fr track is a fixed width (no `auto`) or the two grids, having
-   different cell content, would resolve them differently. */
-#fishTableIcons,
-.fishTableRow {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 34px 34px 40px 40px 64px 48px;
-	gap: 4px;
-	align-items: center;
-}
-
-#fishTableIcons {
-	position: static;
-	width: auto;
-	height: 12px;
-	margin: 4px 0;
-	background: none;
-}
-#fishTableIcons span {
-	width: 24px;
-	height: 10px;
-	justify-self: start;
-	margin-left: -5px; /* nudge onto the bars (which sit ~6px into their box) */
-	background: url(../gfx/view5/icons.png) no-repeat;
-	image-rendering: pixelated;
-}
-#fishTableIcons span:nth-child(1) {
-	grid-column: 2;
-	background-position: 0 0;
-}
-#fishTableIcons span:nth-child(2) {
-	grid-column: 3;
-	background-position: -25px 0;
-}
-#fishTableIcons span:nth-child(3) {
-	grid-column: 4;
-	background-position: -51px 0;
-}
-#fishTableIcons span:nth-child(4) {
-	grid-column: 5;
-	background-position: -76px 0;
-}
-
-.fishTableRow {
-	width: auto;
-	height: auto;
-	padding: 2px 4px;
-	box-sizing: border-box;
-}
-.fishTableRow > * {
-	float: none;
-	margin: 0;
-	min-width: 0;
-}
-.fishTableRow .fishTableSpeciesName {
-	width: auto;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.fishTableRow .fishTableHealthBox,
-.fishTableRow .fishTableHungerBox,
-.fishTableRow .fishTableSickBox,
-.fishTableRow .fishTableSizeBox {
-	width: auto;
-}
-.fishTableRow .button {
-	box-sizing: border-box;
-	width: 100%;
-	height: auto;
-	padding: 2px 4px;
-}
-/* the 2014 rule shrank the button on :press — jarring in a grid; just darken */
-.fishTableRow .button:active {
-	width: 100%;
-	height: auto;
-	border-width: 1px;
-	background: #b7a97e;
-}
-
-#tabStatistics {
-	display: block;
-	font-size: 13px;
-	line-height: 1.7;
-}
-#tabStatistics div {
-	position: static;
-}
-#tabStatistics #fishStats,
-#tabStatistics #waterProperties {
-	margin-top: 10px;
-	font-weight: bold;
-}
-#tabStatistics #fishStats {
-	margin-top: 0;
-}
+/* Statistics view (view5) is rendered from state — its CSS lives in
+   viewStatistics.css. */
