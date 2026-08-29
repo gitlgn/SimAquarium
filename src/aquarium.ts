@@ -473,7 +473,7 @@ class Aquarium {
 	/*** CREATE THE AQUARIUM ***/
 
 	create() {
-		this.#canvasTankCtx = ctx2d($('tank') as HTMLCanvasElement);
+		this.#canvasTankCtx = ctx2d($('tank'));
 		this.#setWall(this.#usedBackground);
 		this.layerBackRefresh();
 		this.layerFrontRefresh();
