@@ -22,11 +22,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - run: npm ci
@@ -36,14 +36,17 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
-        # Creates the Pages site on the first successful run.
-        with:
-          enablement: true
+      # Pages is already enabled for this repo (done once via the REST API —
+      # `enablement: true` here needs a token beyond GITHUB_TOKEN). This step
+      # just reads the site config.
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
+          # dist/.well-known/assetlinks.json — without this, v4+ tars exclude
+          # every dotfile/dotfolder and the Android asset-links file vanishes.
+          include-hidden-files: true
 
   deploy:
     needs: build
@@ -53,4 +56,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
