@@ -1,15 +1,14 @@
 /*** STATISTICS VIEW (Phase 6 — markup is built from state by statistics.ts) ***/
 
 #view5 {
-	/* name | health | hunger | size | sick-dot | Sell | price
-	   the bar columns are FIXED (not 1fr) so the header + rows — which have
-	   different content in the other columns — resolve them identically and
-	   the stat icons stay lined up with the bars. */
-	--fishrow-cols: minmax(0, 1fr) 72px 72px 72px 20px 62px 48px;
+	/* name | health | fed | grown | well | Sell | price
+	   the four bar columns are FIXED (not 1fr) and equal, so the header + rows
+	   resolve them identically and the stat icons stay lined up with the bars. */
+	--fishrow-cols: minmax(0, 1fr) 60px 60px 60px 60px 58px 46px;
 }
 @media (max-width: 600px) {
 	#view5 {
-		--fishrow-cols: minmax(0, 1fr) 54px 54px 54px 18px 54px 44px;
+		--fishrow-cols: minmax(0, 1fr) 46px 46px 46px 46px 50px 40px;
 	}
 }
 
@@ -42,8 +41,8 @@
 	background: url(../gfx/view5/icons.png) no-repeat;
 	image-rendering: pixelated;
 }
-/* header glyphs map to the columns: heart→health, fork→hunger,
-   ruler→size, wand→sick-dot */
+/* header glyphs map to the columns: heart→health, fork→fed,
+   ruler→grown, wand→well */
 #fishTableIcons span:nth-child(1) {
 	grid-column: 2;
 	background-position: 0 0;
@@ -59,7 +58,6 @@
 #fishTableIcons span:nth-child(4) {
 	grid-column: 5;
 	background-position: -51px 0;
-	justify-self: center;
 }
 
 #fishTableContainer {
@@ -86,8 +84,9 @@
 	text-overflow: ellipsis;
 }
 
-/* CSS bars — no bitmaps, no percent text. --v (0-1) is set inline on <i>
-   alongside the fill width, and drives the colour. Hover shows the exact %. */
+/* CSS bars — no bitmaps, no percent text. Every bar reads the same way:
+   full = good. --v (0-1) is set inline on <i> with the fill width and drives
+   the hue (0 = red = bad, 1 = green = good). Hover shows the exact %. */
 .fishRow-meter {
 	height: 15px;
 	background: #cececd;
@@ -99,33 +98,10 @@
 	display: block;
 	height: 100%;
 	min-width: 2px;
-	transition: width 0.25s ease;
-}
-/* health: full = green, empty = red */
-.fishRow-meter--health > i {
-	background: hsl(calc(var(--v, 1) * 125), 62%, 43%);
-}
-/* hunger: fuller bar = hungrier = redder */
-.fishRow-meter--hunger > i {
-	background: hsl(calc(45 - var(--v, 0) * 45), 78%, 48%);
-}
-/* size: neutral growth progress */
-.fishRow-meter--size > i {
-	background: #4a83b0;
-}
-
-/* sick indicator — grey dot, red + glow when sick */
-.fishRow-dot {
-	width: 12px;
-	height: 12px;
-	justify-self: center;
-	border-radius: 50%;
-	background: #bcbcbb;
-	box-shadow: inset 0 0 0 1px #9a9a99;
-}
-.fishRow-dot.is-sick {
-	background: #d62828;
-	box-shadow: 0 0 5px #d62828;
+	background: hsl(calc(var(--v, 0) * 125), 60%, 44%);
+	transition:
+		width 0.25s ease,
+		background-color 0.25s ease;
 }
 
 .fishRow-sell {
