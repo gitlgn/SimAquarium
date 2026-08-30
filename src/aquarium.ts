@@ -18,6 +18,7 @@ import {
 	computeFishNumComfort,
 } from './species.js';
 import { $, ctx2d } from './dom.js';
+import { bubbles } from './bubbles.js';
 import {
 	BUY,
 	SELL,
@@ -149,6 +150,8 @@ class Aquarium {
 
 		this.#killFish = -1;
 		this.#breedFish = -1;
+
+		bubbles.clear();
 
 		this.#fishBirths = 0;
 		this.#fishDeaths = 0;
@@ -832,7 +835,13 @@ class Aquarium {
 
 	/* MOVE FISH EVERY 32/1000 -- 1024/1000 SECONDS */
 	moveFish() {
-		for (let i = 0; i < this.#fishNum; i++) this.#fish[i].move();
+		const heads: { x: number; y: number; sizeX: number; right: boolean }[] = [];
+		for (let i = 0; i < this.#fishNum; i++) {
+			const f = this.#fish[i];
+			f.move();
+			heads.push({ x: f.getX(), y: f.getY(), sizeX: f.getSizeX(), right: f.getVX() === 10 });
+		}
+		bubbles.tick(heads, this.#usedFilter);
 		if (uio.getView() === VIEW_AQUARIUM) this.render();
 	}
 
@@ -972,6 +981,7 @@ class Aquarium {
 		for (let i = 0; i < this.#fishNum; i++) {
 			this.#renderFish(this.#fish[i]);
 		}
+		bubbles.draw(this.#canvasTankCtx);
 		this.#renderForeground();
 	}
 
