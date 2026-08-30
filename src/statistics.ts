@@ -9,6 +9,7 @@
 import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
 import { fishSpecies } from './species.js';
+import { fishArt } from './fishArt.js';
 import { VIEW_STATISTICS } from './constants.js';
 import { $ } from './dom.js';
 
@@ -64,6 +65,7 @@ class Stats {
 
 			html +=
 				'<div class="fishRow">' +
+				`<span class="fishRow-icon">${fishArt(specNum, 'fishRow-icon-svg', true)}</span>` +
 				`<span class="fishRow-name">${esc(aquarium.returnSpecName(i))}</span>` +
 				meter('health', health) +
 				meter('fed', fed) +

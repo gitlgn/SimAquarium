@@ -370,9 +370,14 @@ const CROP: Record<number, readonly [number, number, number, number]> = {
 	28: [2, 14, 98, 30], // dolphin    ~3.7:1
 };
 
-/** Inline SVG for the shop card — inherits the page, no xmlns needed. */
-export function fishArt(spec: number): string {
-	return `<svg class="shopCard-fishIcon" viewBox="0 0 100 56" aria-hidden="true">${inner(spec)}</svg>`;
+/**
+ * Inline SVG for the shop card and the fish-list rows — inherits the page, no
+ * xmlns needed. `cls` sets the class; `crop` uses the per-species CROP box so
+ * long / tall fish fill a small icon instead of letterboxing to a sliver.
+ */
+export function fishArt(spec: number, cls = 'shopCard-fishIcon', crop = false): string {
+	const [vx, vy, vw, vh] = crop ? (CROP[spec] ?? [0, 0, 100, 56]) : [0, 0, 100, 56];
+	return `<svg class="${cls}" viewBox="${vx} ${vy} ${vw} ${vh}" aria-hidden="true">${inner(spec)}</svg>`;
 }
 
 /**
