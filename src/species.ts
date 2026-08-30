@@ -112,7 +112,7 @@ export function computeFishNumComfort() {
 
 // FISH FRAMES — fishFrame{L,R}[species][frame]
 //
-// The tank fish are the same vector art as the shop cards (src/fishArt.ts),
+// The tank fish are the same art as the shop cards (src/fishArt.ts, skinnable),
 // rasterised via a data-URI SVG. `#renderFish` scales them to the live size
 // exactly as it did the PNGs; baked at TANK_SCALE_MAX so they stay ~1:1 even
 // when the canvas is at its highest resolution.
@@ -122,17 +122,20 @@ const fishFrameL: HTMLImageElement[][] = [];
 const fishFrameR: HTMLImageElement[][] = [];
 
 for (let i = 0; i < 29; i++) {
-	fishFrameL[i] = [];
-	fishFrameR[i] = [];
-
-	const w = Math.round(fishSpecies[i].sizeX * TANK_SCALE_MAX);
-	const h = Math.round(fishSpecies[i].sizeY * TANK_SCALE_MAX);
-
-	fishFrameR[i][0] = new Image();
-	fishFrameR[i][0].src = fishArtSvgUri(i, w, h, false);
-	fishFrameL[i][0] = new Image();
-	fishFrameL[i][0].src = fishArtSvgUri(i, w, h, true);
+	fishFrameL[i] = [new Image()];
+	fishFrameR[i] = [new Image()];
 }
+
+/** (Re)point every frame image at the current fish skin. Cheap — data URIs. */
+export function rebuildFishFrames() {
+	for (let i = 0; i < 29; i++) {
+		const w = Math.round(fishSpecies[i].sizeX * TANK_SCALE_MAX);
+		const h = Math.round(fishSpecies[i].sizeY * TANK_SCALE_MAX);
+		fishFrameR[i][0].src = fishArtSvgUri(i, w, h, false);
+		fishFrameL[i][0].src = fishArtSvgUri(i, w, h, true);
+	}
+}
+rebuildFishFrames();
 
 export class Fish {
 	#x;

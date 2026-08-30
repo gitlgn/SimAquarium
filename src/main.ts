@@ -51,6 +51,8 @@ function boot() {
 		config.loadGame();
 	}
 
+	config.loadSkin(); // reflect the saved fish skin (repaints once cartoon sprites load)
+
 	// starts the fish-move interval at the default speed and syncs the speed handle
 	uio.setSmallInterval(loop.chosenSpeed);
 	loop.big = window.setInterval(function () {

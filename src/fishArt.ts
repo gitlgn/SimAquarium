@@ -357,6 +357,69 @@ function inner(spec: number): string {
 	return (DEFS[spec] ?? DEFS[0])();
 }
 
+/* ------------------------------------------------------------------ *
+ * Skins: `classic` = the drawn set above; `cartoon` = the flat Kenney
+ * Fish Pack (CC0, public/gfx/kenney/fish). 28 species map onto the 9
+ * Kenney fish by colour family + body shape — it's the stylised
+ * alternative, not a species catalogue.
+ * ------------------------------------------------------------------ */
+
+export type FishSkin = 'classic' | 'cartoon';
+let skin: FishSkin = 'classic';
+export const setFishSkin = (s: FishSkin) => {
+	skin = s;
+};
+export const getFishSkin = (): FishSkin => skin;
+
+// prettier-ignore
+const KENNEY_FISH: readonly string[] = [
+	'fish_brown',        // 0  Test fish (mirrors 1)
+	'fish_brown',        // 1  Southern platyfish
+	'fish_orange',       // 2  Guppy
+	'fish_grey',         // 3  Panda corydoras
+	'fish_brown',        // 4  Bronze catfish
+	'fish_green',        // 5  Zebrafish
+	'fish_grey',         // 6  Sailfin molly
+	'fish_orange',       // 7  Rosy barb
+	'fish_red',          // 8  Cardinal tetra
+	'fish_grey_long_a',  // 9  Dojo loach
+	'fish_blue',         // 10 Paradise fish
+	'fish_brown',        // 11 Tropheus
+	'fish_grey_long_b',  // 12 Bala shark
+	'fish_orange',       // 13 Electric yellow cichlid
+	'fish_orange',       // 14 Clown loach
+	'fish_grey',         // 15 Fairy cichlid
+	'fish_green',        // 16 San Francisco piranha
+	'fish_blue',         // 17 Siamese fighting fish
+	'fish_pink',         // 18 Ram cichlid
+	'fish_brown',        // 19 Oscar
+	'fish_blue',         // 20 Marine angelfish
+	'fish_blue',         // 21 Electric Blue Hap
+	'fish_orange',       // 22 Goldfish
+	'fish_grey',         // 23 Black Piranha
+	'fish_grey',         // 24 Freshwater angelfish
+	'fish_pink',         // 25 Discus
+	'fish_grey_long_a',  // 26 Barracuda
+	'fish_green',        // 27 Green Sea Turtle
+	'fish_grey_long_b',  // 28 Bottlenose dolphin
+];
+
+const kenneyName = (spec: number) => KENNEY_FISH[spec] ?? KENNEY_FISH[0];
+const kenneyUrl = (spec: number) => `gfx/kenney/fish/${kenneyName(spec)}.svg`;
+
+// A data-URI SVG rendered in an <img> can't pull an external file, so the
+// Kenney sprites are fetched once and cached as base64 data URIs to embed.
+const kenneyCache = new Map<string, string>();
+export async function loadCartoonSprites(): Promise<void> {
+	await Promise.all(
+		[...new Set(KENNEY_FISH)].map(async (name) => {
+			if (kenneyCache.has(name)) return;
+			const txt = await fetch(`gfx/kenney/fish/${name}.svg`).then((r) => r.text());
+			kenneyCache.set(name, 'data:image/svg+xml;base64,' + btoa(txt));
+		})
+	);
+}
+
 // Per-species viewBox crop for the tank raster. Most fish sit fine in the full
 // 0 0 100 56 box (~1.8:1, a typical fish); the very long / very tall species
 // get a tighter box so stretching it to their sizeX:sizeY barely distorts.
@@ -370,8 +433,11 @@ const CROP: Record<number, readonly [number, number, number, number]> = {
 	28: [2, 14, 98, 30], // dolphin    ~3.7:1
 };
 
-/** Inline SVG for the shop card — inherits the page, no xmlns needed. */
+/** Markup for the shop card — an inline SVG (classic) or an <img> (cartoon). */
 export function fishArt(spec: number): string {
+	if (skin === 'cartoon') {
+		return `<img class="shopCard-fishIcon" src="${kenneyUrl(spec)}" alt="">`;
+	}
 	return `<svg class="shopCard-fishIcon" viewBox="0 0 100 56" aria-hidden="true">${inner(spec)}</svg>`;
 }
 
@@ -381,6 +447,17 @@ export function fishArt(spec: number): string {
  * sizeX:sizeY; `flip` mirrors the fish to face left.
  */
 export function fishArtSvgUri(spec: number, w: number, h: number, flip = false): string {
+	const cartoon = skin === 'cartoon' ? kenneyCache.get(kenneyName(spec)) : undefined;
+	if (cartoon) {
+		const g = flip
+			? `<g transform="translate(64,0) scale(-1,1)"><image href="${cartoon}" width="64" height="64"/></g>`
+			: `<image href="${cartoon}" width="64" height="64"/>`;
+		const svg =
+			`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" ` +
+			`viewBox="0 0 64 64" preserveAspectRatio="none">${g}</svg>`;
+		return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+	}
+	// classic (also the fallback while the cartoon sprites are still loading)
 	const g = flip
 		? `<g transform="translate(100,0) scale(-1,1)">${inner(spec)}</g>`
 		: inner(spec);

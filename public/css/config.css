@@ -91,17 +91,20 @@
 	background: #e2d7ab;
 }
 
-#confRelaxRow {
+#confRelaxRow,
+#confFishSkinRow {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	cursor: pointer;
 }
-#confRelaxRow input {
+#confRelaxRow input,
+#confFishSkinRow input {
 	cursor: pointer;
 }
 
-#confRelaxModeInfo {
+#confRelaxModeInfo,
+#confFishSkinInfo {
 	font-size: 11px;
 	color: #5a5245;
 }
