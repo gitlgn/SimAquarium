@@ -42,10 +42,11 @@
 }
 
 .shopCard-fishIcon {
-	/* fixed box; the viewBox letterboxes each fish (xMidYMid meet) so tall
-	   ones (angelfish) and long ones (barracuda, dolphin) all sit centred */
+	/* fixed box; the fish is letterboxed inside it (svg viewBox / img object-fit)
+	   so tall (angelfish) and long (barracuda, dolphin) species sit centred */
 	width: 88px;
 	height: 50px;
+	object-fit: contain;
 	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
 

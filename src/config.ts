@@ -7,7 +7,8 @@ import { aquarium, updateBuyButtons } from './aquarium.js';
 import { fishShop } from './fishshop.js';
 import { storage } from './storage.js';
 import { loop } from './loop.js';
-import { computeBreedingRate, computeFishNumComfort } from './species.js';
+import { computeBreedingRate, computeFishNumComfort, rebuildFishFrames } from './species.js';
+import { setFishSkin, loadCartoonSprites, type FishSkin } from './fishArt.js';
 import { $ } from './dom.js';
 import { toast } from './toast.js';
 
@@ -39,6 +40,31 @@ class Config {
 		if (this.#relaxCheckbox().checked === true) this.#relaxEnable();
 		else this.#relaxDisable();
 		this.saveGame();
+	}
+
+	/*** FISH SKIN — classic drawn set vs the flat Kenney sprites ***/
+	#applySkin(s: FishSkin) {
+		setFishSkin(s);
+		const paint = () => {
+			rebuildFishFrames();
+			fishShop.updateView();
+			aquarium.render();
+		};
+		if (s === 'cartoon') void loadCartoonSprites().then(paint);
+		else paint();
+	}
+
+	/** Read the saved skin on boot and reflect it in the checkbox. */
+	loadSkin() {
+		const s: FishSkin = this.getItem('fishSkin') === 'cartoon' ? 'cartoon' : 'classic';
+		($('confFishSkin') as HTMLInputElement).checked = s === 'cartoon';
+		this.#applySkin(s);
+	}
+
+	skinChange() {
+		const s: FishSkin = ($('confFishSkin') as HTMLInputElement).checked ? 'cartoon' : 'classic';
+		this.setItem('fishSkin', s);
+		this.#applySkin(s);
 	}
 
 	/*** NEW GAME ***/
