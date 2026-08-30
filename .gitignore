@@ -17,6 +17,10 @@ pnpm-debug.log*
 logs/
 *.log
 
+# raw asset packs — only the curated subset under public/gfx/ is committed
+# (e.g. public/gfx/kenney/ from kenney.nl Fish Pack, CC0 — see ASSETS.md)
+/kenney_*/
+
 # editor / OS
 .vscode/*
 !.vscode/extensions.json
