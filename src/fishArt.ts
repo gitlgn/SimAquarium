@@ -382,10 +382,10 @@ const KENNEY_FISH: readonly string[] = [
 	'fish_grey',         // 6  Sailfin molly
 	'fish_orange',       // 7  Rosy barb
 	'fish_red',          // 8  Cardinal tetra
-	'fish_grey_long_a',  // 9  Dojo loach
+	'fish_grey',         // 9  Dojo loach
 	'fish_blue',         // 10 Paradise fish
 	'fish_brown',        // 11 Tropheus
-	'fish_grey_long_b',  // 12 Bala shark
+	'fish_grey',         // 12 Bala shark
 	'fish_orange',       // 13 Electric yellow cichlid
 	'fish_orange',       // 14 Clown loach
 	'fish_grey',         // 15 Fairy cichlid
@@ -399,9 +399,9 @@ const KENNEY_FISH: readonly string[] = [
 	'fish_grey',         // 23 Black Piranha
 	'fish_grey',         // 24 Freshwater angelfish
 	'fish_pink',         // 25 Discus
-	'fish_grey_long_a',  // 26 Barracuda
+	'fish_grey',         // 26 Barracuda
 	'fish_green',        // 27 Green Sea Turtle
-	'fish_grey_long_b',  // 28 Bottlenose dolphin
+	'fish_grey',         // 28 Bottlenose dolphin
 ];
 
 const kenneyName = (spec: number) => KENNEY_FISH[spec] ?? KENNEY_FISH[0];
