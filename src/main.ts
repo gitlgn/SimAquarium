@@ -14,6 +14,7 @@ import { scenery } from './scenery.js';
 import { lighting } from './lighting.js';
 import { filtration, background } from './filtration.js';
 import { uio } from './uio.js';
+import { bubbles } from './bubbles.js';
 import { eventsCreate } from './events.js';
 import { loop } from './loop.js';
 
@@ -28,6 +29,7 @@ if (import.meta.env.DEV) {
 		lighting,
 		filtration,
 		background,
+		bubbles,
 		uio,
 		loop,
 	});
