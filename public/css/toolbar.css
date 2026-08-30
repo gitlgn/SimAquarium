@@ -139,9 +139,9 @@
 	text-align: left;
 }
 
-/* water-condition gauge — a CSS bar (no bitmaps). aquarium.updatePollutionBar()
+/* water-quality gauge — a CSS bar (no bitmaps). aquarium.updatePollutionBar()
    sets the fill's height% + colour from the pollution value; the frame is CSS.
-   Fills from the bottom, green → red as it rises. */
+   Full = clean = green; drains from the top and reddens as pollution rises. */
 #statusWater {
 	position: relative;
 	inset: auto;
