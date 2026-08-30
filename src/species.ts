@@ -6,6 +6,7 @@
 import { aquarium } from './aquarium.js';
 import { uio } from './uio.js';
 import { fishArtSvgUri } from './fishArt.js';
+import { TANK_SCALE_MAX } from './constants.js';
 
 /**
  * @typedef {object} Species
@@ -112,10 +113,10 @@ export function computeFishNumComfort() {
 // FISH FRAMES — fishFrame{L,R}[species][frame]
 //
 // The tank fish are the same vector art as the shop cards (src/fishArt.ts),
-// rasterised via a data-URI SVG at 4× each species' sizeX:sizeY. Sharper than
-// the blurry 2014 sprites; `#renderFish` scales them to the live size exactly
-// as it did the PNGs. (The old fishNR.png files still ship — the Config panel
-// preview uses one directly.)
+// rasterised via a data-URI SVG. `#renderFish` scales them to the live size
+// exactly as it did the PNGs; baked at TANK_SCALE_MAX so they stay ~1:1 even
+// when the canvas is at its highest resolution.
+// (The old fishNR.png files still ship — the Config panel preview uses one.)
 
 const fishFrameL: HTMLImageElement[][] = [];
 const fishFrameR: HTMLImageElement[][] = [];
@@ -124,8 +125,8 @@ for (let i = 0; i < 29; i++) {
 	fishFrameL[i] = [];
 	fishFrameR[i] = [];
 
-	const w = Math.round(fishSpecies[i].sizeX * 4);
-	const h = Math.round(fishSpecies[i].sizeY * 4);
+	const w = Math.round(fishSpecies[i].sizeX * TANK_SCALE_MAX);
+	const h = Math.round(fishSpecies[i].sizeY * TANK_SCALE_MAX);
 
 	fishFrameR[i][0] = new Image();
 	fishFrameR[i][0].src = fishArtSvgUri(i, w, h, false);

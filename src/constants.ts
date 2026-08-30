@@ -7,6 +7,14 @@
 export const BUY = -1;
 export const SELL = 1;
 
+// The tank is a 360×240 logical space (the 2014 canvas size). The on-screen
+// canvas backs it at `paintedCssWidth × devicePixelRatio` (see
+// aquarium.#fitTank) so there's ~1 canvas pixel per screen pixel — crisp,
+// no wasted fill. This is the upper bound on that multiple (a 4K display
+// past it softens gracefully) and the resolution the fish rasters are baked
+// at (src/fishArt.ts via species.ts).
+export const TANK_SCALE_MAX = 8;
+
 // Fish facing (vX values). Not yet referenced by name — species.js still uses
 // the literals 10 / -10.
 export const DIRECTION_LEFT = -10;
