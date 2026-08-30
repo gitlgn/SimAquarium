@@ -1,14 +1,23 @@
 /*** STATISTICS VIEW (Phase 6 — markup is built from state by statistics.ts) ***/
 
 #view5 {
-	/* name | health | fed | grown | well | Sell | price
-	   the four bar columns are FIXED (not 1fr) and equal, so the header + rows
-	   resolve them identically and the stat icons stay lined up with the bars. */
-	--fishrow-cols: minmax(0, 1fr) 60px 60px 60px 60px 58px 46px;
+	/* icon | name | health | fed | grown | well | Sell | price
+	   the four bar columns + Sell are FIXED and equal, so the header + rows
+	   resolve them identically and the stat glyphs stay lined up with the bars.
+	   `name` and `price` are kept in their own vars: the container query below
+	   collapses `name` to 0 (and hides the text) when the panel is too narrow
+	   for a name, and lets `price` flex to soak up the freed width so the row
+	   still reaches the right edge. The vars are joined directly in
+	   `grid-template-columns` on the rows + header (not pre-joined here) so the
+	   overrides are read where they are inherited. */
+	--fishrow-name: minmax(0, 1fr);
+	--fishrow-bars: 60px 60px 60px 60px 58px;
+	--fishrow-price: 46px;
 }
 @media (max-width: 600px) {
 	#view5 {
-		--fishrow-cols: minmax(0, 1fr) 46px 46px 46px 46px 50px 40px;
+		--fishrow-bars: 46px 46px 46px 46px 50px;
+		--fishrow-price: 40px;
 	}
 }
 
@@ -18,6 +27,9 @@
 	display: block;
 	/* one zoom for the header + rows together, so their grids stay aligned */
 	zoom: var(--fishlist-zoom);
+	/* query the list's own width (in the same units the rows lay out in, i.e.
+	   after the zoom above) so the name can be dropped when it no longer fits */
+	container: fishlist / inline-size;
 }
 
 #fishTableInfo {
@@ -27,7 +39,7 @@
 
 #fishTableIcons {
 	display: grid;
-	grid-template-columns: var(--fishrow-cols);
+	grid-template-columns: 26px var(--fishrow-name) var(--fishrow-bars) var(--fishrow-price);
 	gap: 4px;
 	align-items: center;
 	height: 14px;
@@ -42,21 +54,21 @@
 	image-rendering: pixelated;
 }
 /* header glyphs map to the columns: heart→health, fork→fed,
-   ruler→grown, wand→well */
+   ruler→grown, wand→well (cols 3-6: icon is 1, name is 2) */
 #fishTableIcons span:nth-child(1) {
-	grid-column: 2;
+	grid-column: 3;
 	background-position: 0 0;
 }
 #fishTableIcons span:nth-child(2) {
-	grid-column: 3;
+	grid-column: 4;
 	background-position: -25px 0;
 }
 #fishTableIcons span:nth-child(3) {
-	grid-column: 4;
+	grid-column: 5;
 	background-position: -76px 0;
 }
 #fishTableIcons span:nth-child(4) {
-	grid-column: 5;
+	grid-column: 6;
 	background-position: -51px 0;
 }
 
@@ -68,7 +80,7 @@
 
 .fishRow {
 	display: grid;
-	grid-template-columns: var(--fishrow-cols);
+	grid-template-columns: 26px var(--fishrow-name) var(--fishrow-bars) var(--fishrow-price);
 	gap: 4px;
 	align-items: center;
 	padding: 3px 6px;
@@ -77,11 +89,66 @@
 	color: #191919;
 	font-size: 12px;
 }
+/* Pin every cell to its column so hiding the name (below) doesn't let the
+   bars/Sell/price flow left out of step with the fixed header glyphs. */
+.fishRow > :nth-child(1) {
+	grid-column: 1;
+}
+.fishRow > :nth-child(2) {
+	grid-column: 2;
+}
+.fishRow > :nth-child(3) {
+	grid-column: 3;
+}
+.fishRow > :nth-child(4) {
+	grid-column: 4;
+}
+.fishRow > :nth-child(5) {
+	grid-column: 5;
+}
+.fishRow > :nth-child(6) {
+	grid-column: 6;
+}
+.fishRow > :nth-child(7) {
+	grid-column: 7;
+}
+.fishRow > :nth-child(8) {
+	grid-column: 8;
+}
+
+.fishRow-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+.fishRow-icon-svg {
+	width: 24px;
+	height: 16px;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
 
 .fishRow-name {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+/* Narrow list: no room for the name text — show the fish graphic only.
+   --fishrow-name collapses to 0 so the bars stay lined up with the header
+   glyphs. It has to be set on the header + the row container (both descendants
+   of the query container — a @container rule can't target the container itself).
+   ~480px is where a short name starts to clip; bump it if you want names to
+   persist longer. */
+@container fishlist (max-width: 480px) {
+	#fishTableIcons,
+	#fishTableContainer {
+		--fishrow-name: 0px;
+		--fishrow-price: minmax(46px, 1fr);
+	}
+	.fishRow-name {
+		display: none;
+	}
 }
 
 /* CSS bars — no bitmaps, no percent text. Every bar reads the same way:
